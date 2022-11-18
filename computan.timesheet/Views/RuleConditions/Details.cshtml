@@ -1,0 +1,19 @@
+﻿@model computan.timesheet.core.RuleCondition
+@{ ViewBag.Title = "Details"; }
+<h2>Details</h2>
+<div>
+    <h4>RuleCondition</h4>
+    <hr/>
+    <dl class="dl-horizontal">
+        <dt> @Html.DisplayNameFor(model => model.Rule.name) </dt>
+        <dd> @Html.DisplayFor(model => model.Rule.name) </dd>
+        <dt> @Html.DisplayNameFor(model => model.RuleConditionType.name) </dt>
+        <dd> @Html.DisplayFor(model => model.RuleConditionType.name) </dd>
+        <dt> @Html.DisplayNameFor(model => model.ruleconditionvalue) </dt>
+        <dd> @Html.DisplayFor(model => model.ruleconditionvalue) </dd>
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new {Model.id}) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

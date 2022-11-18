@@ -1,0 +1,20 @@
+﻿@{ Layout = null; }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Computan Timesheet Login</title>
+    <!-- Global stylesheets -->
+    <link href="~/Content/fonts.googleapis.min.css" rel="stylesheet"/>
+    @Styles.Render("~/Content/css")
+    <!-- Core JS files -->
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/Scripts/corejs")
+    @Scripts.Render("~/Scripts/loginjs")
+    @RenderSection("scripts", false)
+</head>
+<body class="wht"> @RenderBody() </body>
+</html>

@@ -1,0 +1,131 @@
+﻿@model computan.timesheet.core.ClientBillingCycle
+@{ ViewBag.Title = "Edit Client Billing Cycle"; }
+
+@section header {
+    <div style="background-color: #fff;" class="panel page-header border-top-primary">
+        <div class="page-header-content">
+            <div class="page-title">
+                <h5>
+                    <i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Timesheet</span> - Manage Client Billing Cycles
+                    <small class="display-block">Manage Client Billing Cycles</small>
+                </h5>
+            </div>
+            <div class="heading-elements">
+                <div class="btn-group">
+                    <a href="/ClientBillingCycles/index" class="btn btn-primary"><i class="icon-list3 position-left"></i>List Client Billing Cycles</a>
+                </div>
+            </div>
+            <a class="heading-elements-toggle">
+                <i class="icon-menu"></i>
+            </a>
+        </div>
+        <div style="border-bottom: 0; box-shadow: none; margin-bottom: 0;" class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/Home/index"><i class="icon-home2 position-left"></i>Home</a>
+                </li>
+                <li>
+                    <a href="/ClientBillingCycles/index">Client Billing Cycles</a>
+                </li>
+                <li>
+                    <a href="/ClientBillingCycles/edit/@Model.Id">Edit Client Billing Cycle</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+}
+
+<div class="panel panel-flat">
+    <div class="panel-heading">
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li>
+                    <a data-action="collapse"></a>
+                </li>
+                <li>
+                    <a data-action="reload"></a>
+                </li>
+            </ul>
+        </div>
+        <a class="heading-elements-toggle">
+            <i class="icon-menu"></i>
+        </a>
+    </div>
+    <div class="panel-body">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-horizontal">
+                <h4>Edit Client Billing Cycle</h4>
+                <hr/>
+                @Html.ValidationSummary(true, "", new {@class = "text-danger"})
+                @Html.HiddenFor(model => model.Id)
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @Html.LabelFor(model => model.clientid, "Client Name", new {@class = "control-label"})
+                        @Html.DropDownList("clientid", null, "Please Select", new {@class = "form-control"})
+                        @Html.ValidationMessageFor(model => model.clientid, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @Html.LabelFor(model => model.billingcyletypeid, "Billing Cycle Type", new {@class = "control-label"})
+                        @Html.DropDownList("billingcyletypeid", null, "Please Select", new {@class = "form-control"})
+                        @Html.ValidationMessageFor(model => model.billingcyletypeid, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+                <div class="form-group datediv">
+                    <div class="col-md-12">
+                        @Html.Label("date", "Select Date", new {@class = "control-label"})
+                        @Html.DropDownList("date", ViewBag.dates as SelectList, "Please Select", new {@class = "form-control"})
+                    </div>
+                </div>
+                @Html.HiddenFor(model => model.createdonutc)
+                @Html.HiddenFor(model => model.updatedonutc)
+                @Html.HiddenFor(model => model.ipused)
+                @Html.HiddenFor(model => model.userid)
+                <div class="form-group">
+                    <div class="col-md-12 text-center">
+                        <input type="submit" value="Save" class="btn btn-primary"/>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/Scripts/select2")
+}
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#billingcyletypeid").select2();
+        $("#clientid").select2();
+        $("#date").select2();
+        //$("#day").select2();
+        //if ($("#billingcyletypeid").val() == 1) {
+        //    $(".datediv").hide();
+        //    $(".daydiv").show();
+        //}
+        if ($("#billingcyletypeid").val() == 3) {
+            $(".datediv").show();
+            //$(".daydiv").hide();
+        } else {
+            $(".datediv").hide();
+        }
+        $(document).on('change',
+            '#billingcyletypeid',
+            function() {
+                var currentvalue = $(this).val();
+                if (currentvalue == 3) {
+                    $(".datediv").show();
+                    //$(".daydiv").hide();
+                } else {
+                    $(".datediv").hide();
+                    //$(".daydiv").show();
+                }
+            });
+    });
+</script>

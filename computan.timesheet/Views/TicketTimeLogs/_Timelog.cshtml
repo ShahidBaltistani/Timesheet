@@ -1,0 +1,49 @@
+﻿@model IEnumerable<computan.timesheet.Models.TimelogViewModel>
+<div class="panel-body" style="max-width: inherit; overflow-x: scroll;">
+    <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper no-footer">
+        <div class="datatable-scroll">
+            <table class="table table-striped timelogtable">
+                <thead>
+                <tr role="row">
+                    <th> @Html.Raw("Full Name") </th>
+                    <th> @Html.Raw("Username") </th>
+                    <th> @Html.Raw("Time Spent (Hrs)") </th>
+                    <th> @Html.Raw("Billable Time (Hrs)") </th>
+                </tr>
+                </thead>
+                <tbody>
+                @if (Model != null && Model.Count() > 0)
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <span>@item.fullname</span>
+                            </td>
+                            <td>
+                                <span>@item.username</span>
+                            </td>
+                            <td>
+                                <span>@item.timespent</span>
+                            </td>
+                            <td>
+                                <span>@item.billabletime</span>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="text-center">
+                            <h6 class="no-margin-top">
+                                <a href="#"><i class="icon-task"></i>&nbsp;&nbsp;Sorry, No time log found.</a>
+                            </h6>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

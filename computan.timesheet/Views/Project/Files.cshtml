@@ -1,0 +1,241 @@
+﻿@model computan.timesheet.Models.ProDashboardViewModel
+@{ ViewBag.Title = "Files"; }
+
+@section secondarysidebar {
+    <!-- Secondary sidebar -->
+    <div class="sidebar sidebar-secondary sidebar-default">
+        <div class="sidebar-content">
+            <!-- Actions -->
+            <div class="sidebar-category">
+                <div class="category-title">
+                    <span>Actions</span>
+                    <ul class="icons-list">
+                        <li>
+                            <a href="#" data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="category-content">
+                    <div class="row row-condensed">
+                        <div class="col-xs-6">
+                            <a class="addfiles btn bg-blue btn-block btn-float btn-float-lg">
+                                <i class="icon-file-plus"></i> <span>Add File</span>
+                            </a>
+                            <button data-id="@Model.project.id" target="_blank" class="btn bg-indigo-300 btn-block btn-float btn-float-lg btnaddcredentials">
+                                <i class="icon-key"></i> <span>New Creden</span>
+                            </button>
+                        </div>
+                        <div class="col-xs-6">
+                            <a href="/projects/edit/@Model.project.id" target="_blank" class="btn bg-purple-300 btn-block btn-float btn-float-lg">
+                                <i class="icon-files-empty2"></i> <span>Edit Project</span>
+                            </a>
+                            <a href="/project/notes/@Model.project.id" class="btn bg-grey-300 btn-block btn-float btn-float-lg notes">
+                                <i class="icon-notebook"></i> <span>Notes</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-category cts-sidebar">
+                <div class="category-title">
+                    <span>Tickets by status</span>
+                    <ul class="icons-list">
+                        <li>
+                            <a href="#" data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="category-content no-padding">
+                    <ul class="navigation navigation-alt navigation-accordion filterbystatus">
+                        @foreach (var item in Model.sidebarstatus)
+                        {
+                            <li>
+                                <a href="/project/index/@Model.project.id/@item.id" class="@(item.id == ViewBag.ActiveStatus ? "active" : "")">
+                                    @item.name <span class="badge badge-success position-left">@item.count</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+            <div class="sidebar-category">
+                <div class="category-title">
+                    <span>Members worked on</span>
+                    <ul class="icons-list">
+                        <li>
+                            <a href="#" data-action="collapse" class=""></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="category-content" style="display: block;">
+                    <ul class="media-list">
+                        @if (Model.projectMembers != null && Model.projectMembers.Count() > 0)
+                        {
+                            foreach (var item in Model.projectMembers.OrderByDescending(x => x.active))
+                            {
+                                <li class="media">
+                                    <a href="#" class="media-left">
+                                        <img src="/images/placeholder.jpg" class="img-sm img-circle" alt="">
+                                    </a>
+                                    <div class="media-body">
+                                        <a href="#" class="media-heading text-semibold">@item.username</a>
+                                    </div>
+                                    <div class="media-right media-middle">
+                                        <span class="status-mark @(item.active ? "border-success" : "border-danger")"></span>
+                                    </div>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <li class="media">
+                                <span class="text-size-mini text-muted display-block">Sorry no member found.</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /secondary sidebar -->
+}
+
+@section header{
+    <div class="page-header">
+        <div class="page-header-content"> </div>
+        <div class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/"><i class="icon-home2 position-left"></i> Home</a>
+                </li>
+                <li>
+                    <a href="/projectdashboard/@Model.project.id">@Model.project.name</a>
+                </li>
+            </ul>
+            <a class="breadcrumb-elements-toggle">
+                <i class="icon-menu-open"></i>
+            </a>
+        </div>
+    </div>
+}
+
+<div class="panel panel-default" id="maincontent">
+    <div class="panel-heading">
+        <h5 class="panel-title">@Model.project.name</h5>
+    </div>
+    <div class="panel-body">
+        <div id="tasklist">
+            @Html.Partial("_ProjectNavTab", "files", new ViewDataDictionary {{"projectid", Model.project.id}})
+            <div class="contentdiv">
+                <div class="panel panel-flat panel-collapsed">
+                    <div class="panel-heading">
+                        <h6 class="panel-title"><i class="icon-link position-left"></i>files</h6>
+                        <div class="heading-elements">
+                            <ul class="icons-list">
+                                <li>
+                                    <a class="addfiles btn btn-success">Add File</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <a class="heading-elements-toggle">
+                            <i class="icon-menu"></i>
+                        </a>
+                    </div>
+                    <div class="d-block">
+                        <table class="table table-xxs">
+                            <thead>
+                            <tr class="bg-teal-400">
+                                <th>Filename</th>
+                                <th>Added Date</th>
+                                <th>Options</th>
+                            </tr>
+                            </thead>
+                            <tbody class="table-body">
+                            @if (Model.files != null && Model.files.Count() > 0)
+                            {
+                                foreach (var item in Model.files)
+                                {
+                                    <tr>
+                                        <td>
+                                            <a href="~/Helpers/FilesHandler.ashx?File=@item.FilePath" download>@item.filename</a>
+                                        </td>
+                                        <td>@item.createdonutc</td>
+                                        <td>
+                                            <button id="btnDelete" class="btn btn-danger btn-xs" data-id="@item.id">
+                                                <i class="icon-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="4" style="text-align: center;"> Sorry, no files found.</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Upload Project Files Model-->
+<div class="modal fade" id="uploadfielmodel" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Upload Project File</h4>
+            </div>
+            <div class="modal-body" id="modeldiv">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <div id="notificationdiv"></div>
+                        <div class="col-md-offset-2 col-md-5">
+                            @Html.TextBox("projectfile", null, new {@class = "", type = "file"})
+                            <input type="hidden" value="@Model.project.id" class="modelprojectid"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="reset" id="btnuploadfile" value="Upload" class="btn btn-primary"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Add Credential Model-->
+<div class="modal fade" id="Addcredentialmodel" role="dialog">
+    <div class="modal-dialog" style="width: 60%;">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">
+                    <span class="credentialmodeltitle"></span>
+                </h4>
+            </div>
+            <div class="modal-body" id="credentialformmodeldiv" style="height: 600px; max-height: 600px; overflow-y: scroll"> </div>
+        </div>
+    </div>
+</div>
+<script src="~/Scripts/custom/projectDashboard.min.js"></script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+<script id="error-notification-template" type="text/x-handlebars-template">
+    <div class="alert alert-danger alert-styled-left alert-bordered usernotification">
+        <button data-dismiss="alert" class="close" type="button"><span>×</span><span class="sr-only">Close</span></button>
+        <span class="text-semibold">{{errortext}}</span>
+    </div>
+</script>
+<script id="success-notification-template" type="text/x-handlebars-template">
+    <div class="alert alert-success alert-styled-left alert-bordered usernotification">
+        <button data-dismiss="alert" class="close" type="button"><span>×</span><span class="sr-only">Close</span></button>
+        <span class="text-semibold">{{successtext}}</span>
+    </div>
+</script>

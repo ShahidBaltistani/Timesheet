@@ -1,0 +1,537 @@
+﻿@model computan.timesheet.Models.TeamDashboardViewModel
+@{ ViewBag.Title = "My Tasks"; }
+<style>
+    .Sortable {
+        border: 1px solid #eee;
+        list-style-type: none;
+        margin: 0px;
+        min-height: 25px;
+        padding: 0px;
+    }
+
+    .select2 { color: black; }
+
+    .Sortable li {
+        background-color: #d7d7d7;
+        cursor: pointer;
+        margin: 3px;
+        width: 97% !important;
+    }
+
+    .nospace {
+        margin-left: 0px;
+        margin-right: 0px;
+        padding-left: 1px;
+        padding-right: 1px;
+    }
+</style>
+
+@section Scripts {
+    @Scripts.Render("~/Scripts/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/Scripts/select2")
+    @Scripts.Render("~/Scripts/select2")
+}
+
+<!-- Include Date Range Picker -->
+@*<script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />*@
+<script>
+    jQuery(document).ready(function() {
+        jQuery("#ByUsers").select2();
+        jQuery("#ToUsers").select2();
+        jQuery('#AssignmentFromDate').datepicker();
+        jQuery('#AssignmentToDate').datepicker();
+        jQuery('#btnLoad').click(function() { filter(); });
+    });
+    var updated = false;
+
+    function bindEvent() {
+        jQuery('.StartEndDate').on('apply.daterangepicker',
+            function(ev, picker) {
+                var startDate = picker.startDate.format('MM/DD/YYYY');
+                var endDate = picker.endDate.format('MM/DD/YYYY');
+                var t = picker.element;
+                var ticketid = $(t).data("ticketid");
+                var querystring = "?startDate=" + startDate + "&endDate=" + endDate + "&ticketid=" + ticketid;
+                $.ajax({
+                    url: '/tickets/ChangeDates' + querystring,
+                    type: 'GEt'
+                }).done(function(data) {
+                    return false;
+                });
+            });
+        jQuery('.StartEndDate').daterangepicker({
+                "showDropdowns": true,
+                "timePickerIncrement": 0,
+                "alwaysShowCalendars": true,
+                //"startDate": "03/20/2018",
+                //"endDate": "03/26/2018"
+            },
+            function(start, end) {
+                //console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+            });
+        $(".Sortable").sortable({
+            connectWith: ".Sortable",
+            connectToSortable: '#grid-main_content',
+            helper: 'clone',
+            revert: 'invalid',
+            start: function(event, ui) {
+                $(ui.helper).addClass("ui-helper");
+                var start_pos = ui.item.index();
+                ui.item.data('start_pos', start_pos);
+                ui.item.data('c1', $(ui.item).parent().data("container"));
+                ui.item.data('itemid', $(ui.item).data("itemid"));
+                ui.item.data('parentPanelID', $(ui.item).parent().parent().parent().prop("id")); // like this AssignedPanel
+            },
+            update: function(event, ui) {
+                if (updated == false) {
+                    updated = true;
+                    //var start_pos = ui.item.data('start_pos');
+                    //var end_pos = ui.item.index();
+                    //alert("start " + ui.item.data('c1') + " End " + $(ui.item).parent().data("container") + " item " + );
+                    setTimeout(function() { updated = false }, 50);
+                    // update base panel counter
+                    var Counter = parseInt($("#" + ui.item.data('parentPanelID')).find("#counter").html());
+                    $("#" + ui.item.data('parentPanelID')).find("#counter").html(Counter - 1);
+                    // update new panel counter
+                    var newCounterid = $(ui.item).parent().parent().parent().prop("id");
+                    Counter = parseInt($("#" + newCounterid).find("#counter").html());
+                    $("#" + newCounterid).find("#counter").html(Counter + 1);
+                    //update ticket status in db
+                    changeStatus($(ui.item).parent().data("container"), ui.item.data('itemid'));
+                }
+            }
+        }).disableSelection();
+    }
+
+    $(function() {
+        bindEvent();
+    });
+
+    function filter() {
+        var querystring = "?AssignmentFromDate=" + $("#AssignmentFromDate").val() + "&AssignmentToDate=" + $("#AssignmentToDate").val();
+        $.ajax({
+            url: '/Home/MyTasksAjax' + querystring,
+            type: 'GET',
+        }).done(function(data) {
+            $("#statusList").html(data);
+            setTimeout(function() { bindEvent(); }, 50);
+            return false;
+        });
+    }
+
+    function changeStatus(newstatusid, ticketid) {
+        $.ajax({
+            url: '/tickets/ChangeStatus',
+            data: {
+                newstatusid: newstatusid,
+                ticketid: ticketid
+            },
+            type: 'POST'
+        }).done(function(data) {
+            return false;
+        });
+    }
+</script>
+<div class="container-fluid" style="margin: 0px; padding: 0px;">
+<div class="panel-group">
+<div class="panel">
+<div class="panel-heading bg-teal-700">
+    <div class="row">
+        <div class="col-xs-12">
+            <h4 class="panel-title ticket-title">
+                <i style="font-size: 25px;" class="fa fa-dashboard position-left"></i>
+                <span>Dashboard for @User.Identity.Name </span>
+                <span class="pull-right">
+                    <a href="~/tickets/mytickets/2" target="_blank" style="color: white;">Old View</a>
+                </span>
+            </h4>
+        </div>
+    </div>
+</div>
+<div class="panel-body" style="padding: 0px 5px;">
+<div class="row">
+    <div class="col-sm-12 nospace" style="margin-top: 10px;">
+        <div class="col-sm-2"> Assigned From Date </div>
+        <div class="col-sm-2 nospace"> Assigned To Date </div>
+        <div class="col-sm-2 nospace"> </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12 nospace" style="margin-top: 10px;">
+        <div class="col-sm-2">
+            <input type="text" id="AssignmentFromDate" name="AssignmentFromDate" maxlength="10" class="form-control" value="@ViewBag.fromdate"/>
+        </div>
+        <div class="col-sm-2 nospace">
+            <input type="text" id="AssignmentToDate" name="AssignmentToDate" maxlength="10" class="form-control" value="@ViewBag.todate"/>
+        </div>
+        <div class="col-sm-2 nospace">
+            <input type="button" id="btnLoad" name="btnLoad" class="btn btn-default " value="Load"/>
+        </div>
+    </div>
+</div>
+<hr/>
+<div class="row" id="statusList">
+<div class="col-md-2 nospace">
+    <div class="panel-group">
+        <div class="panel panel-primary" id="AssignedPanelID">
+            <div class="panel-heading">
+                <span class="panel-title">
+                    Starting Next @*Assigned id = 6*@
+                    <i id="counter" class="pull-right">@Model.tickets.Where(x => x.statusid == 6).Count()</i>
+                </span>
+            </div>
+            <div id="collapse1">
+                @*class="panel-collapse collapse"*@
+                <ul class="list-group Sortable" id="sortable1" data-container="6">
+                    @*Starting Next in db = Assigned*@
+                    @foreach (var item in Model.tickets.Where(x => x.statusid == 6).OrderByDescending(x => x.id))
+                    {
+                        <li class="list-group-item" data-itemid="@item.id" data-toggle="tooltip" data-placement="top" title="@item.topic">
+                            <a href="~/tickets/ticketitem/@item.id" target="_blank">
+                                <div class="row">
+                                    <b>@item.createdonutc.ToShortDateString()</b>
+                                    @if (item.topic.Length > 50)
+                                    {
+                                        <span>@item.topic.Substring(0, 50) ...</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@item.topic</span>
+                                    }
+                                </div>
+                            </a>
+                            <span class="clearfix"></span>
+                            <div class="row">
+                                <div class="ticketstatusaction">
+                                    <div class="pull-left">
+                                        <span class="btn bg-slate-700 btnclosemultipletask">Due: @(item.enddate != null ? item.enddate.Value.ToShortDateString() : "Not Set") To: @item.assignedtouserName</span>
+                                    </div>
+                                    <div class="pull-right">
+                                        <div class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                                <i class="icon-menu7"></i>
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-menu-right">
+                                                <li>
+                                                    <a href="~/tickets/ticketitem/@item.id" target="_blank">
+                                                        <span class="fa fa-pencil-square-o"> View Ticket</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <input id="StartEndDate" name="StartEndDate" value="@(item.startdate == null ? "" : item.startdate.Value.ToShortDateString()) - @(item.enddate == null ? "" : item.enddate.Value.ToShortDateString())" data-ticketid="@item.id" type="text" class="StartEndDate form-control"/>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-2 nospace">
+    <div class="panel-group">
+        <div class="panel panel-primary" id="InProgressPanelID">
+            <div class="panel-heading">
+                <span class="panel-title">
+                    In Progress @*In Progress id = 2*@
+                    <i id="counter" class="pull-right">@Model.tickets.Where(x => x.statusid == 2).Count()</i>
+                </span>
+            </div>
+            <div id="collapse2">
+                <ul class="list-group Sortable" id="sortable2" data-container="2">
+                    @foreach (var item in Model.tickets.Where(x => x.statusid == 2).OrderByDescending(x => x.id))
+                    {
+                        <li class="list-group-item" data-itemid="@item.id" data-toggle="tooltip" data-placement="top" title="@item.topic">
+                            <a href="~/tickets/ticketitem/@item.id" target="_blank">
+                                <div class="row">
+                                    <b>@item.createdonutc.ToShortDateString()</b>
+                                    @if (item.topic.Length > 50)
+                                    {
+                                        <span>@item.topic.Substring(0, 50) ...</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@item.topic</span>
+                                    }
+                                </div>
+                            </a>
+                            <span class="clearfix"></span>
+                            <div class="row">
+                                <div class="ticketstatusaction">
+                                    <div class="pull-left">
+                                        <span class="btn bg-slate-700 btnclosemultipletask">Due: @(item.enddate != null ? item.enddate.Value.ToShortDateString() : "Not Set") To: @item.assignedtouserName</span>
+                                    </div>
+                                    <div class="pull-right">
+                                        <div class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                                <i class="icon-menu7"></i>
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-menu-right">
+                                                <li>
+                                                    <a href="~/tickets/ticketitem/@item.id" target="_blank">
+                                                        <span class="fa fa-pencil-square-o"> View Ticket</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <input id="StartEndDate" name="StartEndDate" value="@(item.startdate == null ? "" : item.startdate.Value.ToShortDateString()) - @(item.enddate == null ? "" : item.enddate.Value.ToShortDateString())" data-ticketid="@item.id" type="text" class="StartEndDate form-control"/>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-2 nospace">
+    <div class="panel-group">
+        <div class="panel panel-primary" id="OnHoldPanelID">
+            <div class="panel-heading">
+                <span class="panel-title">
+                    On Hold @*On Hold id = 4*@
+                    <i id="counter" class="pull-right">@Model.tickets.Where(x => x.statusid == 4).Count()</i>
+                </span>
+            </div>
+            <div id="collapse3">
+                <ul class="list-group Sortable" id="sortable3" data-container="4">
+                    @foreach (var item in Model.tickets.Where(x => x.statusid == 4).OrderByDescending(x => x.id))
+                    {
+                        <li class="list-group-item" data-itemid="@item.id" data-toggle="tooltip" data-placement="top" title="@item.topic">
+                            <a href="~/tickets/ticketitem/@item.id" target="_blank">
+                                <div class="row">
+                                    <b>@item.createdonutc.ToShortDateString()</b>
+                                    @if (item.topic.Length > 50)
+                                    {
+                                        <span>@item.topic.Substring(0, 50) ...</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@item.topic</span>
+                                    }
+                                </div>
+                            </a>
+                            <span class="clearfix"></span>
+                            <div class="row">
+                                <div class="ticketstatusaction">
+                                    <div class="pull-left">
+                                        <span class="btn bg-slate-700 btnclosemultipletask">Due: @(item.enddate != null ? item.enddate.Value.ToShortDateString() : "Not Set") To: @item.assignedtouserName</span>
+                                    </div>
+                                    <div class="pull-right">
+                                        <div class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                                <i class="icon-menu7"></i>
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-menu-right">
+                                                <li>
+                                                    <a href="~/tickets/ticketitem/@item.id" target="_blank">
+                                                        <span class="fa fa-pencil-square-o"> View Ticket</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <input id="StartEndDate" name="StartEndDate" value="@(item.startdate == null ? "" : item.startdate.Value.ToShortDateString()) - @(item.enddate == null ? "" : item.enddate.Value.ToShortDateString())" data-ticketid="@item.id" type="text" class="StartEndDate form-control"/>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-2 nospace">
+    <div class="panel-group">
+        <div class="panel panel-primary" id="QCPanelID">
+            <div class="panel-heading">
+                <span class="panel-title">
+                    QC @*QC id = 5*@
+                    <i id="counter" class="pull-right">@Model.tickets.Where(x => x.statusid == 5).Count()</i>
+                </span>
+            </div>
+            <div id="collapse4">
+                <ul class="list-group Sortable" id="sortable4" data-container="5">
+                    @foreach (var item in Model.tickets.Where(x => x.statusid == 5).OrderByDescending(x => x.id))
+                    {
+                        <li class="list-group-item" data-itemid="@item.id" data-toggle="tooltip" data-placement="top" title="@item.topic">
+                            <a href="~/tickets/ticketitem/@item.id" target="_blank">
+                                <div class="row">
+                                    <b>@item.createdonutc.ToShortDateString()</b>
+                                    @if (item.topic.Length > 50)
+                                    {
+                                        <span>@item.topic.Substring(0, 50) ...</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@item.topic</span>
+                                    }
+                                </div>
+                            </a>
+                            <span class="clearfix"></span>
+                            <div class="row">
+                                <div class="ticketstatusaction">
+                                    <div class="pull-left">
+                                        <span class="btn bg-slate-700 btnclosemultipletask">Due: @(item.enddate != null ? item.enddate.Value.ToShortDateString() : "Not Set") To: @item.assignedtouserName</span>
+                                    </div>
+                                    <div class="pull-right">
+                                        <div class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                                <i class="icon-menu7"></i>
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-menu-right">
+                                                <li>
+                                                    <a href="~/tickets/ticketitem/@item.id" target="_blank">
+                                                        <span class="fa fa-pencil-square-o"> View Ticket</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <input id="StartEndDate" name="StartEndDate" value="@(item.startdate == null ? "" : item.startdate.Value.ToShortDateString()) - @(item.enddate == null ? "" : item.enddate.Value.ToShortDateString())" data-ticketid="@item.id" type="text" class="StartEndDate form-control"/>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-2 nospace">
+    <div class="panel-group">
+        <div class="panel panel-primary" id="InReviewPanelID">
+            <div class="panel-heading">
+                <span class="panel-title">
+                    In Review @*In Review id = 7*@
+                    <i id="counter" class="pull-right">@Model.tickets.Where(x => x.statusid == 7).Count()</i>
+                </span>
+            </div>
+            <div id="collapse5">
+                <ul class="list-group Sortable" id="sortable5" data-container="7">
+                    @foreach (var item in Model.tickets.Where(x => x.statusid == 7).OrderByDescending(x => x.id))
+                    {
+                        <li class="list-group-item" data-itemid="@item.id" data-toggle="tooltip" data-placement="top" title="@item.topic">
+                            <a href="~/tickets/ticketitem/@item.id" target="_blank">
+                                <div class="row">
+                                    <b>@item.createdonutc.ToShortDateString()</b>
+                                    @if (item.topic.Length > 50)
+                                    {
+                                        <span>@item.topic.Substring(0, 50) ...</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@item.topic</span>
+                                    }
+                                </div>
+                            </a>
+                            <span class="clearfix"></span>
+                            <div class="row">
+                                <div class="ticketstatusaction">
+                                    <div class="pull-left">
+                                        <span class="btn bg-slate-700 btnclosemultipletask">Due: @(item.enddate != null ? item.enddate.Value.ToShortDateString() : "Not Set") To: @item.assignedtouserName</span>
+                                    </div>
+                                    <div class="pull-right">
+                                        <div class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                                <i class="icon-menu7"></i>
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-menu-right">
+                                                <li>
+                                                    <a href="~/tickets/ticketitem/@item.id" target="_blank">
+                                                        <span class="fa fa-pencil-square-o"> View Ticket</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <input id="StartEndDate" name="StartEndDate" value="@(item.startdate == null ? "" : item.startdate.Value.ToShortDateString()) - @(item.enddate == null ? "" : item.enddate.Value.ToShortDateString())" data-ticketid="@item.id" type="text" class="StartEndDate form-control"/>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-2 nospace">
+    <div class="panel-group">
+        <div class="panel panel-primary" id="DonePanelID">
+            <div class="panel-heading">
+                <span class="panel-title">
+                    Done @*Done id = 3*@
+                    <i id="counter" class="pull-right">@Model.tickets.Where(x => x.statusid == 3).Count()</i>
+                </span>
+            </div>
+            <div id="collapse6">
+                <ul class="list-group Sortable" id="sortable6" data-container="3">
+                    @foreach (var item in Model.tickets.Where(x => x.statusid == 3).OrderByDescending(x => x.id))
+                    {
+                        <li class="list-group-item" data-itemid="@item.id" data-toggle="tooltip" data-placement="top" title="@item.topic">
+                            <a href="~/tickets/ticketitem/@item.id" target="_blank">
+                                <div class="row">
+                                    <b>@item.createdonutc.ToShortDateString()</b>
+                                    @if (item.topic.Length > 50)
+                                    {
+                                        <span>@item.topic.Substring(0, 50) ...</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@item.topic</span>
+                                    }
+                                </div>
+                            </a>
+                            <span class="clearfix"></span>
+                            <div class="row">
+                                <div class="ticketstatusaction">
+                                    <div class="pull-left">
+                                        <span class="btn bg-slate-700 btnclosemultipletask">Due: @(item.enddate != null ? item.enddate.Value.ToShortDateString() : "Not Set") To: @item.assignedtouserName</span>
+                                    </div>
+                                    <div class="pull-right">
+                                        <div class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                                <i class="icon-menu7"></i>
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-menu-right">
+                                                <li>
+                                                    <a href="~/tickets/ticketitem/@item.id" target="_blank">
+                                                        <span class="fa fa-pencil-square-o"> View Ticket</span>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <input id="StartEndDate" name="StartEndDate" value="@(item.startdate == null ? "" : item.startdate.Value.ToShortDateString()) - @(item.enddate == null ? "" : item.enddate.Value.ToShortDateString())" data-ticketid="@item.id" type="text" class="StartEndDate form-control"/>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<br/>
+</div>
+</div>
+</div>
+</div>

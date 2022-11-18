@@ -1,0 +1,84 @@
+﻿@model IEnumerable<computan.timesheet.core.TicketItem>
+@if (Model != null && Model.Count() > 0)
+{
+    foreach (var item in Model)
+    {
+        var ticketid = item.ticketid;
+        <tr id="@item.id">
+            <td>
+                @if (item.projectid != null)
+                {
+                    <input type="checkbox" class="selecttask" value="@item.id"/>
+                }
+            </td>
+            <td>
+                <div class="ticketcontainer">
+                    <div class="ticketcontent">
+                        <i class="@(item.tickettypeid == 1 ? "icon-envelop5" : "icon-envelop3") position-left"></i>
+                        <span class='text-bold'>@item.ToShortDateTimeReceived</span> @item.ToString()<span class="pull-right" title="@(item.TicketItemLog.FirstOrDefault().assignbyuser != null ? item.TicketItemLog.FirstOrDefault().assignbyuser.FullName : null)">@item.TicketItemLog.Where(a => a.assignedtousersid == ViewBag.currentuserid).FirstOrDefault().assignedon.ToString("MM/dd/yyyy")</span>
+                        <input type="hidden" id="sortorder" value="@item.TicketItemLog.Where(a => a.assignedtousersid == ViewBag.currentuserid).FirstOrDefault().displayorder"/>
+                        @if (item.tickettypeid == 2)
+                        {
+                            <a class="ticketaction" href="/manualticket/edit/@item.ticketid" target="_blank">
+                                <i class="icon-pencil5"></i>
+                            </a>
+                        }
+                        <div class="text-semibold">
+                            <i class="icon-file-eye position-left modellink previewicon" id="@item.id" data-id="@item.id" title="@item.subject <br /> @item.shortbody" data-placement="right" data-html="true" data-popup="tooltip"></i>
+                            <a href="/ticketitems/index/@item.ticketid" target="_blank">@Html.DisplayFor(modelItem => item.subject)</a>
+                        </div>
+                    </div>
+                    <div class="ticketactions">
+                        <div class="row">
+                            <div class="input-group">
+                                <i class="icon-cart5 cursorpointer addbucketktime" data-itemid="@item.id" data-projectid="@item.projectid" data-skillid="@item.skillid" data-title="@item.Ticket.topic" data-selecteddate="@item.lastmodifiedtime"></i>
+                                <a id="lnkAddTime" class="addtasktime" data-title="@item.subject" data-projectid="@item.projectid" data-ticketitemid="@item.id" data-skillid="@item.skillid">
+                                    <i class="icon-add"></i>
+                                </a>
+                                <a href="/ticketitems/ticketitem/@item.id" class="ticketaction" target="_blank">
+                                    <i class="icon-pencil7"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="btn-group btn-group-xs ticketstatusbar colors" data-toggle="buttons">
+                                <label class="btn btn-default">
+                                    <input id="ticketstatusradio" type="radio" name="statustyperadio" value="ticket" autocomplete="off" data-ticketid="@item.ticketid" data-ticketitemid="@item.id"> Ticket
+                                </label>
+                                <label class="btn btn-default active">
+                                    <input id="emailstatusradio" type="radio" name="statustyperadio" value="email" autocomplete="off" data-ticketid="@item.ticketid" data-ticketitemid="@item.id" checked="checked"> Email
+                                </label>
+                                <label class="btn btn-default">
+                                    <input id="userstatusradio" type="radio" name="statustyperadio" value="user" autocomplete="off" data-ticketid="@item.ticketid" data-ticketitemid="@item.id"> User
+                                </label>
+                            </div>
+                            <div class="btn-group btn-group-xs ticketstatusaction">
+                                <div class="btn-group">
+                                    <button type="button" class="btn bg-grey-700 dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right">
+                                        @foreach (var ticket in ViewBag.ticketitemstatusaction.OtherTicketStatusCollection)
+                                        {
+                                            <li>
+                                                <a href="#" class="changeticketstatus" data-statusid="@ticket.id">
+                                                    <i class="icon-menu7"></i> @ticket.name
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    }
+}
+else
+{
+    <tr>
+        <td colspan="2" class="text-center">Sorry, No task found.</td>
+    </tr>
+}

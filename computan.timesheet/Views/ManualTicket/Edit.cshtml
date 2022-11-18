@@ -1,0 +1,141 @@
+﻿@model computan.timesheet.Models.ManualTicketViewModel
+@{ ViewBag.Title = "Edit Manual Ticket"; }
+
+@section header {
+    <div style="background-color: #fff;" class="panel page-header border-top-primary">
+        <div class="page-header-content">
+            <div class="page-title">
+                <h5>
+                    <i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Timesheet</span> - Manage Manual Tickets
+                    <small class="display-block">Manage Manual Tickets</small>
+                </h5>
+            </div>
+            <div class="heading-elements">
+                <div class="btn-group">
+                    <a href="/manualticket/index/2" class="btn btn-primary"><i class="icon-list3 position-left"></i> List Manual Tickets</a>
+                </div>
+            </div>
+            <a class="heading-elements-toggle">
+                <i class="icon-menu"></i>
+            </a>
+        </div>
+        <div style="border-bottom: 0; box-shadow: none; margin-bottom: 0;" class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/Home/index"><i class="icon-home2 position-left"></i>Home</a>
+                </li>
+                <li>
+                    <a href="/manualticket/index">Manual Tickets</a>
+                </li>
+                <li>
+                    <a href="/manualticket/eid/@Model.ticketitem.id">Edit Manual Ticket</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+}
+
+<div class="panel panel-flat">
+    <div class="panel-heading">
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li>
+                    <a data-action="collapse"></a>
+                </li>
+                <li>
+                    <a data-action="reload"></a>
+                </li>
+            </ul>
+        </div>
+        <a class="heading-elements-toggle">
+            <i class="icon-menu"></i>
+        </a>
+    </div>
+    <div class="panel-body">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-horizontal">
+                <h4>Edit Manual Ticket</h4>
+                <hr/>
+                @Html.ValidationSummary(true, "", new {@class = "text-danger"})
+                @Html.HiddenFor(model => model.ticket.id)
+                @Html.HiddenFor(model => model.ticketitem.id)
+                <div class="form-group">
+                    <div class="col-md-8">
+                        @Html.LabelFor(model => model.ticket.topic, new {@class = "control-label"})
+                        @Html.EditorFor(model => model.ticket.topic, new {htmlAttributes = new {@class = "form-control"}})
+                        @Html.ValidationMessageFor(model => model.ticket.topic, "", new {@class = "text-danger"})
+                    </div>
+                    <div class="col-md-4">
+                        @Html.LabelFor(model => model.ticketitem.projectid, "Project", new {@class = "control-label"})
+                        @Html.DropDownListFor(model => model.ticketitem.projectid, (SelectList) ViewBag.projectid, "Please Select", new {@class = "form-control"})
+                        @Html.ValidationMessageFor(model => model.ticketitem.projectid, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-8">
+                        @Html.LabelFor(model => model.ticketitem.subject, new {@class = "control-label"})
+                        @Html.EditorFor(model => model.ticketitem.subject, new {htmlAttributes = new {@class = "form-control"}})
+                        @Html.ValidationMessageFor(model => model.ticketitem.subject, "", new {@class = "text-danger"})
+                    </div>
+                    <div class="col-md-4">
+                        @Html.LabelFor(model => model.ticketitem.skillid, "Skill", new {@class = "control-label"})
+                        @Html.DropDownListFor(model => model.ticketitem.skillid, (SelectList) ViewBag.skillid, "Please Select", new {@class = "form-control"})
+                        @Html.ValidationMessageFor(model => model.ticketitem.skillid, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <div class="input-group">
+                            <label class="input-group-addon">Assign Users</label>
+                            <select id="users" class=" multiselect-select-all-filtering" multiple="multiple" name="users">
+                                @foreach (var item in ViewBag.users)
+                                {
+                                    var log = Model.ticketitem.TicketItemLog.Where(i => i.assignedtousersid == item.Id).FirstOrDefault();
+                                    if (log != null)
+                                    {
+                                        <option selected value="@item.Id"> @item.FirstName @item.LastName </option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@item.Id"> @item.FirstName @item.LastName </option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @Html.Label("Description", new {@class = "control-label"})
+                        @Html.TextAreaFor(model => model.ticketitem.uniquebody, 10, 1, new {@class = "form-control", width = "100%"})
+                        @Html.ValidationMessageFor(model => model.ticketitem.uniquebody, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12 text-center">
+                        <input type="submit" value="Save" class="btn btn-primary"/>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/Scripts/select2")
+    @Scripts.Render("~/Scripts/ckeditor4")
+    <script src="~/Scripts/default/js/plugins/forms/selects/bootstrap_multiselect.js"></script>
+}
+
+<script type="text/javascript">
+    jQuery(function() {
+        // Full featured editor
+        CKEDITOR.replace('ticketitem.uniquebody', { height: '300px', removePlugins: 'easyimage, cloudservices', extraPlugins: 'forms,base64image' });
+        $('#users').select2();
+        $("#ticketitem_projectid").select2();
+        $("#ticketitem_skillid").select2();
+    });
+</script>

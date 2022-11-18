@@ -1,0 +1,21 @@
+﻿@model string
+<ul class="nav nav-tabs nav-tabs-highlight">
+    <li class="@(Model == "inbox" ? "active" : "")">
+        <a href="/tickets/index/1"><i class="icon icon-envelop5 label-icon-sm"></i>Inbox</a>
+    </li>
+    <li class="@(Model == "tasks" ? "active" : "")">
+        <a href="/tickets/mytickets/2"><i class="fa fa-tasks label-icon-sm"></i>Tasks</a>
+    </li>
+    <li class="@(Model == "bucket" ? "active" : "")">
+        <a href="/tickettimelogs/mybuckets"><i class="icon icon-basket label-icon-sm"></i>Bucket</a>
+    </li>
+    <li class="@(Model == "timelog" ? "active" : "")">
+        <a href="/tickettimelogs/index"><i class="icon icon-calculator2 label-icon-sm"></i>Time log</a>
+    </li>
+    @if (Request.IsAuthenticated && User.IsInRole("Admin"))
+    {
+        <li class="@(Model == "rules" ? "active" : "")">
+            <a href="/rules"><i class="icon-list label-icon-sm"></i>Rules</a>
+        </li>
+    }
+</ul>

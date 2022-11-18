@@ -1,0 +1,22 @@
+﻿@model IEnumerable<computan.timesheet.core.Project>
+<div class="row">
+    @if (Model != null && Model.Count() > 0)
+    {
+        foreach (var clientproject in Model)
+        {
+            <div class="col-md-4">
+                <div class="panel bg-grey">
+                    <div class="panel-heading">
+                        <h5 class="panel-title">
+                            <i class="icon-magazine">&nbsp;</i><a href="/projectdashboard/@clientproject.id" target="_blank">@clientproject.getprojectname</a>
+                        </h5>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div>Sorry, no project found.</div>
+    }
+</div>

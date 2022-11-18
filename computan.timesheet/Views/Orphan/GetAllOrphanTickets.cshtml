@@ -1,0 +1,35 @@
+﻿@model computan.timesheet.Models.OrphanTickets.OrphanViewModel
+@{ ViewBag.Title = "Orphan"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+<div class="panel">
+    @Html.Partial("_OrphanTicketNavTab", "orphan")
+    <div class="panel-body">
+        @Html.Partial("_OrphanSearchFilter", Model.OrphanSearch, new ViewDataDictionary { { "id", "1" } })
+    </div>
+    <div class="panel-body">
+        <table class="table datatable-button-html5-basic" id="DataTables_Table_0" role="grid" aria-describedby="Orphan-Tickets_info">
+            <thead>
+                <tr role="row">
+                    <th> TeamName </th>
+                    <th> Title </th>
+                    <th> Age [Days] </th>
+                    <th> Status </th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.OrphanTickets)
+                {
+                    <tr>
+                        <td> @item.TeamName </td>
+                        <td> <a href="/tickets/ticketitem/@item.id">@item.topic</a> </td>
+                        <td> @item.Age </td>
+                        <td> @item.StatusName </td>
+                        <td> <a class="btn btn-danger" id="suppressBtn" href="#" data-id="@item.id" value="Orphan">Suppress</a> </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<script src="~/Scripts/orphan/orphanTickets.js"></script>
+

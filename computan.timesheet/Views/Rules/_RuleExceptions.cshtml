@@ -1,0 +1,23 @@
+﻿@model List<computan.timesheet.core.RuleException>
+<table class="table">
+    <thead>
+    <tr>
+        <th> @Html.DisplayNameFor(model => model.FirstOrDefault().RuleConditionType.name) </th>
+        <th> @Html.DisplayNameFor(model => model.FirstOrDefault().ruleexceptionvalue) </th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody class="tbodyexceptions">
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td> @Html.DisplayFor(modelItem => item.RuleConditionType.name) </td>
+            <td> @Html.DisplayFor(modelItem => item.ruleexceptionvalue) </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new {item.id}, new {@class = "eidtrulesexception", data_id = item.id}) |
+                @Html.ActionLink("Delete", "Delete", new {item.id}, new {@class = "deletetrulesexception", data_id = item.id})
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

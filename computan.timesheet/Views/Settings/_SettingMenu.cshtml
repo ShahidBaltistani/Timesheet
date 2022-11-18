@@ -1,0 +1,21 @@
+﻿@model string
+<div class="category-content no-padding">
+    <ul class="navigation navigation-alt navigation-accordion">
+        @if (User.IsInRole("Admin") || User.IsInRole("TeamLead"))
+        {
+            <li class="@(Model == "timeEntry" ? "active" : "") ">
+                <a href="/Settings/TimeEntry"><i class="icon-watch2"></i>Time Entry</a>
+            </li>
+            <li class="@(Model == "customizeOrphanAge" ? "active" : "") ">
+                <a href="/Settings/OrphanedTicketAge"><i class="icon-pencil5"></i>Customize Orphaned Age</a>
+            </li>
+        }
+        <li class="@(Model == "subscribeTeam" ? "active" : "") ">
+            <a href="/Settings/OrphanedTicketSetting"><i class="icon-rocket"></i>Subscribe Orphaned Tickets</a>
+        </li>
+        <li class="@(Model == "twoFA" ? "active" : "") ">
+            <a href="/Settings/TwoFAPermissionSettings"><i class="icon-lock"></i>2FA Permission</a>
+        </li>
+
+    </ul>
+</div>

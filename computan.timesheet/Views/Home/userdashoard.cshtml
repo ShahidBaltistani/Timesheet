@@ -1,0 +1,1035 @@
+﻿@model computan.timesheet.Models.TeamDashboardViewModel
+@{ ViewBag.Title = "User Dashboard"; }
+<style>
+    .select2 { color: black; }
+
+    .nospace {
+        margin-left: 0px;
+        margin-right: 0px;
+        padding-left: 1px;
+        padding-right: 1px;
+    }
+</style>
+
+@section Scripts {
+    @Scripts.Render("~/Scripts/select2")
+    @Scripts.Render("~/Scripts/custom/tagsinput")
+    <script src="~/Scripts/default/plugins/jquery.alphanum.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/custom/team.min.js"></script>
+}
+
+<!-- Include Date Range Picker -->
+@*<script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />*@
+<script>
+    jQuery(document).ready(function() {
+        jQuery('.btncross, .btnCancel').on("click", function() { filter(); });
+        jQuery('#btnNoAssignment').on("click",
+            function() {
+                var btnVal = $('#btnNoAssignment').val();
+                if (btnVal == "Only me") {
+                    $('#btnNoAssignment').val("Teams");
+                    $('.no-assignment').hide();
+                } else {
+                    $('#btnNoAssignment').val("Only me");
+                    $('.no-assignment').show();
+                }
+            });
+        jQuery(document).on("click",
+            ".assign-single-ticket",
+            function() {
+                // Fetch user input data.
+                var ticketid = jQuery("#AssignmentDialogTicketId").val();
+                var projectid = jQuery("#ticketprojectid").val();
+                var skillid = jQuery("#ticketskillid").val();
+                var userscsv = jQuery(".assignedusersinput").val();
+                var teamscsv = jQuery(".assignedteaminput").val();
+                var comment = jQuery("#ticketcomment").val();
+                var StartDate = jQuery("#StartDate").val();
+                var EndDate = jQuery("#EndDate").val();
+                var ticketscsv = ticketid;
+                var EstimatedTime = jQuery("#estimateTimeInput").val();
+                var EstimateTimeHidden = jQuery("#EstimateTimeHidden").val();
+                // Validate required information.
+                //if (EstimatedTime == "" || EstimatedTime == 0) { sweetAlert("Sorry! Assignment Missing", "Please add ticket estimate time.", "error"); return false; }
+                if (projectid == "") {
+                    sweetAlert("Sorry", "Please select a project from the list.", "error");
+                    return false;
+                }
+                if (skillid == "") {
+                    sweetAlert("Sorry", "Please select a skill from the list.", "error");
+                    return false;
+                }
+                if (userscsv == "" && teamscsv == "") {
+                    sweetAlert("Sorry! Assignment Missing", "Please assign ticket to at least one user/team.", "error");
+                    return false;
+                }
+                if (EstimatedTime === EstimateTimeHidden) {
+                    EstimatedTime = null;
+                }
+                $.ajax({
+                    url: '/tickets/assigntickets/',
+                    data: {
+                        ticketcsv: ticketscsv,
+                        projectid: projectid,
+                        skillid: skillid,
+                        StartDate: StartDate,
+                        EndDate: EndDate,
+                        usercsv: userscsv,
+                        teamcsv: teamscsv,
+                        comment: comment,
+                        EstimatedTime: EstimatedTime
+                    },
+                    type: 'POST',
+                }).done(function(data) {
+                    if (data.error) {
+                        alert(data.errortext);
+                        return false;
+                    }
+                    $.each(data.tickets,
+                        function(index, value) {
+                            jQuery("#" + value).find(".assignticketaction").hide();
+                        });
+                    // display success message.
+                    new PNotify({
+                        title: 'Success',
+                        text: 'The task has been assigned to selected users.',
+                        type: 'success'
+                    });
+                    // hide the dialog box.
+                    filter();
+                    jQuery('#ticketAssignModal').modal('hide');
+                    return false;
+                });
+            });
+        jQuery('.assignedusersinput').on('beforeItemAdd',
+            function(event) {
+                var tag = event.item;
+                $.ajax({
+                    url: '/home/PrefetchSingleTeams?UserID=' + tag.value,
+                    type: 'GET',
+                }).done(function(data) {
+                    if (data.error) {
+                        alert(JSON.stringify(data.errortext));
+                        return false;
+                    } else {
+                        jQuery('.assignedteaminput').tagsinput('add', { value: data.teamid, text: data.teamName });
+                        return false;
+                    }
+                });
+            });
+        jQuery('.assignedusersinput').on('beforeItemRemove',
+            function(event) {
+                var tag = event.item;
+                var ticketid = jQuery("#AssignmentDialogTicketId").val();
+                if (!event.options || !event.options.preventPost) {
+                    jQuery.post('/Home/RemoveTicketUser',
+                        { ticketid: ticketid, userid: tag.value },
+                        function(response) {
+                            if (!response.success) {
+                                jQuery('.assignedusersinput').tagsinput('add', tag, { preventPost: true });
+                            }
+                            if (response.success) {
+                                new PNotify({
+                                    title: 'Success!',
+                                    text: response.messagetext,
+                                    type: 'success',
+                                    hide: true
+                                });
+                                //jQuery('.assignedusersinput').tagsinput('remove', { value: tag.value, text: tag.text });
+                            }
+                            return true;
+                        });
+                }
+            });
+        jQuery('.assignedteaminput').on('beforeItemRemove',
+            function(event) {
+                var tag = event.item;
+                var ticketid = jQuery("#AssignmentDialogTicketId").val();
+                if (!event.options || !event.options.preventPost) {
+                    jQuery.post('/Home/RemoveTicketteam',
+                        { ticketid: ticketid, teamid: tag.value },
+                        function(response) {
+                            if (!response.success) {
+                                // Re-add the tag since there was a failure
+                                // "preventPost" here will stop this ajax call from running when the tag is added
+                                jQuery('.assignedteaminput').tagsinput('add', tag, { preventPost: true });
+                            }
+                            if (response.success) {
+                                new PNotify({
+                                    title: 'Success!',
+                                    text: response.messagetext,
+                                    type: 'success',
+                                    hide: true
+                                });
+                            }
+                        });
+                }
+                // event.item: contains the item
+                // event.cancel: set to true to prevent the item getting removed
+            });
+    });
+    var updated = false;
+
+    function bindEvent() {
+        jQuery('.StartEndDate').on('apply.daterangepicker',
+            function(ev, picker) {
+                var startDate = picker.startDate.format('MM/DD/YYYY');
+                var endDate = picker.endDate.format('MM/DD/YYYY');
+                var t = picker.element;
+                var ticketid = $(t).data("ticketid");
+                var querystring = "?startDate=" + startDate + "&endDate=" + endDate + "&ticketid=" + ticketid;
+                $.ajax({
+                    url: '/tickets/ChangeDates' + querystring,
+                    type: 'GEt',
+                }).done(function(data) {
+                    return false;
+                });
+            });
+        jQuery('.StartEndDate').daterangepicker({
+                "showDropdowns": true,
+                "timePickerIncrement": 0,
+                "alwaysShowCalendars": true,
+                //"startDate": "03/20/2018",
+                //"endDate": "03/26/2018"
+            },
+            function(start, end) {
+                //console.log('New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+            });
+        $(".Sortable").sortable({
+            connectWith: ".Sortable",
+            connectToSortable: '#grid-main_content',
+            helper: 'clone',
+            revert: 'invalid',
+            start: function(event, ui) {
+                $(ui.helper).addClass("ui-helper");
+                var start_pos = ui.item.index();
+                ui.item.data('start_pos', start_pos);
+                ui.item.data('c1', $(ui.item).parent().data("container"));
+                ui.item.data('itemid', $(ui.item).data("itemid"));
+                ui.item.data('parentPanelID', $(ui.item).parent().parent().parent().prop("id")); // like this AssignedPanel
+            },
+            update: function(event, ui) {
+                if (updated == false) {
+                    updated = true;
+                    //var start_pos = ui.item.data('start_pos');
+                    //var end_pos = ui.item.index();
+                    //alert("start " + ui.item.data('c1') + " End " + $(ui.item).parent().data("container") + " item " + );
+                    setTimeout(function() { updated = false }, 50);
+                    // update base panel counter
+                    var Counter = parseInt($("#" + ui.item.data('parentPanelID')).find("#counter").html());
+                    $("#" + ui.item.data('parentPanelID')).find("#counter").html(Counter - 1);
+                    // update new panel counter
+                    var newCounterid = $(ui.item).parent().parent().parent().prop("id");
+                    Counter = parseInt($("#" + newCounterid).find("#counter").html());
+                    $("#" + newCounterid).find("#counter").html(Counter + 1);
+                    //update ticket status in db
+                    changeStatus($(ui.item).parent().data("container"), ui.item.data('itemid'));
+                }
+            }
+        }).disableSelection();
+    }
+
+    $(function() { bindEvent(); });
+
+    function changeStatus(newstatusid, ticketid) {
+        $.ajax({
+            url: '/tickets/ChangeStatus',
+            data: {
+                newstatusid: newstatusid,
+                ticketid: ticketid
+            },
+            type: 'POST',
+        }).done(function(data) {
+            return false;
+        });
+    }
+</script>
+<div class="container-fluid" style="padding: 0px;">
+<div class="panel-group">
+<div class="panel">
+<div class="panel-heading bg-teal-700">
+    <div class="row">
+        <div class="col-xs-12">
+            <h4 class="panel-title ticket-title">
+                <i style="font-size: 25px;" class="fa fa-dashboard position-left"></i>
+                Dashboard for @Model.teamName Team
+            </h4>
+            <input type="hidden" name="teamid" id="teamid" value="@ViewBag.teamid"/>
+        </div>
+    </div>
+</div>
+<div class="panel-body" style="padding: 0px 20px;">
+<div class="row" style="margin-top: 10px;">
+    <div class="col-sm-12 nospace">
+        <div class="col-sm-2 nospace"> From Date </div>
+        <div class="col-sm-2 nospace"> To Date </div>
+        <div class="col-sm-2 nospace"> Client </div>
+        <div class="col-sm-2 nospace"> Project </div>
+        <div class="col-sm-2 nospace"> Assigned By </div>
+        <div class="col-sm-2 nospace"> Assigned To </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12 nospace">
+        <div class="col-sm-2 nospace">
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <i class="icon-calendar3"></i>
+                </span>
+                <input type="text" id="AssignmentFromDate" name="AssignmentFromDate" maxlength="10" class="form-control" value="@ViewBag.fromdate"/>
+            </div>
+        </div>
+        <div class="col-sm-2 nospace">
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <i class="icon-calendar3"></i>
+                </span>
+                <input type="text" id="AssignmentToDate" name="AssignmentToDate" maxlength="10" class="form-control" value="@ViewBag.todate"/>
+            </div>
+        </div>
+        <div class="col-sm-2 nospace">
+            @Html.DropDownList("clients", null, "Please Select", new {@class = "form-control select2"})
+        </div>
+        <div class="col-sm-2 nospace">
+            @Html.DropDownList("projects", null, "Please Select", new {@class = "form-control select2"})
+        </div>
+        <div class="col-sm-2 nospace">
+            @Html.DropDownList("ByUsers", null, "Please Select", new {@class = "form-control select2"})
+        </div>
+        <div class="col-sm-2 nospace">
+            @Html.DropDownList("ToUsers", null, "Please Select", new {@class = "form-control select2"})
+        </div>
+    </div>
+</div>
+<div class="row" style="margin-top: 10px;"> Ticket Title </div>
+<div class="row">
+    <div class="col-sm-12 nospace">
+        <div class="col-sm-2 nospace">
+            <input type="text" id="tTitle" name="ticketTitle" class="form-control" placeholder="Search by title"/>
+        </div>
+        <div class="col-sm-1 nospace">
+            <input type="button" id="btnLoad" name="btnLoad" class="btn btn-default " value="Load"/>
+        </div>
+    </div>
+</div>
+<hr/>
+<div class="row" id="statusList">
+<div class="col-md-2 no-padding">
+    <div class="panel panel-primary" id="AssignedPanelID">
+        <div class="panel-heading">
+            <span class="panel-title">
+                Starting Next @*Assigned id = 6*@
+                <span style="float: right;">
+                    <input type="button" id="btnNoAssignment" name="btnNoAssignment" class="btn btn-sm bg-teal-700" value="Only me" style="bottom: 2px; font-size: 9px; margin-right: 2px; padding: 1px;">
+                    <span id="counter" class="label label-warning pull-right">@Model.DashboardTickets.Where(x => x.statusid == 6).Count()</span>
+                </span>
+            </span>
+        </div>
+        <div id="collapse1">
+            @*class="panel-collapse collapse"*@
+            <ul class="list-group Sortable" id="sortable1" data-container="6">
+                @*Add New Tickets*@
+                @if (Model.PendingAssignmentTickets != null)
+                {
+                    foreach (var newItem in Model.PendingAssignmentTickets)
+                    {
+                        var IsAssigned = newItem.TicketAssignedToCollection != null ? "has-assignment" : "no-assignment";
+                        <li id="@newItem.id" class="list-group-item list-class no-padding @IsAssigned" data-itemid="@newItem.id" data-placement="top">
+                            <div class="panel border-left-lg border-left-warning dashboarditem">
+                                <div class="panel-footer">
+                                    <a href="~/tickets/ticketitem/@newItem.id" target="_blank" data-toggle="tooltip" title="@newItem.topic">
+                                        <b>@newItem.createdonutc.ToShortDateString()</b>
+                                        @if (newItem.topic.Length > 50)
+                                        {
+                                            <span>@newItem.topic.Substring(0, 50)...</span>
+                                        }
+                                        else
+                                        {
+                                            <span>@newItem.topic</span>
+                                        }
+                                    </a>
+                                    <div class="clear:both"></div>
+                                    <div class="pull-left">
+                                        @if (newItem.TicketAssignedToCollection != null)
+                                        {
+                                            foreach (var log in newItem.TicketAssignedToCollection.Select(x => x.user).Distinct())
+                                            {
+                                                <div class="label label-success" data-toggle="tooltip" title="@log.FullName">
+                                                    @log.GetInitials
+                                                </div>
+                                            }
+                                        }
+                                        <span class="label label-default">
+                                            @(newItem.enddate != null ? newItem.enddate.Value.ToShortDateString() : "Not Due")
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="panel-footer">
+                                    @if (!Model.IsFlagged(newItem.id))
+                                    {
+                                        <i class="fa fa-lg fav fa-star-o add-fav-ticket"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fa fa-lg fav fa-star remove-fav-ticket"></i>
+                                    }
+                                    <i class="icon-play ticketaction assignticketaction" data-toggle="tooltip" title="Assign Ticket" data-ticketid="@newItem.id" data-itemid="@newItem.id" data-projectid="" data-skillid=""></i>
+                                    <i class="icon-share2 moveteam" data-toggle="tooltip" title="Change Team" data-ticketid="@newItem.id" data-btnteamid="@ViewBag.teamid"></i>
+                                    <ul class="pull-right">
+                                        <li class="dropdown no-padding no-margin">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                                <i class="icon-menu7"></i> <span class="caret"></span>
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-menu-right">
+                                                <li>
+                                                    <a target="_blank" href="~/tickets/ticketitem/@newItem.id"><i class="icon-pencil5"></i> View Ticket</a>
+                                                </li>
+                                                <li class="divider"></li>
+                                                <li>
+                                                    <input id="StartEndDate" name="StartEndDate" value="@(newItem.startdate == null ? "" : newItem.startdate.Value.ToShortDateString()) - @(newItem.enddate == null ? "" : newItem.enddate.Value.ToShortDateString())" data-ticketid="@newItem.id" type="text" class="StartEndDate form-control"/>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                }
+                @*Starting Next in db = Assigned*@
+                @foreach (var item in Model.DashboardTickets.Where(x => x.statusid == 6).OrderByDescending(x => x.id))
+                {
+                    var IsAssigned = item.TicketAssignedToCollection != null ? "has-assignment" : "no-assignment";
+                    <li id="@item.id" class="list-group-item list-class no-padding @IsAssigned" data-itemid="@item.id" data-placement="top">
+                        <div class="panel border-left-lg border-left-primary dashboarditem">
+                            <div class="panel-footer">
+                                <a href="~/tickets/ticketitem/@item.id" target="_blank" data-toggle="tooltip" title="@item.topic">
+                                    <b>@item.createdonutc.ToShortDateString()</b>
+                                    @if (item.topic.Length > 50)
+                                    {
+                                        <span>@item.topic.Substring(0, 50)...</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@item.topic</span>
+                                    }
+                                </a>
+                                <div class="clear:both"></div>
+                                <div class="pull-left">
+                                    @if (item.TicketAssignedToCollection != null)
+                                    {
+                                        foreach (var log in item.TicketAssignedToCollection.Select(x => x.user).Distinct())
+                                        {
+                                            <div class="label label-success" data-toggle="tooltip" title="@log.FullName">
+                                                @log.GetInitials
+                                            </div>
+                                        }
+                                    }
+                                    <span class="label label-default">
+                                        @(item.enddate != null ? item.enddate.Value.ToShortDateString() : "Not Due")
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="panel-footer">
+                                @if (!Model.IsFlagged(item.id))
+                                {
+                                    <i class="fa fa-lg fav fa-star-o add-fav-ticket"></i>
+                                }
+                                else
+                                {
+                                    <i class="fa fa-lg fav fa-star remove-fav-ticket"></i>
+                                }
+                                <i class="icon-play ticketaction assignticketaction" data-toggle="tooltip" title="Assign Ticket" data-ticketid="@item.id" data-itemid="@item.id" data-projectid="@item.projectid" data-skillid="@item.skillid"></i>
+                                <i class="icon-share2 moveteam" data-toggle="tooltip" title="Change Team" data-ticketid="@item.id" data-btnteamid="@ViewBag.teamid"></i>
+                                <ul class="pull-right">
+                                    <li class="dropdown no-padding no-margin">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                            <i class="icon-menu7"></i> <span class="caret"></span>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-menu-right">
+                                            <li>
+                                                <a target="_blank" href="~/tickets/ticketitem/@item.id"><i class="icon-pencil5"></i> View Ticket</a>
+                                            </li>
+                                            <li class="divider"></li>
+                                            <li>
+                                                <input id="StartEndDate" name="StartEndDate" value="@(item.startdate == null ? "" : item.startdate.Value.ToShortDateString()) - @(item.enddate == null ? "" : item.enddate.Value.ToShortDateString())" data-ticketid="@item.id" type="text" class="StartEndDate form-control"/>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="col-md-2 nospace">
+    <div class="panel-group">
+        <div class="panel panel-primary" id="InProgressPanelID">
+            <div class="panel-heading">
+                <span class="panel-title">
+                    In Progress @*In Progress id = 2*@
+                    <span id="counter" class="label label-warning pull-right">
+                        @Model.DashboardTickets.Where(x => x.statusid == 2).Count()
+                    </span>
+                </span>
+            </div>
+            <div id="collapse2">
+                <ul class="list-group Sortable" id="sortable2" data-container="2">
+                    @foreach (var item in Model.DashboardTickets.Where(x => x.statusid == 2).OrderByDescending(x => x.id))
+                    {
+                        var IsAssigned = item.TicketAssignedToCollection != null ? "has-assignment" : "no-assignment";
+                        <li id="@item.id" class="list-group-item list-class no-padding @IsAssigned" data-itemid="@item.id" data-placement="top">
+                            <div class="panel border-left-lg border-left-primary dashboarditem">
+                                <div class="panel-footer">
+                                    <a href="~/tickets/ticketitem/@item.id" target="_blank" data-toggle="tooltip" title="@item.topic">
+                                        <b>@item.createdonutc.ToShortDateString()</b>
+                                        @if (item.topic.Length > 50)
+                                        {
+                                            <span>@item.topic.Substring(0, 50)...</span>
+                                        }
+                                        else
+                                        {
+                                            <span>@item.topic</span>
+                                        }
+                                    </a>
+                                    <div class="clear:both"></div>
+                                    <div class="pull-left">
+                                        @if (item.TicketAssignedToCollection != null)
+                                        {
+                                            foreach (var log in item.TicketAssignedToCollection.Select(x => x.user).Distinct())
+                                            {
+                                                <div class="label label-success" data-toggle="tooltip" title="@log.FullName">
+                                                    @log.GetInitials
+                                                </div>
+                                            }
+                                        }
+                                        <span class="label label-default">
+                                            @(item.enddate != null ? item.enddate.Value.ToShortDateString() : "Not Due")
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="panel-footer">
+                                    @if (!Model.IsFlagged(item.id))
+                                    {
+                                        <i class="fa fa-lg fav fa-star-o add-fav-ticket"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fa fa-lg fav fa-star remove-fav-ticket"></i>
+                                    }
+                                    <i class="icon-play ticketaction assignticketaction" data-toggle="tooltip" title="Assign Ticket" data-ticketid="@item.id" data-itemid="@item.id" data-projectid="@item.projectid" data-skillid="@item.skillid"></i>
+                                    <i class="icon-share2 moveteam" data-toggle="tooltip" title="Change Team" data-ticketid="@item.id" data-btnteamid="@ViewBag.teamid"></i>
+                                    <ul class="pull-right">
+                                        <li class="dropdown no-padding no-margin">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                                <i class="icon-menu7"></i> <span class="caret"></span>
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-menu-right">
+                                                <li>
+                                                    <a target="_blank" href="~/tickets/ticketitem/@item.id"><i class="icon-pencil5"></i> View Ticket</a>
+                                                </li>
+                                                <li class="divider"></li>
+                                                <li>
+                                                    <input id="StartEndDate" name="StartEndDate" value="@(item.startdate == null ? "" : item.startdate.Value.ToShortDateString()) - @(item.enddate == null ? "" : item.enddate.Value.ToShortDateString())" data-ticketid="@item.id" type="text" class="StartEndDate form-control"/>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-2 nospace">
+    <div class="panel-group">
+        <div class="panel panel-primary" id="OnHoldPanelID">
+            <div class="panel-heading">
+                <span class="panel-title">
+                    On Hold @*On Hold id = 4*@
+                    <span id="counter" class="label label-warning pull-right">
+                        @Model.DashboardTickets.Where(x => x.statusid == 4).Count()
+                    </span>
+                </span>
+            </div>
+            <div id="collapse3">
+                <ul class="list-group Sortable" id="sortable3" data-container="4">
+                    @foreach (var item in Model.DashboardTickets.Where(x => x.statusid == 4).OrderByDescending(x => x.id))
+                    {
+                        var IsAssigned = item.TicketAssignedToCollection != null ? "has-assignment" : "no-assignment";
+                        <li id="@item.id" class="list-group-item list-class no-padding @IsAssigned" data-itemid="@item.id" data-placement="top">
+                            <div class="panel border-left-lg border-left-primary dashboarditem">
+                                <div class="panel-footer">
+                                    <a href="~/tickets/ticketitem/@item.id" target="_blank" data-toggle="tooltip" title="@item.topic">
+                                        <b>@item.createdonutc.ToShortDateString()</b>
+                                        @if (item.topic.Length > 50)
+                                        {
+                                            <span>@item.topic.Substring(0, 50)...</span>
+                                        }
+                                        else
+                                        {
+                                            <span>@item.topic</span>
+                                        }
+                                    </a>
+                                    <div class="clear:both"></div>
+                                    <div class="pull-left">
+                                        @if (item.TicketAssignedToCollection != null)
+                                        {
+                                            foreach (var log in item.TicketAssignedToCollection.Select(x => x.user).Distinct())
+                                            {
+                                                <div class="label label-success" data-toggle="tooltip" title="@log.FullName">
+                                                    @log.GetInitials
+                                                </div>
+                                            }
+                                        }
+                                        <span class="label label-default">
+                                            @(item.enddate != null ? item.enddate.Value.ToShortDateString() : "Not Due")
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="panel-footer">
+                                    @if (!Model.IsFlagged(item.id))
+                                    {
+                                        <i class="fa fa-lg fav fa-star-o add-fav-ticket"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fa fa-lg fav fa-star remove-fav-ticket"></i>
+                                    }
+                                    <i class="icon-play ticketaction assignticketaction" data-toggle="tooltip" title="Assign Ticket" data-ticketid="@item.id" data-itemid="@item.id" data-projectid="@item.projectid" data-skillid="@item.skillid"></i>
+                                    <i class="icon-share2 moveteam" data-toggle="tooltip" title="Change Team" data-ticketid="@item.id" data-btnteamid="@ViewBag.teamid"></i>
+                                    <ul class="pull-right">
+                                        <li class="dropdown no-padding no-margin">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                                <i class="icon-menu7"></i> <span class="caret"></span>
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-menu-right">
+                                                <li>
+                                                    <a target="_blank" href="~/tickets/ticketitem/@item.id"><i class="icon-pencil5"></i> View Ticket</a>
+                                                </li>
+                                                <li class="divider"></li>
+                                                <li>
+                                                    <input id="StartEndDate" name="StartEndDate" value="@(item.startdate == null ? "" : item.startdate.Value.ToShortDateString()) - @(item.enddate == null ? "" : item.enddate.Value.ToShortDateString())" data-ticketid="@item.id" type="text" class="StartEndDate form-control"/>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-2 nospace">
+    <div class="panel-group">
+        <div class="panel panel-primary" id="QCPanelID">
+            <div class="panel-heading">
+                <span class="panel-title">
+                    QC @*QC id = 5*@
+                    <span id="counter" class="label label-warning pull-right">
+                        @Model.DashboardTickets.Where(x => x.statusid == 5).Count()
+                    </span>
+                </span>
+            </div>
+            <div id="collapse4">
+                <ul class="list-group Sortable" id="sortable4" data-container="5">
+                    @foreach (var item in Model.DashboardTickets.Where(x => x.statusid == 5).OrderByDescending(x => x.id))
+                    {
+                        var IsAssigned = item.TicketAssignedToCollection != null ? "has-assignment" : "no-assignment";
+                        <li id="@item.id" class="list-group-item list-class no-padding @IsAssigned" data-itemid="@item.id" data-placement="top">
+                            <div class="panel border-left-lg border-left-primary dashboarditem">
+                                <div class="panel-footer">
+                                    <a href="~/tickets/ticketitem/@item.id" target="_blank" data-toggle="tooltip" title="@item.topic">
+                                        <b>@item.createdonutc.ToShortDateString()</b>
+                                        @if (item.topic.Length > 50)
+                                        {
+                                            <span>@item.topic.Substring(0, 50)...</span>
+                                        }
+                                        else
+                                        {
+                                            <span>@item.topic</span>
+                                        }
+                                    </a>
+                                    <div class="clear:both"></div>
+                                    <div class="pull-left">
+                                        @if (item.TicketAssignedToCollection != null)
+                                        {
+                                            foreach (var log in item.TicketAssignedToCollection.Select(x => x.user).Distinct())
+                                            {
+                                                <div class="label label-success" data-toggle="tooltip" title="@log.FullName">
+                                                    @log.GetInitials
+                                                </div>
+                                            }
+                                        }
+                                        <span class="label label-default">
+                                            @(item.enddate != null ? item.enddate.Value.ToShortDateString() : "Not Due")
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="panel-footer">
+                                    @if (!Model.IsFlagged(item.id))
+                                    {
+                                        <i class="fa fa-lg fav fa-star-o add-fav-ticket"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fa fa-lg fav fa-star remove-fav-ticket"></i>
+                                    }
+                                    <i class="icon-play ticketaction assignticketaction" data-toggle="tooltip" title="Assign Ticket" data-ticketid="@item.id" data-itemid="@item.id" data-projectid="@item.projectid" data-skillid="@item.skillid"></i>
+                                    <i class="icon-share2 moveteam" data-toggle="tooltip" title="Change Team" data-ticketid="@item.id" data-btnteamid="@ViewBag.teamid"></i>
+                                    <ul class="pull-right">
+                                        <li class="dropdown no-padding no-margin">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                                <i class="icon-menu7"></i> <span class="caret"></span>
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-menu-right">
+                                                <li>
+                                                    <a target="_blank" href="~/tickets/ticketitem/@item.id"><i class="icon-pencil5"></i> View Ticket</a>
+                                                </li>
+                                                <li class="divider"></li>
+                                                <li>
+                                                    <input id="StartEndDate" name="StartEndDate" value="@(item.startdate == null ? "" : item.startdate.Value.ToShortDateString()) - @(item.enddate == null ? "" : item.enddate.Value.ToShortDateString())" data-ticketid="@item.id" type="text" class="StartEndDate form-control"/>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-2 nospace">
+    <div class="panel-group">
+        <div class="panel panel-primary" id="InReviewPanelID">
+            <div class="panel-heading">
+                <span class="panel-title">
+                    In Review @*In Review id = 7*@
+                    <span id="counter" class="label label-warning pull-right">
+                        @Model.DashboardTickets.Where(x => x.statusid == 7).Count()
+                    </span>
+                </span>
+            </div>
+            <div id="collapse5">
+                <ul class="list-group Sortable" id="sortable5" data-container="7">
+                    @foreach (var item in Model.DashboardTickets.Where(x => x.statusid == 7).OrderByDescending(x => x.id))
+                    {
+                        var IsAssigned = item.TicketAssignedToCollection != null ? "has-assignment" : "no-assignment";
+                        <li id="@item.id" class="list-group-item list-class no-padding @IsAssigned" data-itemid="@item.id" data-placement="top">
+                            <div class="panel border-left-lg border-left-primary dashboarditem">
+                                <div class="panel-footer">
+                                    <a href="~/tickets/ticketitem/@item.id" target="_blank" data-toggle="tooltip" title="@item.topic">
+                                        <b>@item.createdonutc.ToShortDateString()</b>
+                                        @if (item.topic.Length > 50)
+                                        {
+                                            <span>@item.topic.Substring(0, 50)...</span>
+                                        }
+                                        else
+                                        {
+                                            <span>@item.topic</span>
+                                        }
+                                    </a>
+                                    <div class="clear:both"></div>
+                                    <div class="pull-left">
+                                        @if (item.TicketAssignedToCollection != null)
+                                        {
+                                            foreach (var log in item.TicketAssignedToCollection.Select(x => x.user).Distinct())
+                                            {
+                                                <div class="label label-success" data-toggle="tooltip" title="@log.FullName">
+                                                    @log.GetInitials
+                                                </div>
+                                            }
+                                        }
+                                        <span class="label label-default">
+                                            @(item.enddate != null ? item.enddate.Value.ToShortDateString() : "Not Due")
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="panel-footer">
+                                    @if (!Model.IsFlagged(item.id))
+                                    {
+                                        <i class="fa fa-lg fav fa-star-o add-fav-ticket"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fa fa-lg fav fa-star remove-fav-ticket"></i>
+                                    }
+                                    <i class="icon-play ticketaction assignticketaction" data-toggle="tooltip" title="Assign Ticket" data-ticketid="@item.id" data-itemid="@item.id" data-projectid="@item.projectid" data-skillid="@item.skillid"></i>
+                                    <i class="icon-share2 moveteam" data-toggle="tooltip" title="Change Team" data-ticketid="@item.id" data-btnteamid="@ViewBag.teamid"></i>
+                                    <ul class="pull-right">
+                                        <li class="dropdown no-padding no-margin">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                                <i class="icon-menu7"></i> <span class="caret"></span>
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-menu-right">
+                                                <li>
+                                                    <a target="_blank" href="~/tickets/ticketitem/@item.id"><i class="icon-pencil5"></i> View Ticket</a>
+                                                </li>
+                                                <li class="divider"></li>
+                                                <li>
+                                                    <input id="StartEndDate" name="StartEndDate" value="@(item.startdate == null ? "" : item.startdate.Value.ToShortDateString()) - @(item.enddate == null ? "" : item.enddate.Value.ToShortDateString())" data-ticketid="@item.id" type="text" class="StartEndDate form-control"/>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-2 nospace">
+    <div class="panel-group">
+        <div class="panel panel-primary" id="DonePanelID">
+            <div class="panel-heading">
+                <span class="panel-title">
+                    Done @*Done id = 3*@
+                    <span id="donecounter" class="label label-warning pull-right">
+                        @Model.DashboardTickets.Where(x => x.statusid == 3 && x.IsArchieved == false).Count()
+                    </span>
+                </span>
+            </div>
+            <div id="collapse6">
+                <ul class="list-group Sortable" id="sortable6" data-container="3">
+                    @foreach (var item in Model.DashboardTickets.Where(x => x.statusid == 3 && x.IsArchieved == false).OrderByDescending(x => x.id))
+                    {
+                        var IsAssigned = item.TicketAssignedToCollection != null ? "has-assignment" : "no-assignment";
+                        <li id="@item.id" class="list-group-item list-class no-padding @IsAssigned" data-itemid="@item.id" data-placement="top">
+                            <div class="panel border-left-lg border-left-primary dashboarditem">
+                                <div class="panel-footer">
+                                    <a href="~/tickets/ticketitem/@item.id" target="_blank" data-toggle="tooltip" title="@item.topic">
+                                        <b>@item.createdonutc.ToShortDateString()</b>
+                                        @if (item.topic.Length > 50)
+                                        {
+                                            <span>@item.topic.Substring(0, 50)...</span>
+                                        }
+                                        else
+                                        {
+                                            <span>@item.topic</span>
+                                        }
+                                    </a>
+                                    <div class="clear:both"></div>
+                                    <div class="pull-left">
+                                        @if (item.TicketAssignedToCollection != null)
+                                        {
+                                            foreach (var log in item.TicketAssignedToCollection.Select(x => x.user).Distinct())
+                                            {
+                                                <div class="label label-success" data-toggle="tooltip" title="@log.FullName">
+                                                    @log.GetInitials
+                                                </div>
+                                            }
+                                        }
+                                        <span class="label label-default">
+                                            @(item.enddate != null ? item.enddate.Value.ToShortDateString() : "Not Due")
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="panel-footer">
+                                    @if (!Model.IsFlagged(item.id))
+                                    {
+                                        <i class="fa fa-lg fav fa-star-o add-fav-ticket"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fa fa-lg fav fa-star remove-fav-ticket"></i>
+                                    }
+                                    <i class="icon-play ticketaction assignticketaction" data-toggle="tooltip" title="Assign Ticket" data-ticketid="@item.id" data-itemid="@item.id" data-projectid="@item.projectid" data-skillid="@item.skillid"></i>
+                                    <i class="icon-share2 moveteam" data-toggle="tooltip" title="Change Team" data-ticketid="@item.id" data-btnteamid="@ViewBag.teamid"></i>
+                                    <i class="icon-archive archiveTicket" data-toggle="tooltip" title="Archive Ticket" data-ticketid="@item.id" data-btnteamid="@ViewBag.teamid"></i>
+                                    <ul class="pull-right">
+                                        <li class="dropdown no-padding no-margin">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                                <i class="icon-menu7"></i> <span class="caret"></span>
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-menu-right">
+                                                <li>
+                                                    <a target="_blank" href="~/tickets/ticketitem/@item.id"><i class="icon-pencil5"></i> View Ticket</a>
+                                                </li>
+                                                <li class="divider"></li>
+                                                <li>
+                                                    <input id="StartEndDate" name="StartEndDate" value="@(item.startdate == null ? "" : item.startdate.Value.ToShortDateString()) - @(item.enddate == null ? "" : item.enddate.Value.ToShortDateString())" data-ticketid="@item.id" type="text" class="StartEndDate form-control"/>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<br/>
+</div>
+</div>
+</div>
+</div>
+@*Model For Assign Tickets*@
+@Html.Partial("_ticketAssignModal")
+@* Model for add Skill *@
+<div class="modal fade" id="AddSkillModal" role="dialog">
+    <div class="modal-dialog" style="width: 900px !important;" data-ticketid="">
+        <div class="modal-content">
+            <div class="panel panel-primary" style="margin-bottom: 0px;">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Add Skill</h4>
+                    <div class="heading-elements">
+                        <button type="button" class="close" data-dismiss="modal" style="font-size: 30pt; font-weight: bolder;">&times;</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label class="input-group-addon">Skill Name</label>
+                                @Html.TextBox("skillname", null, new {@class = "form-control"})
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="text-center">
+                                <input id="btnsavetobucket" type="button" value="Add Skill" class="btn btn-primary add-skill"/>
+                                <input type="button" value="Cancel" class="btn btn-default btnCancel" data-dismiss="modal"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@* Model for add project *@
+<div class="modal fade" id="AddProjectModal" role="dialog">
+    <div class="modal-dialog" style="width: 900px !important;" data-ticketid="">
+        <div class="modal-content">
+            <div class="panel panel-primary" style="margin-bottom: 0px;">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Add Project</h4>
+                    <div class="heading-elements">
+                        <button type="button" class="close" data-dismiss="modal" style="font-size: 30pt; font-weight: bolder;">&times;</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label class="input-group-addon">Client</label>
+                                @Html.DropDownList("clientid", new SelectList(ViewBag.clients, "Value", "Text"), "Please Select", new {@class = "form-control"})
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label class="input-group-addon">Project Name</label>
+                                @Html.TextBox("projectname", null, new {@class = "form-control"})
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="text-center">
+                                <input id="btnsavetobucket" type="button" value="Add Project" class="btn btn-primary add-project"/>
+                                <input type="button" value="Cancel" class="btn btn-default btnCancel" data-dismiss="modal"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@*Model For Move Team*@
+<div class="modal fade" id="MoveTeamModel" role="dialog">
+    <div class="modal-dialog" style="width: 900px !important;" data-Modelteamid="">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="panel panel-primary" style="margin-bottom: 0px;">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Select Team</h4>
+                    <div class="heading-elements">
+                        <button type="button" class="close" data-dismiss="modal" style="font-size: 30pt; font-weight: bolder;">&times;</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label class="input-group-addon">Teams</label>
+                                @Html.DropDownList("tid", new SelectList(ViewBag.Teams, "id", "name"), "Please Select", new {@class = "form-control"})
+                            </div>
+                        </div>
+                        <div class="form-group assignmentwarning hide">
+                            <div class="alert alert-warning">
+                                <b>Warning: </b> Current team assignment of the ticket will be removed and it will be displayed in <b>Starting Next</b> section of selected team above.
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="text-center">
+                                <input id="btnmove" type="button" value="Move" class="btn btn-primary move-team"/>
+                                <input type="button" value="Cancel" class="btn btn-default" data-dismiss="modal"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@*Model For Move Team*@
+<div class="modal fade" id="MoveTeamModel" role="dialog">
+    <div class="modal-dialog" style="width: 900px !important;" data-Modelteamid="">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="panel panel-primary" style="margin-bottom: 0px;">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Select Team</h4>
+                    <div class="heading-elements">
+                        <button type="button" class="close" data-dismiss="modal" style="font-size: 30pt; font-weight: bolder;">&times;</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label class="input-group-addon">Teams</label>
+                                @Html.DropDownList("tid", new SelectList(ViewBag.Teams, "id", "name"), "Please Select", new {@class = "form-control"})
+                            </div>
+                        </div>
+                        <div class="form-group assignmentwarning hide">
+                            <div class="alert alert-warning">
+                                <b>Warning: </b> Current team assignment of the ticket will be removed and it will be displayed in <b>Starting Next</b> section of selected team above.
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="text-center">
+                                <input id="btnmove" type="button" value="Move" class="btn btn-primary move-team"/>
+                                <input type="button" value="Cancel" class="btn btn-default" data-dismiss="modal"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="CurrentTeamName" value="@ViewBag.CurrentTeam.name"/>
+<input type="hidden" id="CurrentTeamId" value="@ViewBag.CurrentTeam.id"/>
+<input type="hidden" id="CurrentUserId" value="@ViewBag.userid"/>
+<input type="hidden" id="IsAdmin" value="@ViewBag.Admin"/>
+<input type="hidden" id="TicketTd" value=""/>
+<input type="hidden" id="AssignmentDialogTicketId" value="0"/>

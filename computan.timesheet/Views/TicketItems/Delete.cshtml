@@ -1,0 +1,88 @@
+﻿@model computan.timesheet.core.TicketItem
+@{ ViewBag.Title = "Delete"; }
+<h2>Delete</h2>
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>TicketItem</h4>
+    <hr/>
+    <dl class="dl-horizontal">
+        <dt> @Html.DisplayNameFor(model => model.Project.name) </dt>
+        <dd> @Html.DisplayFor(model => model.Project.name) </dd>
+        <dt> @Html.DisplayNameFor(model => model.Skill.name) </dt>
+        <dd> @Html.DisplayFor(model => model.Skill.name) </dd>
+        <dt> @Html.DisplayNameFor(model => model.StatusUpdatedByUser.Email) </dt>
+        <dd> @Html.DisplayFor(model => model.StatusUpdatedByUser.Email) </dd>
+        <dt> @Html.DisplayNameFor(model => model.TicketStatus.name) </dt>
+        <dd> @Html.DisplayFor(model => model.TicketStatus.name) </dd>
+        <dt> @Html.DisplayNameFor(model => model.emailmessageid) </dt>
+        <dd> @Html.DisplayFor(model => model.emailmessageid) </dd>
+        <dt> @Html.DisplayNameFor(model => model.bccrecipients) </dt>
+        <dd> @Html.DisplayFor(model => model.bccrecipients) </dd>
+        <dt> @Html.DisplayNameFor(model => model.body) </dt>
+        <dd> @Html.DisplayFor(model => model.body) </dd>
+        <dt> @Html.DisplayNameFor(model => model.conversationid) </dt>
+        <dd> @Html.DisplayFor(model => model.conversationid) </dd>
+        <dt> @Html.DisplayNameFor(model => model.conversationindex) </dt>
+        <dd> @Html.DisplayFor(model => model.conversationindex) </dd>
+        <dt> @Html.DisplayNameFor(model => model.conversationtopic) </dt>
+        <dd> @Html.DisplayFor(model => model.conversationtopic) </dd>
+        <dt> @Html.DisplayNameFor(model => model.datetimecreated) </dt>
+        <dd> @Html.DisplayFor(model => model.datetimecreated) </dd>
+        <dt> @Html.DisplayNameFor(model => model.datetimereceived) </dt>
+        <dd> @Html.DisplayFor(model => model.datetimereceived) </dd>
+        <dt> @Html.DisplayNameFor(model => model.datetimesent) </dt>
+        <dd> @Html.DisplayFor(model => model.datetimesent) </dd>
+        <dt> @Html.DisplayNameFor(model => model.displaycc) </dt>
+        <dd> @Html.DisplayFor(model => model.displaycc) </dd>
+        <dt> @Html.DisplayNameFor(model => model.displayto) </dt>
+        <dd> @Html.DisplayFor(model => model.displayto) </dd>
+        <dt> @Html.DisplayNameFor(model => model.from) </dt>
+        <dd> @Html.DisplayFor(model => model.from) </dd>
+        <dt> @Html.DisplayNameFor(model => model.hasattachments) </dt>
+        <dd> @Html.DisplayFor(model => model.hasattachments) </dd>
+        <dt> @Html.DisplayNameFor(model => model.importance) </dt>
+        <dd> @Html.DisplayFor(model => model.importance) </dd>
+        <dt> @Html.DisplayNameFor(model => model.inreplyto) </dt>
+        <dd> @Html.DisplayFor(model => model.inreplyto) </dd>
+        <dt> @Html.DisplayNameFor(model => model.internetmessageheaders) </dt>
+        <dd> @Html.DisplayFor(model => model.internetmessageheaders) </dd>
+        <dt> @Html.DisplayNameFor(model => model.internetmessageid) </dt>
+        <dd> @Html.DisplayFor(model => model.internetmessageid) </dd>
+        <dt> @Html.DisplayNameFor(model => model.lastmodifiedname) </dt>
+        <dd> @Html.DisplayFor(model => model.lastmodifiedname) </dd>
+        <dt> @Html.DisplayNameFor(model => model.lastmodifiedtime) </dt>
+        <dd> @Html.DisplayFor(model => model.lastmodifiedtime) </dd>
+        <dt> @Html.DisplayNameFor(model => model.mimecontent) </dt>
+        <dd> @Html.DisplayFor(model => model.mimecontent) </dd>
+        <dt> @Html.DisplayNameFor(model => model.replyto) </dt>
+        <dd> @Html.DisplayFor(model => model.replyto) </dd>
+        <dt> @Html.DisplayNameFor(model => model.sensitivity) </dt>
+        <dd> @Html.DisplayFor(model => model.sensitivity) </dd>
+        <dt> @Html.DisplayNameFor(model => model.size) </dt>
+        <dd> @Html.DisplayFor(model => model.size) </dd>
+        <dt> @Html.DisplayNameFor(model => model.subject) </dt>
+        <dd> @Html.DisplayFor(model => model.subject) </dd>
+        <dt> @Html.DisplayNameFor(model => model.torecipients) </dt>
+        <dd> @Html.DisplayFor(model => model.torecipients) </dd>
+        <dt> @Html.DisplayNameFor(model => model.uniquebody) </dt>
+        <dd> @Html.DisplayFor(model => model.uniquebody) </dd>
+        <dt> @Html.DisplayNameFor(model => model.statusupdatedon) </dt>
+        <dd> @Html.DisplayFor(model => model.statusupdatedon) </dd>
+        <dt> @Html.DisplayNameFor(model => model.createdonutc) </dt>
+        <dd> @Html.DisplayFor(model => model.createdonutc) </dd>
+        <dt> @Html.DisplayNameFor(model => model.updatedonutc) </dt>
+        <dd> @Html.DisplayFor(model => model.updatedonutc) </dd>
+        <dt> @Html.DisplayNameFor(model => model.ipused) </dt>
+        <dd> @Html.DisplayFor(model => model.ipused) </dd>
+        <dt> @Html.DisplayNameFor(model => model.userid) </dt>
+        <dd> @Html.DisplayFor(model => model.userid) </dd>
+    </dl>
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        <div class="form-actions no-color">
+            <input type="submit" value="Delete" class="btn btn-default"/> |
+            @Html.ActionLink("Back to List", "Index")
+        </div>
+    }
+</div>

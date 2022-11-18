@@ -1,0 +1,56 @@
+﻿@model IEnumerable<computan.timesheet.core.ProjectNotes>
+<div class="panel panel-flat">
+    <div class="panel-body">
+        <ul class="media-list chat-list chat-list-inverse content-group ulmsg">
+            @if (Model != null && Model.Count() > 0)
+            {
+                foreach (var item in Model)
+                {
+                    <li class="media">
+                        <div class="media-left">
+                            <a href="#">
+                                <img src="~/Content/images/placeholder.jpg" data-id="@item.id" class="img-circle notesimg" alt="" title="@item.addedbyuser.FullName">
+                            </a>
+                        </div>
+                        <div class="media-body">
+                            <div class="media-content">@item.comments</div>
+                            @if (ViewBag.currentuser == item.addedbyuserid)
+                            {
+                                <span class="media-annotation display-block mt-10">
+                                    <b>@item.addedbyuser.FullName&nbsp;</b>@string.Format("{0:f}", item.createdonutc)&nbsp; &nbsp;
+                                    <span data-id="@item.id" class="deletenotemsg">
+                                        <b>Delete</b>
+                                    </span>
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="media-annotation display-block mt-10">
+                                    <b>@item.addedbyuser.FullName&nbsp;</b>@string.Format("{0:f}", item.createdonutc)
+                                </span>
+                            }
+                        </div>
+                    </li>
+                }
+            }
+            else
+            {
+                <li class="media">
+                    <span class="media-annotation display-block mt-10">
+                        <b>Sorry, no note found!</b>
+                    </span>
+                </li>
+            }
+        </ul>
+        <textarea name="enter-message" id="msg" class="form-control content-group" rows="3" cols="1" placeholder="Enter your message..."></textarea>
+        <div class="row">
+            <div class="col-xs-6 text-right">
+                <button type="button" data-id="@ViewBag.projectid" class="btn bg-teal-400 btn-labeled btn-labeled-right btnsendmsg">
+                    <b>
+                        <i class="icon-circle-right2"></i>
+                    </b>Add Note
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

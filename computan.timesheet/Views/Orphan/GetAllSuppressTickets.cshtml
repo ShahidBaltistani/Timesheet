@@ -1,0 +1,60 @@
+﻿@model List<computan.timesheet.Models.OrphanTickets.OrphanTicketViewModel>
+@{
+    ViewBag.Title = "Orphan";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="panel">
+    @Html.Partial("_OrphanTicketNavTab", "supress")
+    <div class="panel-body">
+        <table class="table table-ticket">
+            <thead>
+            <tr class="border-double bg-teal-700">
+                <th> Title </th>
+                <th> Status </th>
+                <th> Action </th>
+            </tr>
+            </thead>
+            <tbody id="productList">
+            @if (Model == null || Model.Count() == 0)
+            {
+                <tr>
+                    <td colspan="3" style="text-align: center"> No Tickets... </td>
+                </tr>
+            }
+            @foreach (var item in Model.OrderByDescending(x => x.LastActivityDate))
+            {
+                <tr>
+                    <td>
+                        <a href="/tickets/ticketitem/@item.id">@item.topic</a>
+                    </td>
+                    <td> @item.StatusName </td>
+                    <td>
+                        <a class="btn btn-primary" id="suppressBtn" href="#" data-id="@item.id" value="Orphan">Un-Suppress</a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
+<script src="~/Scripts/orphan/orphanTickets.js"></script>
+<script>
+
+    $(document).ready(function() {
+        var data = '@ViewBag.message';
+        if (data == 'success') {
+            new PNotify({
+                title: 'Success',
+                text: "Suppressed Successfully !",
+                type: 'success'
+            });
+        } else if (data == 'warning') {
+            new PNotify({
+                title: 'Error',
+                text: "Already Suppressed!",
+                type: 'error'
+            });
+        }
+    });
+</script>

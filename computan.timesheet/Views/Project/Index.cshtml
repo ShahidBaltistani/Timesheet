@@ -1,0 +1,608 @@
+﻿@model computan.timesheet.Models.ProDashboardViewModel
+@{ ViewBag.Title = "Project-Dashboard"; }
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/Scripts/select2")
+    @Scripts.Render("~/Scripts/custom/tagsinput")
+    <script src="~/Scripts/default/plugins/jquery.alphanum.min.js"></script>
+    <script src="~/Scripts/custom/ticket.min.js"></script>
+}
+
+@section secondarysidebar {
+    <!-- Secondary sidebar -->
+    <div class="sidebar sidebar-secondary sidebar-default">
+        <div class="sidebar-content">
+            <!-- Actions -->
+            <div class="sidebar-category">
+                <div class="category-title">
+                    <span>Actions</span>
+                    <ul class="icons-list">
+                        <li>
+                            <a href="#" data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="category-content">
+                    <div class="row row-condensed">
+                        <div class="col-xs-6">
+                            <a class="addfiles btn bg-blue btn-block btn-float btn-float-lg">
+                                <i class="icon-file-plus"></i> <span>Add File</span>
+                            </a>
+                            <button data-id="@Model.project.id" target="_blank" class="btn bg-indigo-300 btn-block btn-float btn-float-lg btnaddcredentials">
+                                <i class="icon-key"></i> <span>New Creden</span>
+                            </button>
+                        </div>
+                        <div class="col-xs-6">
+                            <a href="/projects/edit/@Model.project.id" target="_blank" class="btn bg-purple-300 btn-block btn-float btn-float-lg">
+                                <i class="icon-files-empty2"></i> <span>Edit Project</span>
+                            </a>
+                            <a href="/project/notes/@Model.project.id" class="btn bg-grey-300 btn-block btn-float btn-float-lg notes">
+                                <i class="icon-notebook"></i> <span>Notes</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-category cts-sidebar">
+                <div class="category-title">
+                    <span>Tickets by status</span>
+                    <ul class="icons-list">
+                        <li>
+                            <a href="#" data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="category-content no-padding">
+                    <ul class="navigation navigation-alt navigation-accordion filterbystatus">
+                        @foreach (var item in Model.sidebarstatus)
+                        {
+                            <li class="@(item.id == ViewBag.ActiveStatus ? "active" : "")">
+                                <a href="/project/index/@Model.project.id/@item.id" class="ticketsearch" id="@item.id">
+                                    @item.name <span id="@item.id" class="badge badge-success position-left conversationstatus">@item.count</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+            <div class="sidebar-category">
+                <div class="category-title">
+                    <span>Members worked on</span>
+                    <ul class="icons-list">
+                        <li>
+                            <a href="#" data-action="collapse" class=""></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="category-content" style="display: block;">
+                    <ul class="media-list">
+                        @if (Model.projectMembers != null && Model.projectMembers.Count() > 0)
+                        {
+                            foreach (var item in Model.projectMembers.OrderByDescending(x => x.active))
+                            {
+                                <li class="media">
+                                    <a href="#" class="media-left">
+                                        <img src="/images/placeholder.jpg" class="img-sm img-circle" alt="">
+                                    </a>
+                                    <div class="media-body">
+                                        <a href="#" class="media-heading text-semibold">@item.username</a>
+                                    </div>
+                                    <div class="media-right media-middle">
+                                        <span class="status-mark @(item.active ? "border-success" : "border-danger")"></span>
+                                    </div>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <li class="media">
+                                <span class="text-size-mini text-muted display-block">Sorry no member found.</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /secondary sidebar -->
+}
+
+@section header{
+    <div class="page-header">
+        <div class="page-header-content"> </div>
+        <div class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/"><i class="icon-home2 position-left"></i> Home</a>
+                </li>
+                <li>
+                    <a href="/projectdashboard/@Model.project.id">@Model.project.name</a>
+                </li>
+            </ul>
+            <a class="breadcrumb-elements-toggle">
+                <i class="icon-menu-open"></i>
+            </a>
+        </div>
+    </div>
+}
+
+<div class="panel panel-default" id="maincontent">
+    <div class="panel-heading">
+        <h5 class="panel-title">@Model.project.name</h5>
+    </div>
+    <div class="panel-body">
+        <div id="tasklist">
+            @Html.Partial("_ProjectNavTab", "index", new ViewDataDictionary {{"projectid", Model.project.id}})
+            <div class="contentdiv">
+                <div class="form-inline">
+                    <div class="form-group">
+                        <h5 class="panel-title">List Tickets</h5>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="searchtext" name="searchtext" class="form-control" placeholder="Search by subject or sender name" style="width: 400px;"/>
+                        <input id="searchbtn" type="submit" value="Search" class="btn btn-default"/>
+                        <button type="button" data-toggle="tooltip" title="Assign Multiple Task to Users" class="btn btn-success multiassign">
+                            <i class="icon-task"></i>
+                        </button>
+                        <button type="button" data-toggle="tooltip" title="Change Multiple Task Status" class="btn btn-success closeemultitask">
+                            <i class="icon-check"></i>
+                        </button>
+                        <button type="button" data-toggle="tooltip" title="Merge Multiple Task Status" class="btn btn-success mergemultitask">
+                            <i class="icon-cabinet"></i>
+                        </button>
+                    </div>
+                </div>
+                <br/>
+                <table class="table table-ticket">
+                    <thead>
+                    <tr class="border-double bg-teal-700">
+                        <th></th>
+                        <th style="width: 25px;">
+                            <input type="checkbox" class="checkall"/>
+                        </th>
+                        <th> Task Details </th>
+                    </tr>
+                    </thead>
+                    <tbody id="productList">
+                    @if (Model.ticketViewModel.tickets.Count() > 0)
+                    {
+                        @Html.Partial("_ConversationRow", Model.ticketViewModel)
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4">
+                                <h5 class="panel-title"> <i class="icon-envelop5 position-left"></i> Sorry, no Ticket found. </h5>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Upload Project Files Model-->
+<div class="modal fade" id="uploadfielmodel" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Upload Project File</h4>
+            </div>
+            <div class="modal-body" id="modeldiv">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <div id="notificationdiv"></div>
+                        <div class="col-md-offset-2 col-md-5">
+                            @Html.TextBox("projectfile", null, new {@class = "", type = "file"})
+                            <input type="hidden" value="@Model.project.id" class="modelprojectid"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="reset" id="btnuploadfile" value="Upload" class="btn btn-primary"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Add Credential Model-->
+<div class="modal fade" id="Addcredentialmodel" role="dialog">
+    <div class="modal-dialog" style="width: 60%;">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">
+                    <span class="credentialmodeltitle"></span>
+                </h4>
+            </div>
+            <div class="modal-body" id="credentialformmodeldiv" style="height: 600px; max-height: 600px; overflow-y: scroll"> </div>
+        </div>
+    </div>
+</div>
+@*Model For Assign Tickets*@
+@Html.Partial("_ticketAssignModal")
+<!--Merge model-->
+<div class="modal fade" id="ticketMergeModal" role="dialog">
+    <div class="modal-dialog" style="width: 900px !important;" data-ticketid="">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="panel panel-primary" style="margin-bottom: 0px;">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Merge Ticket</h4>
+                    <div class="heading-elements">
+                        <button id="closeMergeButton" type="button" class="close" data-dismiss="modal" style="font-size: 30pt; font-weight: bolder;">&times;</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label class="control-label col-lg-2">Search Ticket</label>
+                            <div class="col-lg-10">
+                                <div class="input-group">
+                                    <input type="text" class="form-control subjectforsearch" name="subjectforsearch">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button" id="searchmergabletickets">Search</button>
+                                    </span>
+                                </div>
+                                <input type="hidden" id="firstticketid" name="firstticketid" value=""/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive pre-scrollable">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>@*<input class="checkall" type="checkbox" />*@</th>
+                                <th>Date</th>
+                                <th>Sender</th>
+                                <th>Topic</th>
+                            </tr>
+                            </thead>
+                            <tbody id="ticketstomerge"></tbody>
+                        </table>
+                    </div>
+                    <div class="form-group" style="padding-top: 50px">
+                        <input id="Mergeticket" type="button" value="Merge Ticket" class="btn btn-primary merge_ticket"/>
+                        <input type="button" id="closeMergeButton" value="Cancel" data-dismiss="modal" class="btn btn-default"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Global Merge model-->
+<div class="modal fade" id="ticketglobalMergeModal" role="dialog">
+    <div class="modal-dialog" style="width: 900px !important;" data-ticketid="">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="panel panel-primary" style="margin-bottom: 0px;">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Merge Ticket</h4>
+                    <div class="heading-elements">
+                        <button id="closeMergeButton" type="button" class="close" data-dismiss="modal" style="font-size: 30pt; font-weight: bolder;">&times;</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="table-responsive pre-scrollable">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th colspan="2">Merge Tickets</th>
+                                <th></th>
+                            </tr>
+                            <tr>
+                                <th style="width: 5px;">Into</th>
+                                <th style="width: 5px;">From</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody id="tasktomerge"></tbody>
+                        </table>
+                    </div>
+                    <div class="form-group pull-right" style="padding-top: 50px">
+                        <input id="merge_global" type="button" value="Merge Ticket" class="btn btn-primary merge_global_ticket"/>
+                        <input type="button" id="closeMergeButton" value="Cancel" data-dismiss="modal" class="btn btn-default"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@* Show merge status *@
+<div class="modal fade" id="status" role="dialog">
+    <div class="modal-dialog" style="width: 900px !important;" data-ticketid="">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="panel panel-primary" style="margin-bottom: 0px;">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Merge fialed Tickets</h4>
+                    <div class="heading-elements">
+                        <button id="closeMergeButton" type="button" class="close" data-dismiss="modal" style="font-size: 30pt; font-weight: bolder;">&times;</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="table-responsive pre-scrollable">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>Ticket Title</th>
+                                <th>Error Message</th>
+                            </tr>
+                            </thead>
+                            <tbody id="errorstatus"></tbody>
+                        </table>
+                    </div>
+                    <div class="form-group pull-right" style="padding-top: 50px">
+                        <input type="button" id="closeStatusButton" value="Cancel" data-dismiss="modal" class="btn btn-default"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="uniquebodymodelTicketDetail" role="dialog">
+    <div class="modal-dialog conversationmodel" style="margin-bottom: 50px; margin-top: 100px; max-height: 85%; overflow-y: scroll; width: 75% !important">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body" id="Ticketdetailbody">
+                <p>Ticket# <span id="ticketid"></span> meta information: </p><br/><br/>
+                <p>Created Date: <span id="ticketCreatedDate"></span></p><br/><br/>
+                <p>Assigned to <span id="AssignedToTeamName"></span> on <span id="TeamAssignedDateTime"></span> By <span id="AssignedByTeamMember"></span></p><br/>
+            </div>
+            <div class="modal-footer"> </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="changemultiplestatusmodel" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Change Status</h4>
+            </div>
+            <div class="modal-body" id="modelstatusdiv">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <h4>Click a status below to apply to all selected tickets.</h4>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <div class="btn-group btn-group-justified">
+                                <div class="btn-group">
+                                    <button type="button" data-statusid="3" class="btn bg-danger-700 btnclosemultipletask">Close</button>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" data-statusid="2" class="btn bg-success-700 btnclosemultipletask">Open Ticket(s)</button>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" data-statusid="8" class="btn bg-info-700 btnclosemultipletask">Trash</button>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" data-statusid="7" class="btn bg-slate-700 btnclosemultipletask">Need Review</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@*Assign Tickets Model*@
+<div class="modal fade" id="assignuseradmin" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Assign Users</h4>
+            </div>
+            <div class="modal-body" id="modelassignuseradmindiv">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        @Html.Label("Project", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.DropDownList("projectid_assignuser", new SelectList(ViewBag.projects, "Value", "Text"), "Please Select", new {@class = "form-control CustSelect2"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Skill", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.DropDownList("skillid_assignuser", new SelectList(ViewBag.skills, "id", "name"), "Please Select", new {@class = "form-control CustSelect2"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Teams</label>
+                        @{ var countteam = 0; }
+                        @foreach (var team in ViewBag.teams)
+                        {
+                            if (countteam >= 4)
+                            {
+                                <label class="control-label col-md-2">&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                countteam = 0;
+                            }
+                            countteam++;
+                            <div class="col-md-5" style="float: left; position: relative;">
+                                @Html.CheckBox("teamid", new {@class = "shiftteammember shiftuserslist", data_teamid = team.id, team.id})
+                                <label for="@team.id" class="">@team.name</label>
+                            </div>
+                        }
+                    </div>
+                    <div class="form-group" style="height: 250px; overflow-y: scroll;">
+                        <label class="control-label col-md-2">Users</label>
+                        @{ var countuser = 0; }
+                        @foreach (var users in ViewBag.users)
+                        {
+                            if (countuser >= 4)
+                            {
+                                <label class="control-label col-md-2">&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                countuser = 0;
+                            }
+                            countuser++;
+                            <div class="col-md-5" style="float: left; position: relative;">
+                                @Html.CheckBox("userid", new {@class = "teammember userslist", data_userid = users.Id, id = users.Id})
+                                <label for="@users.Id" class="">@users.FirstName @users.LastName</label>
+                            </div>
+                        }
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="button" id="btnassignticket" value="Add" class="btn btn-primary saveticketassignment"/>
+                        </div>
+                    </div>
+                    <input type="hidden" id="assignticket_ticketid" value="0"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@*Start Working Model*@
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Start Working</h4>
+            </div>
+            <div class="modal-body" id="modelbodydiv">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        @Html.Label("Project", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.DropDownList("projectid", new SelectList(ViewBag.projects, "Value", "Text"), "Select Project", new {@class = "form-control"})
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="form-group">
+                        @Html.Label("Skill", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.DropDownList("skillid", new SelectList(ViewBag.skills, "id", "name"), "Select Skill", new {@class = "form-control"})
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="form-group">
+                        @Html.Label("Quoted Time", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.TextBox("quotabletime", null, new {placeholder = "Add Time In Minutes", @class = "form-control"})
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" id="startworking" value="Start" class="btn btn-primary"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer"> </div>
+        </div>
+    </div>
+</div>
+@* Model for add project *@
+<div class="modal fade" id="AddProjectModal" role="dialog">
+    <div class="modal-dialog" style="width: 900px !important;" data-ticketid="">
+        <div class="modal-content">
+            <div class="panel panel-primary" style="margin-bottom: 0px;">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Add Project</h4>
+                    <div class="heading-elements">
+                        <button type="button" class="close" data-dismiss="modal" style="font-size: 30pt; font-weight: bolder;">&times;</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label class="input-group-addon">Client</label>
+                                @Html.DropDownList("clientid", new SelectList(ViewBag.clients, "Value", "Text"), "Please Select", new {@class = "form-control"})
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label class="input-group-addon">Project Name</label>
+                                @Html.TextBox("projectname", null, new {@class = "form-control"})
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="text-center">
+                                <input id="btnsavetobucket" type="button" value="Add Project" class="btn btn-primary add-project"/>
+                                <input type="button" value="Cancel" class="btn btn-default btnCancel" data-dismiss="modal"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@* Model for add Skill *@
+<div class="modal fade" id="AddSkillModal" role="dialog">
+    <div class="modal-dialog" style="width: 900px !important;" data-ticketid="">
+        <div class="modal-content">
+            <div class="panel panel-primary" style="margin-bottom: 0px;">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Add Skill</h4>
+                    <div class="heading-elements">
+                        <button type="button" class="close" data-dismiss="modal" style="font-size: 30pt; font-weight: bolder;">&times;</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label class="input-group-addon">Skill Name</label>
+                                @Html.TextBox("skillname", null, new {@class = "form-control"})
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="text-center">
+                                <input id="btnsavetobucket" type="button" value="Add Skill" class="btn btn-primary add-skill"/>
+                                <input type="button" value="Cancel" class="btn btn-default btnCancel" data-dismiss="modal"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="TicketTd" value=""/>
+<input type="hidden" id="AssignmentDialogTicketId" value="0"/>
+<script src="~/Scripts/custom/projectDashboard.min.js"></script>
+<script type="text/javascript">
+    $('#uniquebodymodel').on('hidden.bs.modal', function() { $("#conversationmodelbodydiv").html(""); });
+    $('#searchbtn').on('click',
+        function() {
+            var text = $('#searchtext').val().toLowerCase();
+            $("#productList tr").filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(text) > -1);
+            });
+        });
+</script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+<script id="error-notification-template" type="text/x-handlebars-template">
+    <div class="alert alert-danger alert-styled-left alert-bordered usernotification">
+        <button data-dismiss="alert" class="close" type="button"><span>×</span><span class="sr-only">Close</span></button>
+        <span class="text-semibold">{{errortext}}</span>
+    </div>
+</script>
+<script id="success-notification-template" type="text/x-handlebars-template">
+    <div class="alert alert-success alert-styled-left alert-bordered usernotification">
+        <button data-dismiss="alert" class="close" type="button"><span>×</span><span class="sr-only">Close</span></button>
+        <span class="text-semibold">{{successtext}}</span>
+    </div>
+</script>

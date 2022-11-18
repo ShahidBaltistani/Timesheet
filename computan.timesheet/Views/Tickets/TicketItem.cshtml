@@ -1,0 +1,730 @@
+﻿@model computan.timesheet.Models.TicketItemViewModel
+@{ ViewBag.Title = "Ticket Detail"; }
+
+@section secondarysidebar {
+    <!-- Secondary sidebar -->
+    <div class="sidebar sidebar-secondary sidebar-default timelogWithEmailSending" data-ticketid="@Model.Ticket.id" data-ticketitemid="@Model.FirstTicketItemID">
+        <input type="hidden" value="@ViewBag.id" name="ticketid" id="ticketid"/>
+        <div class="sidebar-content">
+            <!-- Action buttons -->
+            <!-- Tasks navigation -->
+            <div class="sidebar-category cts-sidebar">
+                <div class="category-title bg-slate category-collapsed">
+                    <span>Task Details</span>
+                    <ul class="icons-list">
+                        <li>
+                            <a href="#" data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="category-content no-padding" style="display: block;">
+                    <ul class="navigation navigation-alt navigation-accordion filterbystatus">
+                        <li class="litaskdetail">
+                            <div class="link-class">
+                                <span class="task-project">Task Project</span>
+                                <div class="task-project-link  @(Model.TicketProject == null ? "hidden" : "")">
+                                    @if (Model.TicketProject != null)
+                                    {
+                                        <a class="my-link" href="/project/index/@Model.TicketProject.id" target="_blank"> @Model.TicketProject.name </a>
+                                    }
+                                    <i class="fa fa-edit changer"></i>
+                                </div>
+                                <div class="row task-project-dropdown @(Model.TicketProject != null ? "hidden" : "")">
+                                    <div class="project-list @(Model.TicketProject == null ? "col-md-12" : "col-md-11")">
+                                        @Html.DropDownList("taskprojectid", new SelectList(Model.Projects, "Value", "Text"), "Please Select", new {@class = "form-control col-md-10 taskprojectids"})
+                                    </div>
+                                    <i class="icon icon-cancel-circle2 @(Model.TicketProject == null ? "hidden" : "") col-md-1 cross"></i>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="litaskdetail">
+                            <a href="#">
+                                <span>Task Skill</span> @Html.DropDownList("taskskillid", new SelectList(Model.Skills, "id", "name"), "Please Select", new {@class = "form-control taskskillids"})
+                            </a>
+                        </li>
+                        @if (Model.TicketProject != null && Model.TicketProject.Client != null && Model.TicketProject.Client.accountmanager != null)
+                        {
+                            <li class='litaskdetail'>
+                                <a href="#">
+                                    <span>Account Manager: </span> <span class="pull-right">@Model.TicketProject.Client.User.FullName</span>
+                                </a>
+                            </li>
+                        }
+                        @if (Model.TicketProject != null && Model.TicketProject.projectmanager != null)
+                        {
+                            <li class='litaskdetail'>
+                                <a href="#">
+                                    <span>Project Manager: </span> <span class="pull-right">@Model.TicketProject.User.FullName</span>
+                                </a>
+                            </li>
+                        }
+                        <li class="litaskdetail">
+                            <a href="#">
+                                <span>Last Modified: </span> <span class="pull-right">@Model.Ticket.lastmodifiedtime.ToString("MM/dd/yyyy")</span>
+                            </a>
+                        </li>
+                        <li class="litaskdetail">
+                            <a href="#">
+                                <span>Last Delivery: </span> <span class="pull-right">@Model.Ticket.lastdeliverytime.ToString("MM/dd/yyyy")</span>
+                            </a>
+                        </li>
+                        <li class="litaskdetail">
+                            <a href="#">
+                                <b>Assigned Team: </b>
+                                @foreach (var team in Model.TicketTeam)
+                                {
+                                    if (team.team != null)
+                                    {
+                                        <span class="pull-right"> "@team.team.code"</span>
+                                    }
+                                }
+                                <br/>
+                            </a>
+                        </li>
+                        <li class="litaskdetail">
+                            <a href="#">
+                                <b>Status: </b> <span class="pull-right sidebarticketstatus">@Model.Ticket.ConversationStatus.name</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Action buttons -->
+            <div class="sidebar-category cts-sidebar-addtime">
+                <div class="category-title bg-slate">
+                    <span>Add Time</span>
+                    <ul class="icons-list">
+                        <li>
+                            <a href="#" data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                <input type="hidden" id="WarningStatus" value="@Model.IsWarning"/>
+                <input type="hidden" id="WarningText" value="@Model.WarningText"/>
+                <div class="category-content">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">Work Date</span>
+                                @Html.TextBox("workdate", null, new {@class = "form-control", maxlength = 10})
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon" style="padding-right: 21px;">Spent Minutes</span>
+                                @Html.TextBox("timespentinminutes", null, new {@class = "form-control", maxlength = 4})
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-addon">Billable Minutes</span>
+                                @Html.TextBox("billabletimeinminutes", null, new {@class = "form-control", maxlength = 4})
+                            </div>
+                        </div>
+                        <div class="form-group"> @Html.TextArea("description", null, new {@class = "form-control", rows = "2"}) </div>
+                        <div class="form-group">
+                            <div class="text-center">
+                                <input type="button" id="btnSaveTime" value="Save Time" class="btn btn-primary savetime"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /action buttons -->
+            <!-- Filter tasks by clients -->
+            <div class="sidebar-category cts-sidebar">
+                <div class="category-title  bg-slate">
+                    <span>Conversation Emails</span>
+                    <ul class="icons-list">
+                        <li>
+                            <a href="#" data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="category-content no-padding">
+                    <form action="#">
+                        <div class="has-feedback has-feedback-left">
+                            <input type="search" class="form-control filteremails" placeholder="Type to filter emails">
+                            <div class="form-control-feedback">
+                                <i class="icon-search4 text-size-base text-muted"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="emailcollection">
+                        <ul class="navigation navigation-alt navigation-accordion" id="leftNevMenu">
+                            @foreach (var item in Model.Ticket.TicketItems.OrderByDescending(ti => ti.id))
+                            {
+                                <li class="emailitem @(item.id == Model.Ticket.TicketItems.OrderByDescending(ti => ti.id).First().id ? "active" : "")" data-emailid="@item.id" data-graphEmailId="@item.emailmessageid">
+                                    <a href="#">
+                                        <span class="sender">@item.lastmodifiedname</span>
+                                        <label class="date-received pull-right">@item.ToShortDateTimeReceived</label>
+                                        <span class="minibody text-muted">@item.minibody</span>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- /Filter tasks by clients -->
+        </div>
+    </div>
+    <!-- /secondary sidebar -->
+}
+
+<div class="panel panel-default" id="maincontent" style="width: 100% !important;">
+<div class="tabbable tab-content-bordered">
+<!-- Primary Tabs -->
+@Html.Partial("_TicketNavTab", "tasks")
+<div class="panel">
+@Html.Partial("_TicketHeadingPanel", Model)
+@*<div class="panel-heading bg-teal-700">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="col-xs-12 col-lg-7">
+                        <h4 class="panel-title ticket-title">
+                            <i class="@(Model.Ticket.tickettypeid == 1 ? "icon-envelop5" : "icon-envelop3") position-left icon-medium"></i>
+                            <span>@Model.Ticket.topic </span>
+                            <span class="ticketidonspan" value="@Model.Ticket.id"></span>
+                        </h4>
+                    </div>
+                    <div class="col-xs-12 col-lg-5">
+                        <div class="heading-elements">
+                            <ul class="icons-list">
+                                <li> <button class="btn btn-primary ticketStatus ticketMeta" data-ticketidmeta="@Model.Ticket.id" data-toggle="tooltip" title="Ticket history">Ticket Meta</button> </li>
+                                <li> <button class="btn btn-default ticketStatus" id="statuschangedValuedAjax" data-toggle="tooltip" title="Ticket status">@Model.Ticket.ConversationStatus.name</button> </li>
+                                <li>
+                                    <div class="btn-group" id="StatusDropdown">
+                                        @if (Model.Ticket.statusid <= 2 || Model.Ticket.statusid == 5)
+                                        {
+                                            <button type="button" class="btn bg-danger-700 changeticketstatus" data-statusid="3">Close</button>
+                                            <button type="button" class="btn bg-danger-700 dropdown-toggle" data-toggle="dropdown"> <span class="caret"></span> </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="button" class="btn bg-success-700 changeticketstatus" data-statusid="2">Open</button>
+                                            <button type="button" class="btn bg-success-700 dropdown-toggle" data-toggle="dropdown"> <span class="caret"></span> </button>
+                                        }
+                                        <ul class="dropdown-menu" role="menu" style="left:-90px;">
+                                            <li class="changeticketstatus" data-statusid="2"><a href="#">Open</a></li>
+                                            <li class="changeticketstatus" data-statusid="3"><a href="#">Close</a></li>
+                                            <li class="changeticketstatus" data-statusid="4"><a href="#">OnHold</a></li>
+                                            <li class="changeticketstatus" data-statusid="7"><a href="#">Review</a></li>
+                                            <li class="changeticketstatus" data-statusid="8"><a href="#">Trash</a></li>
+                                        </ul>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>*@
+<div class="panel-body">
+<!-- Secondary Tabs -->
+<div class="tabbable">
+@Html.Partial("_TicketSecondaryTab", "ticketitem", new ViewDataDictionary {{"ticketId", Model.Ticket.id}, {"ticketProjectId", Model.Ticket.projectid}, {"TicketCommentCount", Model.Ticket.TicketComment.Count()}})
+<div class="tab-content">
+<div id="ticketdetail" data-ticketitemid="0" class="tab-pane has-padding active">
+    <div class="header-actions">
+        <div class="row" style="margin-bottom: 8px;">
+            <div class="view-email-actions">
+                <button id="btnReply" class="btn btn-info btn-xs"> <i class="fa fa-reply label-icon-sm"></i>Reply </button>
+                <button id="btnReplyAll" class="btn btn-info btn-xs"> <i class="fa fa-reply-all label-icon-sm"></i>Reply All </button>
+                <button id="btnForword" class="btn btn-info btn-xs"> <i class="fa fa-forward label-icon-sm"></i>Forward </button>
+                @if (ViewBag.freedCampUrl != null)
+                {
+                    <a href="@ViewBag.freedCampUrl" class="btn btn-info pull-right" target="_blank">
+                        <img src="~/Images/freedcampLogo.png" class="freedcampbutton"/>
+                    </a>
+                }
+            </div>
+            <div class="send-email-actions" style="display: none;">
+                <button class="btn btn-info btn-xs cancelemail"> <i class="fa fa-reply label-icon-sm"></i>Back to message </button>
+                <label type="button" class="btn btn-info btn-float btn-sm btn-bs-file" style="padding: 10px;">
+                    <i class="glyphicon glyphicon-paperclip"></i>
+                    <input type="file" multiple id="attachNewFiles" name="attachNewFiles"/>
+                </label>
+                <div class="pull-right">
+                    <button type="button" class="btn btn-default cancelemail">Cancel</button>
+                    <button id="btnSendEmail" type="button" class="btn btn-success btnSendEmail">Send Email</button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="progress-bar progress-bar-striped active fileuploadprogress hide" role="progressbar" aria-valuenow="5" aria-valuemin="0" aria-valuemax="100" style="width: 5%"> 5% </div>
+            <hr style="margin-bottom: 2px; margin-top: 0px;">
+        </div>
+    </div>
+    <div class="emailcontainer">
+        <div class="header-content">
+            <div class="pull-right" style="visibility: hidden;">
+                <a href="#" class="btn bg-teal-400 btn-sm btn-labeled btn-labeled-left heading-btn startworking" data-ticketid="@Model.Ticket.id" data-projectid="@(Model.TicketItem != null ? Model.TicketItem.projectid : 0)" data-skillid="@(Model.TicketItem != null ? Model.TicketItem.skillid : 0)" type="button">
+                    Start Working
+                    <b>
+                        <i class="icon-alarm-check"></i>
+                    </b>
+                </a>
+            </div>
+            <i class="mail-icon"></i>
+            <div class="mail-info">
+                <label class="mail-modifiedtime"></label>
+                <label class="mail-sender"></label>
+                <label class="mail-subject"></label>
+            </div>
+            <div class="mail-addresses">
+                <div class="mail-to-addresses"> To: </div>
+                <div class="mail-cc-addresses"> CC: </div>
+                <div class="mail-bcc-addresses"> BCC: </div>
+            </div>
+            <hr style="margin: 10px 0px;"/>
+            <div class="mail-attachments"> </div>
+            <hr style="margin: 10px 0px;"/>
+        </div>
+        <div id="email-body"> </div>
+    </div>
+    <div class="sendemailcontainer container-fluid" id="replayPanel" style="display: none;">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="col-xs-12 inputMargin noSpaceLeft">
+                    <div class="col-xs-1">
+                        <label>To</label>
+                    </div>
+                    <div class="col-xs-11 noSpaceLeft">
+                        <div class="col-xs-12 noSpaceLeft">
+                            <div class="col-xs-11 noSpaceLeft">
+                                <input type="hidden" id="emailType" name="emailType" value=""/>
+                                <input id="EmailSendTo" name="EmailSendTo" type="text" class="form-control" value=""/>
+                                <input type="hidden" id="conversation" name="conversation" class="form-control" value=""/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 inputMargin CC noSpaceLeft">
+                    <div class="col-xs-1">
+                        <label>CC</label>
+                    </div>
+                    <div class="col-xs-11 noSpaceLeft">
+                        <div class="col-xs-12 noSpaceLeft">
+                            <div class="col-xs-11 noSpaceLeft">
+                                <input id="EmailSendCC" name="EmailSendCC" type="text" class="form-control" value=""/>
+                            </div>
+                            <div class="col-xs-1 showBCC">
+                                <a class="pull-right" href="#">BCC</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 inputMargin BCC noSpaceLeft">
+                    <div class="col-xs-1">
+                        <label>BCC</label>
+                    </div>
+                    <div class="col-xs-11 noSpaceLeft">
+                        <input id="EmailSendBCC" name="EmailSendBCC" type="text" class="form-control" value=""/>
+                    </div>
+                </div>
+                <div class="col-xs-12 inputMargin noSpaceLeft">
+                    <div class="col-xs-1">
+                        <label>Subject</label>
+                    </div>
+                    <div class="col-xs-11 noSpaceLeft">
+                        <input id="EmailSendSubject" name="EmailSendSubject" type="text" class="form-control" value=""/>
+                    </div>
+                </div>
+                <div class="col-xs-12 inputMargin noSpaceLeft">
+                    <hr style="margin: 10px 0px;"/>
+                    <div class="send-attachments" style="display: none;">
+                        <hr style="margin: 10px 0px;"/>
+                    </div>
+                </div>
+
+                <div class="col-xs-12 inputMargin noSpaceLeft">
+                    <label>
+                        @Html.CheckBox("tlcheckbox", Model.IsRestrict)
+                        <span style="background-color: yellow; font-size: 14px;"> Please check the checkbox if you want to enter the time as well for this task.</span>
+                    </label>
+                    <hr style="margin: 10px 0px;"/>
+                </div>
+                <div class="col-xs-12 inputMargin noSpaceLeft">
+                    <div style="display: none;">
+                        @*Attachment old code not needed*@
+                        <div class="col-xs-1 noSpaceLeft">
+                            <label class="btn-bs-file btn btn-lg btn-default" title="Attach Files">
+                                <span class="glyphicon glyphicon-paperclip"></span>
+                                <input multiple type="file" id="UploadAttachment" name="UploadAttachment"/>
+                            </label>
+                        </div>
+                        <div class="col-xs-11 noSpaceLeft">
+                            <div class="col-md-12 noSpaceLeft" id="UploadAttachmentprogress">
+                                @*run time it will add some controles*@
+                            </div>
+                        </div>
+                    </div>
+                    <textarea name="Emailbody" id="Emailbody" rows="25"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="emailcontentwrapper">
+        @foreach (var item in Model.Ticket.TicketItems.OrderByDescending(ti => ti.lastmodifiedtime))
+        {
+            <div id="email-@item.id" style="display: none;">
+                <span class="lastmodifiedtime">@item.lastmodifiedtime</span>
+                <span class="from">@item.from</span>
+                <span class="sender">@item.sender</span>
+                <span class="subject">@item.subject</span>
+                <span class="to-addresses">@item.torecipients</span>
+                <span class="cc-addresses @(item.ccrecipients != null ? "has-data" : "has-no-data")"> @item.ccrecipients </span>
+                <span class="bcc-addresses @(item.bccrecipients != null ? "has-data" : "has-no-data")"> @item.bccrecipients </span>
+                <div class="attachments @(item.TicketItemAttachment != null ? "has-data" : "has-no-data")">
+                    @if (item.TicketItemAttachment != null)
+                    {
+                        foreach (var itemAttachment in item.TicketItemAttachment)
+                        {
+                            if (itemAttachment.contenttype != "Inline")
+                            {
+                                <div class="attachment-item" data-Attachmentid="@itemAttachment.id">
+                                    <div id="@itemAttachment.id" class="btn-group emailattachment existingfile" style="margin-bottom: 3px;">
+                                        <a href="~/Helpers/FilesHandler.ashx?File=@itemAttachment.EncodePath" class="btn bg-slate-400" target="_blank" download=""> @itemAttachment.name </a>
+                                        <button type="button" class="btn bg-slate-400 dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-right">
+                                            <li>
+                                                <a class="remove-attachment"><i class="icon-close2"></i>Remove Attachment</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    }
+                </div>
+                <span class="email-body">
+                    @if (item.uniquebody != null && item.uniquebody.Contains("</head>"))
+                    {
+                        var pFrom = item.uniquebody.IndexOf("<head>") + "<head>".Length;
+                        var pTo = item.uniquebody.LastIndexOf("</head>");
+                        var result = item.uniquebody.Substring(pFrom, pTo - pFrom);
+                        item.uniquebody = item.uniquebody.Remove(pFrom, pTo - pFrom);
+                    }
+                    @if (item.uniquebody != null && item.uniquebody.Contains("<style"))
+                    {
+                        var pFrom = item.uniquebody.IndexOf("<style");
+                        var pTo = item.uniquebody.LastIndexOf("</style>") + "</style>".Length;
+                        var result = item.uniquebody.Substring(pFrom, pTo - pFrom);
+                        item.uniquebody = item.uniquebody.Remove(pFrom, pTo - pFrom);
+                    }
+                    @item.uniquebody
+                </span>
+            </div>
+        }
+    </div>
+</div>
+<!-- Hidden  -->
+<div class="row hidden">
+    <textarea name="txtComments" id="txtComments" rows="5" cols="80"></textarea>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+<div id="ticketuserscontainer" class="hide">
+    @if (Model.TicketUsers != null)
+    {
+        foreach (var item in Model.TicketUsers)
+        {
+            <span class="tua" data-userid="@item.assignedtousersid">@item.user.FullName</span>
+        }
+    }
+</div>
+<div id="ticketTeamcontainer" class="hide">
+    @if (Model.TicketTeam != null)
+    {
+        foreach (var item in Model.TicketTeam)
+        {
+            <span class="tuat" data-userid="@item.teamid">@item.team.name</span>
+        }
+    }
+</div>
+@*Modals*@
+<div class="modal fade" id="ticketMeta" role="dialog">
+    <div class="modal-dialog" style="width: 900px !important;" data-ticketid="">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="panel panel-primary" style="margin-bottom: 0px;">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Ticket Meta</h4>
+                    <div class="heading-elements">
+                        <button type="button" class="close" data-dismiss="modal" style="font-size: 30pt; font-weight: bolder;">&times;</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <span id="ticketMetaInformation"> </span>
+                        </div>
+                        <div class="form-group">
+                            <div class="text-center">
+                                <input type="button" value="Ok" class="btn btn-default" data-dismiss="modal"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="ticketAssignModal" role="dialog">
+    <div class="modal-dialog" style="width: 900px !important;" data-ticketid="">
+        <div class="modal-content">
+            <div class="panel panel-primary" style="margin-bottom: 0px;">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Assign Ticket</h4>
+                    <div class="heading-elements">
+                        <button type="button" class="close" data-dismiss="modal" style="font-size: 30pt; font-weight: bolder;">&times;</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group top_ticket">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>
+                                        <i class="icon-add add-new-project"> Project</i>
+                                    </label>
+                                    @Html.DropDownList("Assignmenttaskproject", new SelectList(Model.Projects, "Value", "Text"), "Please Select", new {@class = ""})
+                                </div>
+                                <div class="col-md-6">
+                                    <label>
+                                        <i class="icon-add add-new-skill"> Skill</i>
+                                    </label>
+                                    @Html.DropDownList("Assignmenttaskskill", new SelectList(Model.Skills, "id", "name"), "Please Select", new {@class = ""})
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">Assign User:</span>
+                                <input name="ticketnewAssignedUsersInput" type="text" class="form-control newassignedusersinput"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">Assign Team:</span>
+                                <input name="ticketAssignedTeamInput" type="text" class="form-control assignedteaminput"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                <span class="input-group-addon">Estimate Minutes:</span>
+                                <input name="estimateTimeInput" id="estimateTimeInput" type="text" value="0" maxlength="8" class="form-control" autocomplete="off"/>
+                                <input type="hidden" id="EstimateTimeHidden" value="0"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label class="input-group-addon">Start Date:</label>
+                                <input name="StartDate" autocomplete="off" id="StartDate" type="text" value="@(Model.Ticket.startdate != null ? Model.Ticket.startdate.Value.ToShortDateString() : "")" class="form-control StartDate"/>
+                                <label class="input-group-addon">End Date:</label>
+                                <input name="EndDate" autocomplete="off" id="EndDate" type="text" value="@(Model.Ticket.enddate != null ? Model.Ticket.enddate.Value.ToShortDateString() : "")" class="form-control EndDate"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">Comment:</span>
+                                @Html.TextArea("ticketcomments", null, new {@class = "form-control", rows = "2"})
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="text-center">
+                                <input id="btnsavetobucket" type="button" value="Assign Ticket" class="btn btn-primary assign-single-ticket"/>
+                                <input type="button" value="Cancel" class="btn btn-default" data-dismiss="modal"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@* Model for add project *@
+<div class="modal fade" id="AddProjectModal" role="dialog">
+    <div class="modal-dialog" style="width: 900px !important;" data-ticketid="">
+        <div class="modal-content">
+            <div class="panel panel-primary" style="margin-bottom: 0px;">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Add Project</h4>
+                    <div class="heading-elements">
+                        <button type="button" class="close" data-dismiss="modal" style="font-size: 30pt; font-weight: bolder;">&times;</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label class="input-group-addon">Client</label>
+                                @Html.DropDownList("clientid", new SelectList(ViewBag.clients, "Value", "Text"), "Please Select", new {@class = "form-control"})
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label class="input-group-addon">Project Name</label>
+                                @Html.TextBox("projectname", null, new {@class = "form-control"})
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="text-center">
+                                <input id="btnsavetobucket" type="button" value="Add Project" class="btn btn-primary add-project"/>
+                                <input type="button" value="Cancel" class="btn btn-default btnCancel" data-dismiss="modal"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@* Model for add Skill *@
+<div class="modal fade" id="AddSkillModal" role="dialog">
+    <div class="modal-dialog" style="width: 900px !important;" data-ticketid="">
+        <div class="modal-content">
+            <div class="panel panel-primary" style="margin-bottom: 0px;">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Add Skill</h4>
+                    <div class="heading-elements">
+                        <button type="button" class="close" data-dismiss="modal" style="font-size: 30pt; font-weight: bolder;">&times;</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label class="input-group-addon">Skill Name</label>
+                                @Html.TextBox("skillname", null, new {@class = "form-control"})
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="text-center">
+                                <input id="btnsavetobucket" type="button" value="Add Skill" class="btn btn-primary add-skill"/>
+                                <input type="button" value="Cancel" class="btn btn-default btnCancel" data-dismiss="modal"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="startWorkingModal" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="panel panel-primary" style="margin-bottom: 0px;">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Start Working</h4>
+                    <div class="heading-elements">
+                        <button type="button" class="close" data-dismiss="modal" style="font-size: 30pt; font-weight: bolder;">&times;</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        @Html.Label("Project", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.DropDownList("projectid", new SelectList(Model.Projects, "Value", "Text"), "Please Select", new {@class = "form-control"})
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="form-group">
+                        @Html.Label("Skill", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.DropDownList("skillid", new SelectList(Model.Skills, "id", "name"), "Please Select", new {@class = "form-control"})
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="form-group">
+                        @Html.Label("Quoted Time", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.TextBox("quotabletime", null, new {placeholder = "Add Time In Minutes", @class = "form-control"})
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="button" id="startWorkingButton" value="Start Working" class="btn btn-primary startworkingaction"/>
+                            <input type="button" id="cancelButton" data-dismiss="modal" value="Cancel" class="btn btn-default"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div>
+    <input type="hidden" id="UserEmailSignature" value="@ViewBag.EmailSignature"/>
+</div>
+<link href="~/Content/Custom/Tickets/ticketitem.min.css" rel="stylesheet"/>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/Scripts/select2")
+    @Scripts.Render("~/Scripts/custom/tagsinput")
+    @Scripts.Render("~/Scripts/plugins/livefilter")
+    @Scripts.Render("~/Scripts/ckeditor4")
+    <script src="~/Scripts/default/plugins/jquery.alphanum.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/custom/ticketitem.min.js"></script>
+    <script src="~/Scripts/plugins/AjaxProgress/jq-ajax-progress.min.js"></script>
+    <script src="~/Scripts/orphan/orphanTickets.js"></script>
+}
+
+<script>
+    var isCC = true;
+    var isBCC = false;
+    jQuery(document).on('click',
+        '.showBCC',
+        function() {
+            $(".BCC").show();
+            isBCC = true;
+        });
+    var pagenum = 1;
+    var ID = @ViewBag.id;
+
+    function loadticketitem() {
+        pagenum++;
+        if (pagenum != -1) {
+            $("#btnsearch").attr('data-statusid');
+            $.ajax({
+                url: '/tickets/TicketItemPart',
+                data: { id: ID, pagenum: pagenum },
+                type: 'POST'
+            }).done(function(data) {
+                if (data.length > 75) {
+                    $('#leftNevMenu').append($($.parseHTML(data)).filter('#leftNevMenu').html());
+                    $('#emailcontentwrapper').append($($.parseHTML(data)).filter('#emailcontentwrapper').html());
+                }
+                return false;
+            });
+            return false;
+        }
+    }
+
+    $(window).scroll(function() {
+        if ($(window).scrollTop() == $(document).height() - $(window).height()) {
+            loadticketitem();
+        }
+    });
+
+    function copyToClipboard() {
+        var $temp = $("<input>");
+        $("body").append($temp);
+        var value = $.trim($('#text').text());
+        $temp.val(value).select();
+        document.execCommand("copy");
+        $temp.remove();
+        new PNotify({
+            text: "Copied!",
+            addclass: "stack-bottom-right bg-info"
+        });
+    }
+</script>

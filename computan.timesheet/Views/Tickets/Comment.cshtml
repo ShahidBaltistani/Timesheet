@@ -1,0 +1,643 @@
+﻿@model computan.timesheet.Models.TicketItemViewModel
+@{ ViewBag.Title = "Ticket Comments"; }
+
+@section secondarysidebar {
+    <!-- Secondary sidebar -->
+    <div class="sidebar sidebar-secondary sidebar-default timelogWithEmailSending" data-ticketid="@Model.Ticket.id" data-ticketitemid="@Model.FirstTicketItemID">
+        <input type="hidden" value="@ViewBag.id" name="ticketid" id="ticketid"/>
+        <div class="sidebar-content">
+            <!-- Action buttons -->
+            <!-- Tasks navigation -->
+            <div class="sidebar-category cts-sidebar">
+                <div class="category-title bg-slate category-collapsed">
+                    <span>Task Details</span>
+                    <ul class="icons-list">
+                        <li>
+                            <a href="#" data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="category-content no-padding" style="display: none;">
+                    <ul class="navigation navigation-alt navigation-accordion filterbystatus">
+                        <li class="litaskdetail">
+                            <div class="link-class">
+                                <span class="task-project">Task Project</span>
+                                <div class="task-project-link  @(Model.TicketProject == null ? " hidden" : "")">
+                                    @if (Model.TicketProject != null)
+                                    {
+                                        <a class="my-link" href="/project/index/@Model.TicketProject.id" target="_blank"> @Model.TicketProject.name </a>
+                                    }
+                                    <i class="fa fa-edit changer"></i>
+                                </div>
+                                <div class="row task-project-dropdown @(Model.TicketProject != null ? " hidden" : "")">
+                                    <div class="project-list @(Model.TicketProject == null ? " col-md-12" : "col-md-11")">
+                                        @Html.DropDownList("taskprojectid", new SelectList(Model.Projects, "Value", "Text"), "Please Select", new {@class = "form-control col-md-10 taskprojectids"})
+                                    </div>
+                                    <i class="icon icon-cancel-circle2 @(Model.TicketProject == null ? " hidden" : "") col-md-1 cross"></i>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="litaskdetail">
+                            <a href="#">
+                                <span>Task Skill</span> @Html.DropDownList("taskskillid", new SelectList(Model.Skills, "id", "name"), "Please Select", new {@class = "form-control taskskillids"})
+                            </a>
+                        </li>
+                        <li class="litaskdetail">
+                            <a href="#">
+                                <span>Last Modified: </span> <span class="pull-right">@Model.Ticket.lastmodifiedtime.ToString("MM/dd/yyyy")</span>
+                            </a>
+                        </li>
+                        <li class="litaskdetail">
+                            <a href="#">
+                                <span>Last Delivery: </span> <span class="pull-right">@Model.Ticket.lastdeliverytime.ToString("MM/dd/yyyy")</span>
+                            </a>
+                        </li>
+                        <li class="litaskdetail">
+                            <a href="#">
+                                <b>Status: </b> <span class="pull-right">@Model.Ticket.ConversationStatus.name</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Action buttons -->
+            <div class="sidebar-category cts-sidebar-addtime">
+                <div class="category-title bg-slate">
+                    <span>Add Time</span>
+                    <ul class="icons-list">
+                        <li>
+                            <a href="#" data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                <input type="hidden" id="WarningStatus" value="@Model.IsWarning"/>
+                <input type="hidden" id="WarningText" value="@Model.WarningText"/>
+                <div class="category-content">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">Work Date</span>
+                                @Html.TextBox("workdate", null, new {@class = "form-control", maxlength = 10})
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon" style="padding-right: 21px;">Spent Minutes</span>
+                                @Html.TextBox("timespentinminutes", null, new {@class = "form-control", maxlength = 4})
+                            </div>
+                            <div class="input-group">
+                                <span class="input-group-addon">Billable Minutes</span>
+                                @Html.TextBox("billabletimeinminutes", null, new {@class = "form-control", maxlength = 4, tabindex = -1})
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.TextArea("description", null, new {@class = "form-control", rows = "2"})
+                        </div>
+                        <div class="form-group">
+                            <div class="text-center">
+                                <input type="button" id="btnSaveTime" value="Save Time" class="btn btn-primary savetime"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /secondary sidebar -->
+}
+
+@*style="width:1000px !important;"*@
+<div class="panel panel-default" id="maincontent" style="width: 100% !important;">
+<div class="tabbable tab-content-bordered">
+<!-- Primary Tabs -->
+<ul class="nav nav-tabs nav-tabs-highlight">
+    <li class="">
+        <a href="/tickets/index/1"><i class="icon icon-envelop5 label-icon-sm"></i>Inbox</a>
+    </li>
+    <li class="active">
+        <a href="/tickets/mytickets/2"><i class="fa fa-tasks label-icon-sm"></i>Tasks</a>
+    </li>
+    <li class="">
+        <a href="/tickettimelogs/mybuckets"><i class="icon icon-basket label-icon-sm"></i>Bucket</a>
+    </li>
+    <li class="">
+        <a href="/tickettimelogs/index"><i class="icon icon-calculator2 label-icon-sm"></i>Time log</a>
+    </li>
+    @if (Request.IsAuthenticated && User.IsInRole("Admin"))
+    {
+        <li class="">
+            <a href="/rules"><i class="icon-list label-icon-sm"></i>Rules</a>
+        </li>
+    }
+</ul>
+<div class="panel">
+<div class="panel-heading bg-teal-700">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="col-xs-12 col-sm-7">
+                <h4 class="panel-title ticket-title">
+                    <i class="@(Model.Ticket.tickettypeid == 1 ? "icon-envelop5" : "icon-envelop3") position-left icon-medium"></i>
+                    <span>@Model.Ticket.topic </span>
+                    <span class="ticketidonspan" value="@Model.Ticket.id"></span>
+                </h4>
+            </div>
+            <div class="col-xs-12 col-sm-5">
+                <div class="heading-elements">
+                    <ul class="icons-list">
+                        <li>
+                            <button class="label border-left-primary label-striped ticketMeta" data-ticketidmeta="@Model.Ticket.id" data-toggle="tooltip" title="Ticket History">Ticket Meta</button>
+                        </li>
+                        <li>
+                            <button class="label border-left-primary label-striped" id="statuschangedValuedAjax" data-toggle="tooltip" title="Ticket Status">@Model.Ticket.ConversationStatus.name</button>
+                        </li>
+                        <li>
+                            <div class="btn-group btn-group-xs" id="StatusDropdown">
+                                @if (Model.Ticket.statusid <= 2 || Model.Ticket.statusid == 5)
+                                {
+                                    <button type="button" class="btn bg-danger-700 changeticketstatus" data-statusid="3">Close</button>
+                                    <button type="button" class="btn bg-danger-700 dropdown-toggle" data-toggle="dropdown">
+                                        <span class="caret"></span>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn bg-success-700 changeticketstatus" data-statusid="2">Open</button>
+                                    <button type="button" class="btn bg-success-700 dropdown-toggle" data-toggle="dropdown">
+                                        <span class="caret"></span>
+                                    </button>
+                                }
+                                <ul class="dropdown-menu" role="menu" style="left: -90px;">
+                                    <li class="changeticketstatus" data-statusid="2">
+                                        <a href="#">Open</a>
+                                    </li>
+                                    <li class="changeticketstatus" data-statusid="3">
+                                        <a href="#">Close</a>
+                                    </li>
+                                    <li class="changeticketstatus" data-statusid="7">
+                                        <a href="#">Review</a>
+                                    </li>
+                                    <li class="changeticketstatus" data-statusid="8">
+                                        <a href="#">Trash</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="panel-body">
+    <!-- Secondary Tabs -->
+    <div class="tabbable">
+        <div class="form-group">
+            <div class="input-group">
+                <span class="input-group-addon" id="basic-addon1">Assigned To:</span>
+                <input name="ticketAssignedUsersInput" type="text" class="assignedusersinput"/>
+                <span class="input-group-addon" id="basic-addon2" style="cursor: pointer;" data-toggle="modal" data-target="#ticketAssignModal">
+                    <span class="icon-play"></span>
+                </span>
+            </div>
+        </div>
+        <ul class="nav nav-tabs bg-slate nav-tabs-component">
+            <li class="">
+                <a href="/tickets/ticketitem/@Model.Ticket.id"><i class="icon icon-stack4 label-icon-sm"></i>Detail</a>
+            </li>
+            <li class="active">
+                <a href="/tickets/comments/@Model.Ticket.id" data-ticketid="@Model.Ticket.id" class="displaycomment_comment">
+                    <i class="fa fa-comments-o label-icon-sm"></i>Comments (@Model.Ticket.TicketComment.Count())
+                </a>
+            </li>
+            <li class="">
+                <a href="/tickets/credentials/@Model.Ticket.id/" id="Credentials" data-ticketid="@Model.Ticket.id" class="displaycomment_comment"> Credentials </a>
+            </li>
+            <li class="">
+                <a href="/tickets/Ticketitemtimelog/@Model.Ticket.id" id="Timelog" data-ticketid="@Model.Ticket.id" class="displaycomment_comment"> Time Logs </a>
+            </li>
+        </ul>
+        <div class="">
+            <div id="ticketdetail" data-ticketitemid="0" class="tab-pane has-padding active" style="display: none;">
+                <div class="sendemailcontainer container-fluid" id="replayPanel" style="display: none;">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="col-xs-12 inputMargin noSpaceLeft">
+                                <div class="col-xs-1">
+                                    <label>To</label>
+                                </div>
+                                <div class="col-xs-11 noSpaceLeft">
+                                    <div class="col-xs-12 noSpaceLeft">
+                                        <div class="col-xs-11 noSpaceLeft">
+                                            <input type="hidden" id="emailType" name="emailType" value=""/>
+                                            <input id="EmailSendTo" name="EmailSendTo" type="text" class="form-control" value=""/>
+                                            <input type="hidden" id="conversation" name="conversation" class="form-control" value=""/>
+                                        </div>
+                                        <div class="col-xs-1 showCC">
+                                            @*<a class="pull-right" href="#">CC</a>*@
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 inputMargin CC noSpaceLeft">
+                                <div class="col-xs-1">
+                                    <label>CC</label>
+                                </div>
+                                <div class="col-xs-11 noSpaceLeft">
+                                    <div class="col-xs-12 noSpaceLeft">
+                                        <div class="col-xs-11 noSpaceLeft">
+                                            <input id="EmailSendCC" name="EmailSendCC" type="text" class="form-control" value=""/>
+                                        </div>
+                                        <div class="col-xs-1 showBCC">
+                                            <a class="pull-right" href="#">BCC</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 inputMargin BCC noSpaceLeft">
+                                <div class="col-xs-1">
+                                    <label>BCC</label>
+                                </div>
+                                <div class="col-xs-11 noSpaceLeft">
+                                    <input id="EmailSendBCC" name="EmailSendBCC" type="text" class="form-control" value=""/>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 inputMargin noSpaceLeft">
+                                <div class="col-xs-1">
+                                    <label>Subject</label>
+                                </div>
+                                <div class="col-xs-11 noSpaceLeft">
+                                    <input id="EmailSendSubject" name="EmailSendSubject" type="text" class="form-control" value=""/>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 inputMargin noSpaceLeft">
+                                <div style="display: none;">
+                                    @*Attachment old code not needed*@
+                                    <div class="col-xs-1 noSpaceLeft">
+                                        <label class="btn-bs-file btn btn-lg btn-default" title="Attach Files">
+                                            <span class="glyphicon glyphicon-paperclip"></span>
+                                            <input multiple type="file" id="UploadAttachment" name="UploadAttachment"/>
+                                        </label>
+                                    </div>
+                                </div>
+                                <textarea name="Emailbody" id="Emailbody" rows="25"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Hidden Fields Needed For JS File -->
+            <div class="row hidden">
+                <div class="pull-right" style="visibility: hidden;">
+                    <a href="#" class="btn bg-teal-400 btn-sm btn-labeled btn-labeled-left heading-btn startworking" data-ticketid="@Model.Ticket.id" data-projectid="@(Model.TicketItem != null ? Model.TicketItem.projectid : 0)" data-skillid="@(Model.TicketItem != null ? Model.TicketItem.skillid : 0)" type="button">
+                        Start Working
+                        <b>
+                            <i class="icon-alarm-check"></i>
+                        </b>
+                    </a>
+                </div>
+            </div>
+            <div id="other" class="tab-pane has-padding">
+                <div class="comment-container">
+                    <div class="header-actions"> </div>
+                    <div class="header-content"> </div>
+                    <div class="comment_body">
+                        <div class="" style="width: 100%;">
+                            <textarea name="txtComments" id="txtComments" rows="5" cols="80"></textarea> <br/>
+                            <div class="text-right">
+                                <button type="button" class="btn bg-blue" id="btnAddComments"><i class="icon-plus22"></i> Add comment</button>
+                                <button type="button" class="btn bg-blue" id="btnSaveComments" style="display: none;"><i class="glyphicon-save"></i> Save Comments </button>
+                                <button type="button" class="btn bg-blue" id="btnCancelComments" style="display: none;"><i class="glyphicon-save"></i> Cancel</button>
+                            </div><hr/>
+                            <div>
+                                <div class="panel-body">
+                                    <ul class="commentbody media-list content-group-lg stack-media-on-mobile">
+                                        @foreach (var Commentitem in Model.TicketComment)
+                                        {
+                                            <li class='media' id="@Commentitem.id">
+                                                <div class='media-left'>
+                                                    <a href='#'>
+                                                        <img id="@Commentitem.id" src='/Content/images/placeholder.jpg' class='img-circle img-sm' alt='Not Loaded'>
+                                                    </a>
+                                                </div>
+                                                <div class='media-body'>
+                                                    <div class='media-heading'>
+                                                        <a href='#' class='text-semibold'> @Commentitem.commentbyusername </a><span class='media-annotation dotted'> @Commentitem.commenton </span>
+                                                    </div>
+                                                    @{
+                                                        var msg = new HtmlString(Commentitem.commentbody);
+                                                        <div id='CommentBody'> @msg </div>
+                                                        <br/>
+                                                    }
+                                                    <ul class='list-inline list-inline-separate text-size-small'>
+                                                        <li class='EditComments' data-id="@Commentitem.id">
+                                                            <a>Edit</a>
+                                                        </li>
+                                                        <li class='DeleteComments' data-id="@Commentitem.id">
+                                                            <a>Delete</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="media-right">
+                                                    <i data-ticketid="@Model.Ticket.id" data-commentid="@Commentitem.id" class="fa fa-clipboard comment-link"></i>
+                                                </div>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+</div>
+<div id="ticketuserscontainer" class="hide">
+    @if (Model.TicketUsers != null)
+    {
+        foreach (var item in Model.TicketUsers)
+        {
+            <span class="tua" data-userid="@item.assignedtousersid">@item.user.FullName</span>
+        }
+    }
+</div>
+<div id="ticketTeamcontainer" class="hide">
+    @if (Model.TicketTeam != null)
+    {
+        foreach (var item in Model.TicketTeam)
+        {
+            <span class="tuat" data-userid="@item.teamid">@item.team.name</span>
+        }
+    }
+</div>
+@*Modals*@
+<div class="modal fade" id="ticketMeta" role="dialog">
+    <div class="modal-dialog" style="width: 900px !important;" data-ticketid="">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="panel panel-primary" style="margin-bottom: 0px;">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Ticket Meta</h4>
+                    <div class="heading-elements">
+                        <button type="button" class="close" data-dismiss="modal" style="font-size: 30pt; font-weight: bolder;">&times;</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <span id="ticketMetaInformation"> </span>
+                        </div>
+                        <div class="form-group">
+                            <div class="text-center">
+                                <input type="button" value="Ok" class="btn btn-default" data-dismiss="modal"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="ticketAssignModal" role="dialog">
+    <div class="modal-dialog" style="width: 900px !important;" data-ticketid="">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="panel panel-primary" style="margin-bottom: 0px;">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Assign Ticket</h4>
+                    <div class="heading-elements">
+                        <button type="button" class="close" data-dismiss="modal" style="font-size: 30pt; font-weight: bolder;">&times;</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label class="input-group-addon">
+                                    <i class="icon-add add-new-project"> Project</i>
+                                </label>
+                                @Html.DropDownList("Assignmenttaskproject", new SelectList(Model.Projects, "Value", "Text"), "Please Select", new {@class = "form-control"})
+                                <label class="input-group-addon">
+                                    <i class="icon-add add-new-skill"> Skill</i>
+                                </label>
+                                @Html.DropDownList("Assignmenttaskskill", new SelectList(Model.Skills, "id", "name"), "Please Select", new {@class = "form-control"})
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">Assign User:</span>
+                                <input name="ticketnewAssignedUsersInput" type="text" class="form-control newassignedusersinput"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">Assign Team:</span>
+                                <input name="ticketAssignedTeamInput" type="text" class="form-control assignedteaminput"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                <span class="input-group-addon">Estimate Minutes:</span>
+                                <input name="estimateTimeInput" id="estimateTimeInput" type="text" value="0" maxlength="8" class="form-control" autocomplete="off"/>
+                                <input type="hidden" id="EstimateTimeHidden" value="0"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label class="input-group-addon">Start Date:</label>
+                                <input name="StartDate" id="StartDate" type="text" value="@(Model.Ticket.startdate != null ? Model.Ticket.startdate.Value.ToShortDateString() : "")" class="form-control StartDate"/>
+                                <label class="input-group-addon">End Date:</label>
+                                <input name="EndDate" id="EndDate" type="text" value="@(Model.Ticket.enddate != null ? Model.Ticket.enddate.Value.ToShortDateString() : "")" class="form-control EndDate"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">Comment:</span>
+                                @Html.TextArea("ticketcomments", null, new {@class = "form-control", rows = "2"})
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="text-center">
+                                <input id="btnsavetobucket" type="button" value="Assign Ticket" class="btn btn-primary assign-single-ticket"/>
+                                <input type="button" value="Cancel" class="btn btn-default" data-dismiss="modal"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@* Model for add project *@
+<div class="modal fade" id="AddProjectModal" role="dialog">
+    <div class="modal-dialog" style="width: 900px !important;" data-ticketid="">
+        <div class="modal-content">
+            <div class="panel panel-primary" style="margin-bottom: 0px;">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Add Project</h4>
+                    <div class="heading-elements">
+                        <button type="button" class="close" data-dismiss="modal" style="font-size: 30pt; font-weight: bolder;">&times;</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label class="input-group-addon">Client</label>
+                                @Html.DropDownList("clientid", new SelectList(ViewBag.clients, "Value", "Text"), "Please Select", new {@class = "form-control"})
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label class="input-group-addon">Project Name</label>
+                                @Html.TextBox("projectname", null, new {@class = "form-control"})
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="text-center">
+                                <input id="btnsavetobucket" type="button" value="Add Project" class="btn btn-primary add-project"/>
+                                <input type="button" value="Cancel" class="btn btn-default btnCancel" data-dismiss="modal"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@* Model for add Skill *@
+<div class="modal fade" id="AddSkillModal" role="dialog">
+    <div class="modal-dialog" style="width: 900px !important;" data-ticketid="">
+        <div class="modal-content">
+            <div class="panel panel-primary" style="margin-bottom: 0px;">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Add Skill</h4>
+                    <div class="heading-elements">
+                        <button type="button" class="close" data-dismiss="modal" style="font-size: 30pt; font-weight: bolder;">&times;</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label class="input-group-addon">Skill Name</label>
+                                @Html.TextBox("skillname", null, new {@class = "form-control"})
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="text-center">
+                                <input id="btnsavetobucket" type="button" value="Add Skill" class="btn btn-primary add-skill"/>
+                                <input type="button" value="Cancel" class="btn btn-default btnCancel" data-dismiss="modal"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div>
+    <input type="hidden" id="commentPermalink" value="@ViewBag.commentid"/>
+</div>
+<link href="~/Content/Custom/Tickets/Tickets.min.css" rel="stylesheet"/>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/Scripts/select2")
+    @Scripts.Render("~/Scripts/custom/tagsinput")
+    @Scripts.Render("~/Scripts/plugins/livefilter")
+    @Scripts.Render("~/Scripts/ckeditor4")
+    <script src="~/Scripts/default/plugins/jquery.alphanum.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/custom/ticketitem.min.js"></script>
+    <script src="~/Scripts/plugins/AjaxProgress/jq-ajax-progress.min.js"></script>
+}
+
+<script>
+    var isCC = true;
+    var isBCC = false;
+    jQuery(document).on('click',
+        '.showBCC',
+        function() {
+            $(".BCC").show();
+            isBCC = true;
+        });
+    $(document).ready(function() {
+        var value = window.location.href.substring(window.location.href.lastIndexOf('/') + 1);
+        var row = $('#' + value);
+        row.animate({ backgroundColor: '#fdfd96' }, 300);
+        setTimeout(function() { row.animate({ backgroundColor: "#ffffff" }, 5000); });
+    });
+    jQuery(document).on('click',
+        '#Credentials',
+        function() {
+            if ($("#taskprojectid").val() == undefined) {
+                $("#Credentialsbody").html("<b>Sorry no project is selected</b>");
+            } else {
+                $.ajax({
+                    url: '/projectdashboard/ProjectCredentials/' + $("#taskprojectid").val(),
+                    data: {},
+                    type: 'GET'
+                }).done(function(data) {
+                    if (data.error) {
+                        alert("Failed");
+                        return false;
+                    }
+                    $('#Credentialsbody').html(data);
+                    return false;
+                });
+            }
+        });
+    var pagenum = 1;
+    var ID = @ViewBag.id;
+
+    function loadticketitem() {
+        pagenum++;
+        if (pagenum != -1) {
+            $.ajax({
+                url: '/tickets/TicketItemPart',
+                data: { id: ID, pagenum: pagenum },
+                type: 'POST'
+            }).done(function(data) {
+                if (data.length > 75) {
+                    var text = $($.parseHTML(data)).filter('#leftNevMenu').html();
+                    $('#leftNevMenu').append(text);
+                    text = $($.parseHTML(data)).filter('#emailcontentwrapper').html();
+                    $('#emailcontentwrapper').append(text);
+                }
+                return false;
+            });
+            return false;
+        }
+    }
+
+    $(window).scroll(function() {
+        if ($(window).scrollTop() == $(document).height() - $(window).height()) {
+            loadticketitem();
+        }
+    });
+    $(function() {
+        $('#Credentialsbody').on('click',
+            '.usernameclick',
+            function() {
+                var $temp = $("<input>");
+                $("body").append($temp);
+                $temp.val($(this).closest('tr').find(".usernameval").text().trim()).select();
+                document.execCommand("copy");
+                $temp.remove();
+            });
+    });
+    $(function() {
+        $('#Credentialsbody').on('click',
+            '.pwdclick',
+            function() {
+                var $temp = $("<input>");
+                $("body").append($temp);
+                $temp.val($(this).closest('tr').find(".passwordval").text().trim()).select();
+                document.execCommand("copy");
+                $temp.remove();
+            });
+    });
+</script>

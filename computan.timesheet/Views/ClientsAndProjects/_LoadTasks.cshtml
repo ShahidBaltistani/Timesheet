@@ -1,0 +1,62 @@
+﻿@model IEnumerable<computan.timesheet.core.TicketItem>
+<div class="panel-heading">
+    <h5 class="panel-title paneltitleoftask">Tasks</h5>
+    <div class="heading-elements">
+        <ul class="icons-list">
+            <li>
+                <a data-action="collapse" class="taskpanelcollapse"></a>
+            </li>
+        </ul>
+    </div>
+    <a class="heading-elements-toggle">
+        <i class="icon-menu"></i>
+    </a>
+</div>
+<div class="panel-body panel-collapse" id="taskpanelbody">
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr role="row">
+                <th> @Html.Raw("Email Subject") </th>
+                <th> @Html.Raw("Assigned users") </th>
+            </tr>
+            </thead>
+            <tbody>
+            @if (Model != null && Model.Count() > 0)
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <h6 class="no-margin-top">
+                                <a href="/ticketitems/TicketItem/@item.id"><i class="icon-user"></i>&nbsp;&nbsp;@item.subject</a>
+                            </h6>
+                        </td>
+                        <td>
+                            @if (item.TicketItemLog != null && item.TicketItemLog.Count() > 0)
+                            {
+                                foreach (var user in item.TicketItemLog)
+                                {
+                                    <a href="#">
+                                        <img src="/images/UserProfileImage/@user.user.ProfileImage" class="img-circle img-xs" alt="" title="@user.user.FirstName @user.user.LastName" onerror="this.onerror = null;this.src = '/images/placeholder.jpg';">
+                                    </a>
+                                }
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td>
+                        <h6 class="no-margin-top">
+                            <a href="#"><i class="icon-task"></i>&nbsp;&nbsp;Sorry, No task found.</a>
+                        </h6>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

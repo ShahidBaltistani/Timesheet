@@ -1,0 +1,64 @@
+﻿@model IEnumerable<computan.timesheet.core.Ticket>
+@if (Model != null && Model.Count() > 0)
+{
+    foreach (var item in Model)
+    {
+        <tr id="@item.id">
+            <td>
+                <div class="ticket-container">
+                    <div class="ticket-toolbar wrapticket">
+                        <i class="fa fa-lg fav fa-star-o"></i>
+                        <span class="checktask">
+                            <input type="checkbox" class="selecttask" value="@item.id"/>
+                        </span>
+                        <i class="icon-cart5 cursorpointer addtobucket" data-toggle="tooltip" title="Add Ticket To Bucket"></i>
+                        <i class="icon-add cursorpointer AddTimeLog" data-toggle="tooltip" title="Add Time Log"></i>
+                        <div class="btn-group btn-group-xs ticketstatusaction">
+                            @if (item.statusid <= 2 || item.statusid == 5)
+                            {
+                                <button type="button" class="btn bg-danger-700 changeticketstatus" data-statusid="3">Close</button>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn bg-success-700 changeticketstatus" data-statusid="2">Open</button>
+                            }
+                            @if (item.statusid <= 3)
+                            {
+                                <button type="button" class="btn bg-slate-700 changeticketstatus hideable" data-statusid="5">Review</button>
+                            }
+                            @if (item.statusid <= 2)
+                            {
+                                <button type="button" class="btn bg-info-700 changeticketstatus hideable" data-statusid="4">Wont Fix</button>
+                            }
+                        </div>
+                        <i class="@(item.tickettypeid == 1 ? "icon-envelop5" : "icon-envelop3") position-left" title="@item.topic" data-placement="right" data-html="true" data-popup="tooltip"></i>
+                        @if (item.topic.Length > 100)
+                        {
+                            <a href="/tickets/ticketitem/@item.id" target="_blank">@item.topic.Substring(0, 100) ... (@item.messagecount)</a>
+                        }
+                        else
+                        {
+                            <a href="/tickets/ticketitem/@item.id" target="_blank">@Html.DisplayFor(modelItem => item.topic) (@item.messagecount)</a>
+                        }
+                        <span class='text-bold @(ViewBag.statusid.ToString() == "0" ? "inline-block" : "hide")'> - @item.ConversationStatus.name</span>
+                    </div>
+                    <div class="ticket-toolbar pull-right">
+                        <span class='label cursor-pointer bg-slate-700'>@item.LastModifiedToShortDateTime</span>
+                        <span class='text-bold hide'>@item.LastModifiedToDateTimeWithMonthName</span>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    }
+    <tr id="loadmoretr">
+        <td colspan="2" class="text-center">
+            <button class="btn btn-default loadmoretickets" data-pagenumber="@ViewBag.pagenum">Load More Tickets...</button>
+        </td>
+    </tr>
+}
+else
+{
+    <tr>
+        <td colspan="2" class="text-center">Sorry, No more task found.</td>
+    </tr>
+}

@@ -1,0 +1,47 @@
+﻿@model IEnumerable<computan.timesheet.Models.NotificationMessageViewModel>
+@if (Model != null && Model.Count() > 0)
+{
+    foreach (var item in Model.Take(10))
+    {
+        <li class="media" data-id="@item.id">
+            <hr/>
+            <div class="row list-row">
+                <div class="col-md-11">
+                    @if (item.EntityActionId == 7)
+                    {
+                        <a href="/tickets/comment/@item.entityId/@item.commentid" target="_blank" class="markread" data-id="@item.id">
+                            <div class="media-left">
+                                <img src="~/Content/images/placeholder.jpg" class="img-circle img-sm" alt="">
+                            </div>
+                            <div class="media-body">
+                                @(item.Message.Length > 95 ? item.Message.Substring(0, 95) + "..." : item.Message)
+                                <span class="media-annotation pull-right">@(DateTime.Now.Date == item.createdDate.Date ? item.createdDate.ToString("h:mm tt") : item.createdDate.ToString("dd MMM h:mm tt")) </span>
+                            </div>
+                        </a>
+                    }
+                    else
+                    {
+                        <a href="/tickets/ticketitem/@item.entityId" target="_blank" class="markread" data-id="@item.id">
+                            <div class="media-left">
+                                <img src="~/Content/images/placeholder.jpg" class="img-circle img-sm" alt="">
+                            </div>
+                            <div class="media-body">
+                                @(item.Message.Length > 95 ? item.Message.Substring(0, 95) + "..." : item.Message)
+                                <span class="media-annotation pull-right">@(DateTime.Now.Date == item.createdDate.Date ? item.createdDate.ToString("h:mm tt") : item.createdDate.ToString("dd MMM h:mm tt")) </span>
+                            </div>
+                        </a>
+                    }
+                </div>
+                <div class="col-md-1">
+                    <span class="pull-right @(item.status ? "hmarkunread" : "hmarkread")" data-toggle="tooltip" data-id="@item.id" title="@(item.status ? "Mark Unread" : "Mark Read")" style="cursor: pointer; padding-top: 10px;">
+                        <i class="icon-checkmark4 @(item.status ? "notification-color-read" : "notification-color-unread")"></i>
+                    </span>
+                </div>
+            </div>
+        </li>
+    }
+}
+else
+{
+    <li class="media" style="padding-left: 50px; padding-top: 20px;"> No unread notification found </li>
+}

@@ -1,0 +1,81 @@
+﻿@model IEnumerable<computan.timesheet.core.NotificationEntityAction>
+@{ ViewBag.Title = "Index"; }
+
+@section header {
+    <div style="background-color: #fff;" class="panel page-header border-top-primary">
+        <div class="page-header-content">
+            <div class="page-title">
+                <h5>
+                    <i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Timesheet</span> - Manage Entity Actions
+                    <small class="display-block">Manage Entity Actions</small>
+                </h5>
+            </div>
+            <div class="heading-elements">
+                <div class="btn-group">
+                    <a href="/notificationentityactions/create/@ViewContext.RouteData.Values["id"]" class="btn btn-primary"><i class="icon-list3 position-left"></i>Add Member</a>
+                </div>
+            </div>
+            <a class="heading-elements-toggle">
+                <i class="icon-menu"></i>
+            </a>
+        </div>
+        <div style="border-bottom: 0; box-shadow: none; margin-bottom: 0;" class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/Home/Index"><i class="icon-home2 position-left"></i>Home</a>
+                </li>
+                <li>
+                    <a href="#">Entity Actions</a>
+                </li>
+                <li>
+                    <a href="/notificationentityactions/create/@ViewContext.RouteData.Values["id"]">Add Entity Actions</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+}
+
+<div class="panel panel-flat">
+    <div class="panel-heading">
+        <h5 class="panel-title">Entity Actions</h5>
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li>
+                    <a data-action="collapse"></a>
+                </li>
+                <li>
+                    <a data-action="reload"></a>
+                </li>
+            </ul>
+        </div>
+        <a class="heading-elements-toggle">
+            <i class="icon-menu"></i>
+        </a>
+    </div>
+    <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper no-footer">
+        <div class="datatable-scroll">
+            <table class="table datatable-button-html5-basic" id="DataTables_Table_0" role="grid" aria-describedby="DataTables_Table_0_info">
+                <thead>
+                <tr role="row">
+                    <th> @Html.DisplayNameFor(model => model.notificationentity.name) </th>
+                    <th> @Html.DisplayNameFor(model => model.name) </th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr id="@item.id">
+                        <td> @Html.DisplayFor(modelItem => item.notificationentity.name) </td>
+                        <td> @Html.DisplayFor(modelItem => item.name) </td>
+                        <td>
+                            @Html.ActionLink("Edit", "Edit", new {item.id}, new {@class = "btn btn-info btn-xs"})
+                            @Html.ActionLink("Delete", "Delete", new {item.id}, new {@class = "btn btn-info btn-xs"})
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

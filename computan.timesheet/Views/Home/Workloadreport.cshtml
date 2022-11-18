@@ -1,0 +1,97 @@
+﻿@model computan.timesheet.Models.FinalWorkloadRepot
+@{ ViewBag.Title = "Workloadreport"; }
+<div class="container-fluid" style="margin: 0px; padding: 0px;">
+    <div class="panel-group">
+        <div class="panel">
+            <div class="panel-heading bg-teal-700">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <h4 class="panel-title ticket-title">
+                            <i style="font-size: 25px;" class="fa fa-dashboard position-left"></i> Work Load Report
+                        </h4>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body" style="padding: 0px 5px;">
+                @{ var count = 0; }
+                <hr/>
+                <div class="row" id="statusList">
+                    @foreach (var repoteams in Model.Teams)
+                    {
+                        count++;
+                        <div class="col-md-2 no-padding">
+                            <div class="panel panel-primary" id="AssignedPanelID">
+                                <div class="panel-heading">
+                                    <span class="panel-title"> @repoteams.name </span>
+                                </div>
+                                <div id="collapse1">
+                                    <ul class="list-group Sortable" id="sortable1">
+                                        @foreach (var newItem in Model.WorkloadReport.Where(x => x.teamid == repoteams.id))
+                                        {
+                                            if (count % 4 == 0)
+                                            {
+                                                <li class="list-group-item list-class no-padding" data-toggle="tooltip" data-placement="top">
+                                                    <div class="panel border-left-lg border-left-info dashboarditem">
+                                                        <div class="panel-footer">
+                                                            <div style="margin-bottom: 5px; margin-top: 5px;" class="alert alert-info no-border text-center no-padding">
+                                                                <span class="text-semibold">@newItem.username</span>
+                                                            </div>
+                                                            <span class="label label-flat border-info text-info-600">Assigned <span class="badge badge-info">@newItem.Assigned</span></span>
+                                                            <span class="label label-flat border-info text-info-600">In Progress <span class="badge badge-info">@newItem.Inprogress</span></span>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            }
+                                            else if (count % 3 == 0)
+                                            {
+                                                <li class="list-group-item list-class no-padding" data-toggle="tooltip" data-placement="top">
+                                                    <div class="panel border-left-lg border-left-warning dashboarditem">
+                                                        <div class="panel-footer">
+                                                            <div style="margin-bottom: 5px; margin-top: 5px;" class="alert alert-warning no-border text-center no-padding">
+                                                                <span class="text-semibold">@newItem.username</span>
+                                                            </div>
+                                                            <span class="label label-flat border-warning text-warning-600">Assigned<span class="badge badge-warning">@newItem.Assigned</span></span>
+                                                            <span class="label label-flat border-warning text-warning-600">In Progress<span class="badge badge-warning">@newItem.Inprogress</span></span>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            }
+                                            else if (count % 2 == 0 || count % 5 == 0)
+                                            {
+                                                <li class="list-group-item list-class no-padding" data-toggle="tooltip" data-placement="top">
+                                                    <div class="panel border-left-lg border-left-success dashboarditem">
+                                                        <div class="panel-footer">
+                                                            <div style="margin-bottom: 5px; margin-top: 5px;" class="alert alert-success no-border text-center no-padding">
+                                                                <span class="text-semibold">@newItem.username</span>
+                                                            </div>
+                                                            <span class="label label-flat border-success text-success-600">Assigned <span class="badge badge-success">@newItem.Assigned</span></span>
+                                                            <span class="label label-flat border-success text-success-600">In Progress <span class="badge badge-success">@newItem.Inprogress</span></span>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            }
+                                            else
+                                            {
+                                                <li class="list-group-item list-class no-padding" data-toggle="tooltip" data-placement="top">
+                                                    <div class="panel border-left-lg border-left-primary dashboarditem">
+                                                        <div class="panel-footer">
+                                                            <div style="margin-bottom: 5px; margin-top: 5px;" class="alert alert-primary no-border text-center no-padding">
+                                                                <span class="text-semibold">@newItem.username</span>
+                                                            </div>
+                                                            <span class="label label-flat border-primary text-primary-600">Assigned<span class="badge badge-primary">@newItem.Assigned</span></span>
+                                                            <span class="label label-flat border-primary text-primary-600">In Progress<span class="badge badge-primary">@newItem.Inprogress</span></span>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            }
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

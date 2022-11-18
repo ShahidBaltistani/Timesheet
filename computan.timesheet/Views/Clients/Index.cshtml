@@ -1,0 +1,187 @@
+﻿@{ ViewBag.Title = "Clients"; }
+<div class="panel panel-default" id="maincontent">
+    @Html.Partial("_NavTabs", "clients")
+    <div class="panel">
+        <div class="panel-heading bg-teal-700">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="col-xs-12 col-sm-7">
+                        <h4 class="panel-title ticket-title">
+                            <span>Client Listing </span>
+                        </h4>
+                    </div>
+                    <div class="col-xs-12 col-sm-5">
+                        <div class="heading-elements">
+                            <ul class="icons-list">
+                                <li>
+                                    <button class="label border-left-primary label-striped" onclick="window.location.href = '/clients/create'">Add New Client</button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-flat">
+            <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper no-footer">
+                <div class="datatable-scroll">
+                    <table class="display table" style="width: 100%" id="DataTables_Table_0" role="grid" aria-describedby="DataTables_Table_0_info">
+                        <thead>
+                        <tr role="row">
+                            <th>Client Name</th>
+                            <th>Primary Email</th>
+                            <th>Account Manager</th>
+                            <th>Max Billable hours</th>
+                            <th>Website</th>
+                            <th>PM Tool</th>
+                            <th>Customer Source</th>
+                            <th>Status</th>
+                            <th>Option</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="statusFilter" value="1"/>
+
+@section Scripts {
+    <script src="~/Scripts/dataTables.fixedColumns.min.js"></script>
+}
+
+<style>
+    .DTFC_LeftBodyLiner { overflow-x: hidden; }
+</style>
+<link href="~/Content/fixedColumns.dataTables.min.css" rel="stylesheet"/>
+<script type="text/javascript">
+    $(document).ready(function() {
+        var ctable = $('#DataTables_Table_0').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ordering": false,
+            "scrollY": "600px",
+            "scrollX": true,
+            "scrollCollapse": true,
+            "fixedHeader": true,
+            "fixedColumns": true,
+            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            "ajax": {
+                "url": "/Clients/GetData",
+                "type": "POST",
+                "data": function(data) {
+                    data.filter = $('#statusFilter').val() == 'null' ? null : ($('#statusFilter').val() == '1' ? true : false);
+                },
+                "datatype": "json"
+            },
+            "columnDefs": [
+                {
+                    "targets": 0,
+                    "data": "name",
+                    "render": function(data) {
+                        return "<div style='word-wrap:break-word; overflow: hidden; max-width: 250px;'>" + data + "</div>";
+                    }
+                },
+                {
+                    "targets": 1,
+                    "data": "email",
+                    "render": function(data) {
+                        if (data != null) {
+                            return "<div style='word-wrap:break-word; overflow: hidden; max-width: 250px;'>" + data + "</div>";
+                        }
+                        return "";
+                    }
+                },
+                {
+                    "targets": 2,
+                    "data": "User.FullName",
+                    "defaultContent": "",
+                    "render": function(data) {
+                        return data;
+                    }
+                },
+                {
+                    "targets": 3,
+                    "data": "maxbillablehours",
+                    "render": function(data) {
+                        return data;
+                    }
+                },
+                {
+                    "targets": 4,
+                    "data": "website",
+                    "render": function(data) {
+                        return data;
+                    }
+                },
+                {
+                    "targets": 5,
+                    "data": "pmplateformlink",
+                    "defaultContent": "",
+                    "render": function(data) {
+                        if (data != null) {
+                            return '<a href=' + data + ' target="_blank">' + data + '</a>';
+                        }
+                    }
+                },
+                {
+                    "targets": 6,
+                    "data": "CustomerName",
+                    "render": function(data) {
+                        return data;
+                    }
+                },
+                {
+                    "targets": 7,
+                    "data": "isactive",
+                    "render": function(data) {
+                        if (data == true) {
+                            return '<span class="label label-success">Active</span>';
+                        }
+                        return '<span class="label label-danger">In-Active</span>';
+                    }
+                },
+                {
+                    "targets": 8,
+                    "data": "id",
+                    "render": function(data) {
+                        return '<a class="btn btn-primary btn-xs" href="/Clients/Edit/' +
+                            data +
+                            '" >Edit</a>&nbsp;' +
+                            '<a class="btn btn-primary btn-xs" href="/ClientContacts/Index/' +
+                            data +
+                            '" target="_blank">Client Contacts</a>&nbsp;' +
+                            '<a class="btn btn-primary btn-xs" href="/Clients/Dashboard/' +
+                            data +
+                            '" target="_blank">Dashboard</a>';
+                    }
+                }
+            ],
+            buttons: {
+                dom: { button: { className: 'btn btn-default' } },
+                buttons: [
+                    { extend: 'copyHtml5', exportOptions: { columns: 'th:not(:last-child)' } },
+                    { extend: 'excelHtml5', exportOptions: { columns: 'th:not(:last-child)' } },
+                    { extend: 'csvHtml5', exportOptions: { columns: 'th:not(:last-child)' } },
+                    { extend: 'pdfHtml5', pageSize: 'LEGAL', orientation: 'landscape', exportOptions: { columns: 'th:not(:last-child)' } }
+                ]
+            }
+        });
+        $(".dataTables_length").before($("#status-radiobutton-template").html());
+        $('input[name="optradio"]').change(function() {
+            $('input[name="optradio"]').closest("label").removeClass('btn-primary').addClass('btn-default');
+            $('#statusFilter').val($('input[name="optradio"]:checked').val());
+            $('input[name="optradio"]:checked').closest("label").removeClass('btn-default').addClass('btn-primary');
+            ctable.columns.adjust().draw();
+        });
+        $('.dataTables_length select').select2({ minimumResultsForSearch: Infinity, width: 'auto' });
+    });
+</script>
+<script id="status-radiobutton-template" type="text/x-handlebars-template">
+    <div data-toggle="buttons" class="dt-buttons btn-group">
+        <label class="btn btn-primary"> <input type="radio" name="optradio" value="1" checked="checked">Active</label>
+        <label class="btn btn-default"> <input type="radio" name="optradio" value="0">In-Active</label>
+        <label class="btn btn-default"> <input type="radio" name="optradio" value="null">All</label>
+    </div>
+</script>

@@ -1,0 +1,4 @@
+﻿@model computan.timesheet.Models.TicketViewModel
+@Html.Partial("_Search")
+<div class="ticketsbody"> @Html.Partial("_index", Model) </div>
+<input type="hidden" id="searchvalue-@ViewBag.clientid" value="" class="searchvalue"/>

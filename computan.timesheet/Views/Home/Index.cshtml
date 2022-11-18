@@ -1,0 +1,236 @@
+﻿@model computan.timesheet.Models.DashboardViewModel
+@{
+    ViewBag.Title = "Home Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section header {
+    <div style="background-color: #fff;" class="panel page-header border-top-primary">
+        <div class="page-header-content">
+            <div class="page-title">
+                <h5>
+                    <i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Timesheet</span> - Dashboard
+                    <small class="display-block">Welcome to timesheet dashboard!</small>
+                </h5>
+            </div>
+            <div class="heading-elements">
+                <div class="btn-group">
+                    @*<a href="/projects/create" class="btn btn-primary"><i class="icon-list3 position-left"></i>Add New Tickets</a>*@
+                </div>
+            </div>
+            <a class="heading-elements-toggle">
+                <i class="icon-menu"></i>
+            </a>
+        </div>
+        <div style="border-bottom: 0; box-shadow: none; margin-bottom: 0;" class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/"><i class="icon-home2 position-left"></i>Dashboard</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="panel panel-primary panel-bordered">
+            <div class="panel-heading">
+                <h6 class="panel-title">My Tasks</h6>
+                <div class="heading-elements">
+                    <ul class="icons-list">
+                        <li>
+                            <a href="/tickets/mytickets/2" style="color: white;">
+                                <span class="label label-primary heading-text">View All</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                <a class="heading-elements-toggle">
+                    <i class="icon-menu"></i>
+                </a>
+            </div>
+            <div class="panel-body">
+                @if (Model.MyLatestTasks != null && Model.MyLatestTasks.Count() > 0)
+                {
+                    <table style="width: 575px" class="table">
+                        <thead>
+                        <tr>
+                            <th style="width: 200px;">User</th>
+                            <th style="width: 355px;">Description</th>
+                            <th class="text-center" style="width: 20px;">
+                                <i class="icon-arrow-down12"></i>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var item in Model.MyLatestTasks)
+                        {
+                            <tr>
+                                <td style="width: 200px;">
+                                    <div class="media-body">
+                                        <a href="/ticketitems/index/@item.ticketid" target="_blank" class="display-inline-block text-default text-semibold letter-icon-title">@item.from</a>
+                                        <div class="text-muted text-size-small">
+                                            <span class="status-mark border-blue position-left"></span>@item.TicketStatus.name
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="width: 355px;">
+                                    <a href="#" class="text-default display-inline-block">
+                                        <span class="text-semibold">@item.subject</span>
+                                    </a>
+                                </td>
+                                <td style="width: 20px;" class="text-center">
+                                    <ul class="icons-list">
+                                        <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                                <i class="icon-menu7"></i>
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-menu-right">
+                                                <li>
+                                                    <a href="#"><i class="icon-undo"></i> Quick reply</a>
+                                                </li>
+                                                <li>
+                                                    <a href="#"><i class="icon-history"></i> Full history</a>
+                                                </li>
+                                                <li class="divider"></li>
+                                                <li>
+                                                    <a href="#"><i class="icon-checkmark3 text-success"></i> Resolve issue</a>
+                                                </li>
+                                                <li>
+                                                    <a href="#"><i class="icon-cross2 text-danger"></i> Close issue</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <span>Congratulations! you have cleared all of your tasks.</span>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="panel panel-primary panel-bordered">
+            <div class="panel-heading">
+                <h6 class="panel-title">Latest Tickets</h6>
+                <div class="heading-elements">
+                    <ul class="icons-list">
+                        <li>
+                            <a href="/tickets/index/1" style="color: white;">
+                                <span class="label label-primary heading-text">View All</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                <a class="heading-elements-toggle">
+                    <i class="icon-menu"></i>
+                </a>
+            </div>
+            <div class="panel-body">
+                @if (Model.LatestTickets != null && Model.LatestTickets.Count() > 0)
+                {
+                    <table style="width: 575px" class="table">
+                        <thead>
+                        <tr>
+                            <th style="width: 200px;">User</th>
+                            <th style="width: 355px;">Description</th>
+                            <th class="text-center" style="width: 20px;">
+                                <i class="icon-arrow-down12"></i>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var item in Model.LatestTickets)
+                        {
+                            <tr>
+                                <td style="width: 200px;">
+                                    <div class="media-body">
+                                        <a href="/ticketitems/index/@item.id" class="display-inline-block text-default text-semibold letter-icon-title">@item.uniquesenders</a>
+                                        <div class="text-muted text-size-small">
+                                            <span class="status-mark border-blue position-left"></span>@item.ConversationStatus.name
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="width: 355px;">
+                                    <a href="#" class="text-default display-inline-block">
+                                        <span class="text-semibold">@item.topic</span>
+                                    </a>
+                                </td>
+                                <td style="width: 20px;" class="text-center">
+                                    <ul class="icons-list">
+                                        <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                                <i class="icon-menu7"></i>
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-menu-right">
+                                                <li>
+                                                    <a href="#"><i class="icon-undo"></i> Quick reply</a>
+                                                </li>
+                                                <li>
+                                                    <a href="#"><i class="icon-history"></i> Full history</a>
+                                                </li>
+                                                <li class="divider"></li>
+                                                <li>
+                                                    <a href="#"><i class="icon-checkmark3 text-success"></i> Resolve issue</a>
+                                                </li>
+                                                <li>
+                                                    <a href="#"><i class="icon-cross2 text-danger"></i> Close issue</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <span>Congratulations! no tickets available.</span>
+                }
+            </div>
+        </div>
+    </div>
+    @*<div class="col-md-6">
+            <div class="panel panel-success panel-bordered">
+                <div class="panel-heading">
+                    <h6 class="panel-title">My Bucket</h6>
+                    <div class="heading-elements">
+                        <div class="heading-elements">
+                            <button type="button" class="btn btn-link daterange-ranges heading-btn text-semibold">
+                                <i class="icon-calendar3 position-left"></i> <span>January 12 - February 10</span> <b class="caret"></b>
+                            </button>
+                        </div>
+                        <ul class="icons-list">
+                            <li><a data-action="collapse"></a></li>
+                        </ul>
+                    </div>
+                    <a class="heading-elements-toggle"><i class="icon-menu"></i></a>
+                </div>
+                <div class="panel-body" id="mybucketsdahsboard">
+                    @Html.Partial("~/views/tickettimelogs/_mybucket.cshtml", Model.TicketTimeViewModel)
+                </div>
+            </div>
+        </div>*@
+</div>
+<div class="row">
+    <div class="col-md-6"> </div>
+    <div class="col-md-6"> </div>
+</div>
+<script type="text/javascript">
+    $("body").addClass("sidebar-xs");
+</script>

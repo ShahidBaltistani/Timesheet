@@ -1,0 +1,17 @@
+﻿@model computan.timesheet.core.ContactCompany
+@{ ViewBag.Title = "Details"; }
+<h2>Details</h2>
+<div>
+    <h4>ContactCompany</h4>
+    <hr/>
+    <dl class="dl-horizontal">
+        <dt> @Html.DisplayNameFor(model => model.name) </dt>
+        <dd> @Html.DisplayFor(model => model.name) </dd>
+        <dt> @Html.DisplayNameFor(model => model.clientid) </dt>
+        <dd> @Html.DisplayFor(model => model.clientid) </dd>
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new {Model.id}) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

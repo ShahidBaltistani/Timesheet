@@ -1,0 +1,69 @@
+﻿1) add MVC web project
+
+2) Update all the packages in the nuget manager.
+
+3) Install sample Identity project using 
+
+	- Install-Package Microsoft.AspNet.Identity.Samples -Pre
+
+	- replace computan.timesheet.Models namespance to simisue.web.Models in all files.
+
+4) change web.config connectionstring
+
+<add name="DefaultConnection" connectionString="Data Source=COMTEN;Initial Catalog=timesheetdb;UID='sa';PWD='sa@password';Connection Timeout=3000;" providerName="System.Data.SqlClient" />
+
+5) Open App_Start/IdentityConfig.cs file and make the following credentials changes in InitializeIdentityForEF method:
+	
+			const string name = "rashed@computan.com";
+            const string password = "Computan2016#!@";
+            const string roleName = "Admin";
+
+6) Enable Multiple Migrations using following syntax.
+
+http://stackoverflow.com/questions/21537558/multiple-db-contexts-in-the-same-db-and-application-in-ef-6-and-code-first-migra
+
+	1) Add Root Folder Contexts in web project. Add Two Sub folders named [IdentityMigrations] and [TimesheetMigrations].
+	2) Move ApplicationDbConext Class from IdentityModels to Contexts folder.
+	3) When you move above class, you need to fix some references issue. Make sure you project build successfully here.
+	4) Create another conext class named after the project such as TimesheetDbContext.
+	5) Add OnModelCreating Method to rename the tables for Identity Framework.
+
+	protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<IdentityRole>().ToTable("Roles").Property(p => p.Id).HasColumnName("RolesId");
+            modelBuilder.Entity<IdentityUserClaim>().ToTable("UserClaims").Property(p => p.Id).HasColumnName("UserClaimsId");
+            modelBuilder.Entity<IdentityUserLogin>().ToTable("UserLogins");
+            modelBuilder.Entity<IdentityUserRole>().ToTable("UserRoles");
+            modelBuilder.Entity<ApplicationUser>().ToTable("Users").Property(p => p.Id).HasColumnName("UsersId");
+        }
+
+	6) enable migrations for applicationdbcontext
+
+	Enable-Migrations -ContextTypeName ApplicationDbContext -MigrationsDirectory Contexts\IdentityMigrations
+	
+	add-migration -Name "InitialTimesheetDatabaseScript"
+
+	Update-Database -Script
+	
+	Update-Database -Verbose
+
+7) Rebuild the application and login with the credentials given above. once you are successfully logged in, you are ready to move ahead.
+
+12 how to add default value for datetime.
+
+ a) [Required, DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+
+ b) LastUpdatedOn = c.DateTime(nullable: false, defaultValueSql: "GETUTCDATE()"),
+
+ 13) Revert database to initial state for that particular context.
+
+ Update-Database –TargetMigration: $InitialDatabase
+
+ 14) How to change cascadeDelete default behaviour from true to false.
+
+	protected override void OnModelCreating(DbModelBuilder modelBuilder)
+	{
+		modelBuilder.Conventions.Remove<OneToManyCascadeDeleteConvention>();
+	}

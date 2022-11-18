@@ -1,0 +1,29 @@
+﻿@model IEnumerable<computan.timesheet.core.ProjectFiles>
+<div class="panel panel-flat panel-collapsed">
+    <div class="panel-heading">
+        <h6 class="panel-title"><i class="icon-link position-left"></i>files</h6>
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li>
+                    <a class="addfiles btn btn-success">Add File</a>
+                </li>
+            </ul>
+        </div>
+        <a class="heading-elements-toggle">
+            <i class="icon-menu"></i>
+        </a>
+    </div>
+    <div class="panel-body">
+        @if (Model != null && Model.Count() > 0)
+        {
+            foreach (var item in Model)
+            {
+                <a href="@item.FilePath" download>@item.filename</a>
+            }
+        }
+        else
+        {
+            <span>Sorry, no files found.</span>
+        }
+    </div>
+</div>

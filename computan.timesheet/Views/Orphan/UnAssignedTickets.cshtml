@@ -1,0 +1,41 @@
+﻿@model List<computan.timesheet.Models.OrphanTickets.OrphanTicketViewModel>
+@{
+    ViewBag.Title = "UnAssignedTickets";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="panel">
+    @Html.Partial("_OrphanTicketNavTab", "unAssigned")
+    <div class="panel-body">
+        <table class="table table-ticket">
+            <thead>
+            <tr class="border-double bg-teal-700">
+                <th> Title </th>
+                <th> Age [Days] </th>
+                <th> Suppress </th>
+            </tr>
+            </thead>
+            <tbody>
+            @if (Model == null || Model.Count() == 0)
+            {
+                <tr>
+                    <td colspan="3" style="text-align: center"> No Tickets... </td>
+                </tr>
+            }
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <a href="/tickets/ticketitem/@item.id">@item.topic</a>
+                    </td>
+                    <td> @item.Age </td>
+                    <td>
+                        <a class="btn btn-danger" id="suppressBtn" href="/Orphan/SuppressTicket/@item.id" data-id="@item.id" value="Orphan">Suppress</a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="~/Scripts/orphan/orphanTickets.min.js"></script>

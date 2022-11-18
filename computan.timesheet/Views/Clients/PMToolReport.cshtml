@@ -1,0 +1,59 @@
+﻿@model IEnumerable<computan.timesheet.core.Client>
+@{
+    ViewBag.Title = "PMToolReport";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="panel panel-default" id="maincontent">
+    @Html.Partial("_NavTabs", "PMToolReport")
+    <div class="panel">
+        <div class="panel-heading bg-teal-700">
+            <div class="row">
+                <h4 class="panel-title ticket-title">
+                    <span>Client Project Management Tools</span>
+                </h4>
+            </div>
+        </div>
+        <div class="panel panel-flat" style="padding: 20px 20px;">
+            <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper no-footer">
+                <div class="datatable-scroll">
+                    <table class="table table-striped pm-tool">
+                        <thead>
+                        <tr role="row">
+                            <th> @Html.DisplayNameFor(model => model.name) </th>
+                            <th> @Html.DisplayName("PM Tool") </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td> @Html.DisplayFor(modelItem => item.name) </td>
+                                <td>
+                                    <a href="@item.pmplateformlink" target="_blank">@item.pmplateformlink</a>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function() { ApplyDatatable(); });
+
+    function ApplyDatatable() {
+        $('.pm-tool').dataTable({
+            pageLength: 100,
+            paging: true,
+            fixedHeader: true,
+            dom: 'lBfrtip',
+            buttons: [{ extend: 'excelHtml5', title: 'Pm-tool' }, { extend: 'pdfHtml5', title: 'Pm-tool' }],
+            initComplete: function() {
+                $('.buttons-html5').addClass('btn btn-default btn-sm');
+            },
+        });
+        $('.dataTables_length select').select2({ minimumResultsForSearch: Infinity, width: 'auto' });
+    }
+</script>

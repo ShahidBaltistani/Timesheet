@@ -1,0 +1,101 @@
+﻿@model IEnumerable<computan.timesheet.core.Team>
+@{ ViewBag.Title = "Administrator Dashboard"; }
+
+@section header {
+    <div style="background-color: #fff;" class="panel page-header border-top-primary">
+        <div class="page-header-content">
+            <div class="page-title">
+                <h5>
+                    <i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Timesheet</span> - Administrator's Dashboard
+                    <small class="display-block">Welcome to timesheet dashboard!</small>
+                </h5>
+            </div>
+        </div>
+        <div class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/"><i class="icon-home2 position-left"></i>Dashboard</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+}
+
+<div class="flex-container">
+    @foreach (var item in Model)
+    {
+        if (item.isactive)
+        {
+            <div class="col-xs-6 col-sm-4 col-md-3 col-lg-2 col-xl-2 nospace">
+                <a href="~/Home/team/@item.id">
+                    <div class="panel panel-css">
+                        <div class="panel-body vertical-center">
+                            <h3>@item.name</h3>
+                        </div>
+                        <div class="panel-footer">
+                            <b>PM:</b> @Html.DisplayFor(modelItem => item.Managers.FullName)
+                            <i class="fa fa-arrow-circle-right" style="float: right;"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    }
+</div>
+<div class="flex-container">
+    <div class="col-xs-6 col-sm-4 col-md-3 col-lg-2 col-xl-2 nospace">
+        <a href="/UsersAdmin/GetTask">
+            <div class="panel panel-css">
+                <div class="panel-body" style="padding-top: 0px">
+                    <h3>Tasks by User</h3> Checklist of employees tasks by status
+                </div>
+                <i class="fa fa-arrow-circle-right arrow-position"></i>
+            </div>
+        </a>
+    </div>
+    <div class="col-xs-6 col-sm-4 col-md-3 col-lg-2 col-xl-2 nospace">
+        <a href="/ticketitems/alltaskslist">
+            <div class="panel panel-css">
+                <div class="panel-body" style="padding-top: 0px">
+                    <h3>All Tasks</h3> Find tasks by different filters like date, client, and project
+                </div>
+                <i class="fa fa-arrow-circle-right arrow-position"></i>
+            </div>
+        </a>
+    </div>
+    <div class="col-xs-6 col-sm-4 col-md-3 col-lg-2 col-xl-2 nospace">
+        <a href="/clientsandprojects">
+            <div class="panel panel-css">
+                <div class="panel-body" style="padding-top: 0px">
+                    <h3>Clients & Projects</h3> List of clients and their projects
+                </div>
+                <i class="fa fa-arrow-circle-right arrow-position"></i>
+            </div>
+        </a>
+    </div>
+    <div class="col-xs-6 col-sm-4 col-md-3 col-lg-2 col-xl-2 nospace">
+        <a href="/Home/Workloadreport">
+            <div class="panel panel-css">
+                <div class="panel-body" style="padding-top: 0px">
+                    <h3>Work Load Report</h3> Employees Workload Report
+                </div>
+                <i class="fa fa-arrow-circle-right arrow-position"></i>
+            </div>
+        </a>
+    </div>
+    <div class="col-xs-6 col-sm-4 col-md-3 col-lg-2 col-xl-2 nospace">
+        <a href="/Home/Estimatetasktime">
+            <div class="panel panel-css">
+                <div class="panel-body" style="padding-top: 0px">
+                    <h3>Estimate Time</h3> Check tickets estimate time logs
+                </div>
+                <i class="fa fa-arrow-circle-right arrow-position"></i>
+            </div>
+        </a>
+    </div>
+</div>
+<link href="~/Content/Custom/AdminDashboard.css" rel="stylesheet"/>
+<script src="~/Scripts/custom/jquery.matchHeight.min.js"></script>
+<script>
+    $(function() { $('.panel-css .panel-body').matchHeight(); });
+</script>

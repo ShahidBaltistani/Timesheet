@@ -1,0 +1,48 @@
+﻿@model IEnumerable<computan.timesheet.Models.AllTaskViewModel>
+<div class="table-responsive">
+    <table class="table table-striped" id="tasktable">
+        <thead>
+        <tr role="row">
+            <th colspan="2"> @Html.Raw("Email Subject") </th>
+            <th> @Html.Raw("Assigned On") </th>
+            <th> @Html.Raw("Status") </th>
+        </tr>
+        </thead>
+        <tbody>
+        @if (Model != null && Model.Count() > 0)
+        {
+            var count = Model.Count();
+            foreach (var item in Model.OrderByDescending(o => o.displayorder).ThenByDescending(o => o.assignedon))
+            {
+                <tr class="currentrow" data-rownumber="@count" data-taskid="@item.taskid">
+                    <td colspan="2">
+                        <h6 class="no-margin-top">
+                            <a href="/ticketitems/TicketItem/@item.id" target="_blank"><i class="icon-user"></i>&nbsp;&nbsp;@item.subject</a>
+                        </h6>
+                        <a class="modellink" id="@item.id" data-id="@item.id">
+                            <small class="display-block">@item.shortbody</small>
+                        </a>
+                    </td>
+                    <td>
+                        <span>@item.assignedon &nbsp;</span>
+                    </td>
+                    <td> @Html.DropDownList("changeuserstatus", new SelectList(ViewBag.ticketstatuslist, "id", "name", item.statusid), new {@class = "bootstrap-select", data_dropup_auto = "false", data_taskid = item.taskid, data_ticketid = item.ticketid}) </td>
+                </tr>
+                count = count - 1;
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="4" class="text-center">
+                    <h6 class="no-margin-top">
+                        <a href="#"><i class="icon-task"></i>&nbsp;&nbsp;Sorry, No task found.</a>
+                    </h6>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+<script src="~/Scripts/default/js/plugins/forms/selects/bootstrap_select.min.js"></script>
+<script src="~/Scripts/default/js/pages/form_bootstrap_select.js"></script>

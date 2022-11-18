@@ -1,0 +1,148 @@
+﻿@{
+    ViewBag.Title = "Client-Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .top_ticket .row { margin: 0; }
+
+    .top_ticket .row .col-md-6 { padding: 0; }
+
+    .top_ticket label {
+        background-color: #fcfcfc;
+        border: 1px solid #ddd;
+        color: #333;
+        font-size: 13px;
+        font-weight: 400;
+        line-height: 1;
+        margin: 0 -4px 6px 0;
+        padding: 9px 12px;
+        width: 25%;
+    }
+
+    .top_ticket .select2-container { width: 75.1% !important; }
+
+    .check-all {
+        margin-left: 5px !important;
+        margin-right: 20px !important;
+    }
+
+    .custom-td { padding-left: 0px !important; }
+
+    .header-text { font-size: 14px; }
+
+    .custom-label {
+        border: 1px solid transparent;
+        border-bottom-color: transparent;
+        border-left-color: transparent;
+        border-radius: 2px;
+        border-right-color: transparent;
+        border-top-color: transparent;
+        display: inline-block;
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 0.1px;
+        line-height: 1.5384616;
+        padding: 1px 4px 0px 4px;
+        text-align: center;
+        text-transform: uppercase;
+        vertical-align: baseline;
+        white-space: nowrap;
+    }
+
+    #loading-image {
+        left: 50%;
+        position: fixed;
+        top: 50%;
+        z-index: 9999;
+    }
+</style>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/Scripts/select2")
+    @Scripts.Render("~/Scripts/custom/tagsinput")
+    <script src="~/Scripts/default/plugins/jquery.alphanum.min.js"></script>
+}
+
+@section header{
+    <div class="page-header custom-header">
+        <div class="page-header-content">
+        </div>
+        <div class="customDesing">
+            <h3 class="text-white">@ViewBag.clientName Dashboard</h3>
+        </div>
+    </div>
+}
+
+<input type="text" hidden id="projectStatus" value="@ViewBag.type"/>
+<input type="text" hidden id="userId" value="@ViewBag.userId"/>
+<div class="container-fluid">
+    <ul class="nav nav-tabs nav-tabs-highlight">
+        <li class="" id="active">
+            <a href="/Clients/dashboard/@ViewBag.clientId/ActiveProjects">Active Projects</a>
+        </li>
+        <li class="" id="myprojects">
+            <a href="/Clients/dashboard/@ViewBag.clientId/MyProjects/@ViewBag.userId">My Projects</a>
+        </li>
+        <li class="" id="all">
+            <a href="/Clients/dashboard/@ViewBag.clientId/AllProjects">All Projects</a>
+        </li>
+    </ul>
+</div>
+@if (Request.IsAuthenticated && User.IsInRole("Admin"))
+{
+    if (ViewBag.type == "MyProjects")
+    {
+        <div class="UserDropdwon" style="margin: 25px; width: 300px;">
+            @Html.DropDownList("users", ViewBag.users as SelectList, "Select Users", new {@class = "form-control select2"})
+        </div>
+    }
+}
+<!-- Theme UI Client Dashboard -->
+<div class="panel panel-flat">
+    <div class="table-responsive" id="ClientDB"></div>
+</div>
+<!--Loading Image-->
+<img id="loading-image" src="~/Content/spin.gif" style="display: none"/>
+<script>
+    var type = $("#projectStatus").val();
+    $(document).ready(function() {
+        $("#users").val($("#userId").val());
+        LoadClientProjects();
+        if (type == "AllProjects") {
+            $("#all").addClass("active");
+        } else if (type == "MyProjects") {
+            $("#myprojects").addClass("active");
+        } else {
+            $("#active").addClass("active");
+        }
+    });
+
+    function LoadClientProjects() {
+        $("#loading-image").show();
+        $.ajax({
+            url: "/Clients/ClientDashboard/",
+            type: 'GET',
+            data: {
+                id: @ViewBag.clientId,
+                type: type,
+                userId: $("#users").val()
+            },
+            success: function(response) {
+                $("#ClientDB").html(response);
+                $("#loading-image").hide();
+            },
+            error: function() {
+                ProjectsByUser(type);
+            }
+        });
+    }
+
+    $("#users").change(function() {
+        var base_url = window.location.origin;
+        var userId = $("#users").val();
+        var url = base_url + "/Clients/dashboard/" + @ViewBag.clientId + "/MyProjects/" + userId;
+        window.location.href = url;
+        LoadClientProjects();
+    });
+</script>

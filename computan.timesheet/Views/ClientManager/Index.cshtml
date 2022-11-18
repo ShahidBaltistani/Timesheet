@@ -1,0 +1,753 @@
+﻿@model computan.timesheet.Models.ClientManagerViewModel
+@{ ViewBag.Title = "Client Manager"; }
+
+@section secondarysidebar {
+
+    <div class="sidebar sidebar-secondary sidebar-default">
+        <div class="sidebar-content">
+            <!-- Client Category -->
+            <div class="sidebar-category">
+                <br/>
+                <div style="margin-left: 20%;">
+                    @if (ViewBag.isall == true)
+                    {
+                        <span class="label bg-success-400">
+                            <a style="color: white" href="/clientmanager/all">All</a>
+                        </span>
+                        <span>&nbsp;&nbsp;&nbsp;</span>
+                        <span>
+                            <a href="/clientmanager">Active</a>
+                        </span>
+                    }
+                    else
+                    {
+                        <span>
+                            <a href="/clientmanager/all">All</a>
+                        </span>
+                        <span>&nbsp;&nbsp;&nbsp;</span>
+                        <span class="label bg-success-400">
+                            <a style="color: white;" href="/clientmanager">Active</a>
+                        </span>
+                    }
+                </div>
+                <div class="category-title">
+                    <span><i class="icon-cog3"></i> &nbsp; Select a client</span>
+                    <ul class="icons-list">
+                    </ul>
+                </div>
+                <div class="filteredcontainer fileredclient" style="display: none;">
+                    <ul class="navigation navigation-alt navigation-accordion">
+                        <li>
+                            <a class="filteredclient active" data-clientid="0" href="#">
+                                <i class="icon-googleplus5"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="sidebaritemcontainer searchcontainer category-content padding-10" style="display: block;">
+                    <form action="#">
+                        <div class="has-feedback has-feedback-left">
+                            <input class="searchclient form-control" placeholder="Search" type="search">
+                            <div class="form-control-feedback">
+                                <i class="icon-search4 text-size-base text-muted"></i>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="sidebaritemcontainer clientcollection category-content no-padding" style="display: block;">
+                    <ul class="navigation navigation-alt navigation-accordion">
+                        @*<li class="navigation-header">Category title</li>*@
+                        @foreach (var client in Model.Clients)
+                        {
+                            <li>
+                                <a class="client" data-clientid="@client.id" href="#">
+                                    <i class="icon-googleplus5"></i> @client.name
+                                </a>
+                            </li>
+                        }
+                        @*<li class="navigation-divider"></li>*@
+                    </ul>
+                </div>
+            </div>
+            <!-- /Client Category -->
+            <!-- Sub-Client Category -->
+            <div id="subclientcategory" class="sidebar-category" style="display: none;">
+                <div class="category-title">
+                    <span><i class="icon-cog3"></i> &nbsp; Select a sub client</span>
+                    <ul class="icons-list">
+                        @*<li><a href="#" data-action="collapse" class=""></a></li>*@
+                    </ul>
+                </div>
+                <div class="fileredsubclient" style="display: none;">
+                    <ul class="navigation navigation-alt navigation-accordion">
+                        <li>
+                            <a class="filteredsubclient" data-clientid="0" href="#">
+                                <i class="icon-googleplus5"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="searchcontainer category-content padding-10" style="display: block;">
+                    <form action="#">
+                        <div class="has-feedback has-feedback-left">
+                            <input class="searchsubclient form-control" placeholder="Search" type="search">
+                            <div class="form-control-feedback">
+                                <i class="icon-search4 text-size-base text-muted"></i>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="subclientcollection category-content no-padding" style="display: block;">
+                    <ul class="navigation navigation-alt navigation-accordion"></ul>
+                </div>
+            </div>
+            <!-- /Sub-Client Category -->
+        </div>
+    </div>
+    <input type="hidden" id="activeclient" value=""/>
+}
+
+@section header{
+    <div class="page-header">
+        <div class="page-header-content">
+        </div>
+        <div class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="#"><i class="icon-home2 position-left"></i> Home</a>
+                </li>
+            </ul>
+            <ul class="breadcrumb-elements">
+                @*<li><a href="#"><i class="icon-comment-discussion position-left"></i> Link</a></li>*@
+                @*<li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <i class="icon-gear position-left"></i>
+                            Dropdown
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-right">
+                            <li><a href="#"><i class="icon-user-lock"></i> Account security</a></li>
+                            <li><a href="#"><i class="icon-statistics"></i> Analytics</a></li>
+                            <li><a href="#"><i class="icon-accessibility"></i> Accessibility</a></li>
+                            <li class="divider"></li>
+                            <li><a href="#"><i class="icon-gear"></i> All settings</a></li>
+                        </ul>
+                    </li>*@
+            </ul>
+            <a class="breadcrumb-elements-toggle">
+                <i class="icon-menu-open"></i>
+            </a>
+        </div>
+    </div>
+}
+
+<div id="noclientsection" class="panel panel-info">
+    <div class="panel-heading">
+        <h5 class="panel-title">Please select a client from left sidebar.</h5>
+    </div>
+</div>
+<div id="clientprojects-section" style="display: none;">
+    <div id="clinet-projects">
+        <div class="panel panel-success">
+            <ul class="nav nav-tabs nav-tabs-highlight">
+                <li class="active tickets">
+                    <a href="#"><i class="icon icon-task label-icon-sm"></i>Tickets</a>
+                </li>
+                <li class="projectsli">
+                    <a href="#"><i class="icon icon-tab label-icon-sm"></i>Projects</a>
+                </li>
+                <li class="rulesli">
+                    <a href="#"><i class="icon icon-magazine label-icon-sm"></i>Rules</a>
+                </li>
+                <li class="credentialli">
+                    <a href="#"><i class="icon icon-lock label-icon-sm"></i>Credentials</a>
+                </li>
+                <li class="Addcredentialsli pull-right" style="display: none;">
+                    <button @*onclick="window.open('/credentials/CreateForProject/@Model.project.id')"*@ class="btn btn-primary btnaddcredentials" target="_blank" style="color: white !important; margin-right: 10px; margin-top: 6px !important;"><i class="icon-add position-left"></i><span class="badge badge-success"></span>Add Credentials</button>
+                </li>
+            </ul>
+            @*<div class="panel-heading">
+                    <h5 class="panel-title" id="panel-client-title"></h5>
+                </div>*@
+            <div class="main-panel-body panel-body" id="panel-client-body">
+            </div>
+        </div>
+    </div>
+</div>
+<div id="subclientprojects-section" style="display: block;">
+</div>
+<div class="modal fade" id="MyModel" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content" id="MyModel-Content"> </div>
+    </div>
+</div>
+<div class="modal fade" id="Addcredentialmodel" role="dialog">
+    <div class="modal-dialog" style="width: 60%;">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">
+                    <span class="credentialmodeltitle"></span>
+                </h4>
+            </div>
+            <div class="modal-body" id="credentialformmodeldiv" style="height: 600px; max-height: 600px; overflow-y: scroll">
+            </div>
+        </div>
+    </div>
+</div>
+@*Assign Tickets Model*@
+<div class="modal fade" id="assignuseradmin" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Assign Users</h4>
+            </div>
+            <div class="modal-body" id="modelassignuseradmindiv">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        @Html.Label("Project", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.DropDownList("projectid_assignuser", new SelectList(ViewBag.projects, "Value", "Text"), "Please Select", new {@class = "form-control"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Skill", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.DropDownList("skillid_assignuser", new SelectList(ViewBag.skills, "id", "name"), "Please Select", new {@class = "form-control"})
+                        </div>
+                    </div>
+                    <div class="form-group" style="height: 250px; overflow-y: scroll;">
+                        <label class="control-label col-md-2">Users</label>
+                        @{ var countuser = 0; }
+                        @foreach (var users in ViewBag.users)
+                        {
+                            if (countuser >= 4)
+                            {
+                                <label class="control-label col-md-2">&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                countuser = 0;
+                            }
+                            countuser++;
+                            <div class="col-md-5" style="float: left; position: relative;">
+                                @Html.CheckBox("userid", new {@class = "teammember userslist", data_userid = users.Id, id = users.Id})
+                                <label for="@users.Id" class="">@users.FirstName @users.LastName</label>
+                            </div>
+                        }
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="button" id="btnassignticket" value="Add" class="btn btn-primary saveticketassignment"/>
+                        </div>
+                    </div>
+                    <input type="hidden" id="assignticket_ticketid" value="0"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="changemultiplestatusmodel" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Change Multiple Tickets Status</h4>
+            </div>
+            <div class="modal-body" id="modelstatusdiv">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        @Html.Label("Status Type", new {@class = "control-label col-md-2"})
+                        <div class="col-md-5">
+                            @Html.DropDownList("statusid", new List<SelectListItem> {new SelectListItem {Text = "Closed", Value = "3", Selected = true}, new SelectListItem {Text = "Won't Fix", Value = "4"}}, "Please Select Status", new {@class = "form-control"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="reset" id="btnclosemultipletask" value="Add" class="btn btn-primary btnclosemultipletask"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@*Start Working Model*@
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Start Working</h4>
+            </div>
+            <div class="modal-body" id="modelbodydiv">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        @Html.Label("Project", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.DropDownList("projectid", new SelectList(ViewBag.projects, "Value", "Text"), "Select Project", new {@class = "form-control"})
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="form-group">
+                        @Html.Label("Skill", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.DropDownList("skillid", new SelectList(ViewBag.skills, "id", "name"), "Select Skill", new {@class = "form-control"})
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="form-group">
+                        @Html.Label("Quoted Time", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.TextBox("quotabletime", null, new {placeholder = "Add Time In Minutes", @class = "form-control"})
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" id="startworking" value="Start" class="btn btn-primary"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" value="1" id="currentstatus" class="hiddenstatus"/>
+<input type="hidden" value="" id="currentclient"/>
+@Scripts.Render("~/Scripts/plugins/livefilter")
+@Scripts.Render("~/Scripts/custom/clientmanager")
+<script src="~/Scripts/custom/CommonForTickets.min.js"></script>
+<script src="~/Scripts/custom/ticket.min.js"></script>
+<script type="text/javascript">
+    $(function() {
+        ///
+        $.fn.modal.Constructor.prototype.enforceFocus = function() {};
+        $(document).on("input",
+            ".clssearchtext",
+            function() {
+                var len = $(this).val().length;
+                var clientid = $(this).attr("data-clientid");
+                if (len >= 1) {
+                    $(".clsbtnsearch").prop("disabled", false);
+                    $("#searchvalue-" + clientid + ".searchvalue").val($(this).val());
+                } else {
+                    $(".clsbtnsearch").prop("disabled", true);
+                }
+            });
+
+        $(document).on('click',
+            '.tickets',
+            function() {
+                $(".Addcredentialsli").hide();
+                $("#currentstatus").val("1");
+                var clientid = $("#activeclient").val();
+                $("#currentclient").val(clientid);
+                $(this).addClass('active');
+                $('#' + clientid + '.projectsli').removeClass('active');
+                $('.rulesli ').removeClass('active');
+                $('.credentialli').removeClass('active');
+                var id = 1;
+                $.ajax({
+                    url: '/TicketsByClient/index/',
+                    data: {
+                        id: id,
+                        clientid: clientid,
+                        topic: ""
+                    },
+                    type: 'GET',
+
+                }).done(function(data) {
+                    if (data.error) {
+                        alert('failed');
+                        return false;
+                    }
+                    //var title = ".panel-title#panel-client-title-" + clientid;
+                    //var clientname = $(title).attr('data-name');
+                    //var body = "#panel-client-body-" + clientid;
+                    //$("#panel-client-title").html("Tickets");
+                    //remove and class class of counter
+                    $(".main-panel-body").html(data);
+                    $("#1.statusli").addClass("active");
+                    $('.conversationstatus').each(function() {
+                        $(this).removeClass('badge-success');
+                        $(this).addClass('badge-default');
+                    });
+                    // add active class to current tab
+                    $('.statusli#' + id).addClass('active');
+                    //remove and class class of current tab counter
+                    $('#' + id + '.conversationstatus').removeClass('badge-default');
+                    $('#' + id + '.conversationstatus').addClass('badge-success');
+                    return false;
+                });
+            });
+        $(document).on('change',
+            '.projectdropdown',
+            function() {
+                var projectid = $(this).val();
+                var id = $("#currentstatus").val();
+                var clientid = $(this).attr("data-clientid");
+                var searchtextbox = "#idsearchtext-" + clientid + ".clssearchtext";
+                var searchstring = $(searchtextbox).val();
+                searchstring = $("#searchvalue-" + clientid + ".searchvalue").val();
+                $.ajax({
+                    url: '/TicketsByClient/GetTicketsByProject/',
+                    data: {
+                        id: id,
+                        projectid: projectid,
+                        clientid: clientid,
+                        topic: searchstring
+                    },
+                    type: 'GET',
+
+                }).done(function(data) {
+                    if (data.error) {
+                        alert('failed');
+                        return false;
+                    }
+                    var body = "#panel-client-body-" + clientid;
+                    //$(title).html(clientname + "'s Tickets");
+                    $(".ticketsbody").html(data);
+                    $("#" + id + ".statusli").addClass("active");
+                    $('#' + id + '.conversationstatus').addClass('badge-success');
+                    return false;
+                });
+
+            });
+        $(document).on('submit',
+            'form',
+            function(event) {
+                event.preventDefault();
+            });
+        $(document).on('click',
+            '.clsbtnsearch',
+            function() {
+                var id = $("#currentstatus").val();
+                var clientid = $(this).attr("data-clientid");
+                var searchtextbox = "#idsearchtext-" + clientid + ".clssearchtext";
+                var searchstring = $(searchtextbox).val();
+                searchstring = $("#searchvalue-" + clientid + ".searchvalue").val();
+                var projectid = $(".projectdropdown").val();
+                $.ajax({
+                    url: '/TicketsByClient/GetTicketsByProject/',
+                    data: {
+                        id: id,
+                        projectid: projectid,
+                        clientid: clientid,
+                        topic: searchstring
+                    },
+                    type: 'GET',
+
+                }).done(function(data) {
+                    if (data.error) {
+                        alert('failed');
+                        return false;
+                    }
+                    var body = "#panel-client-body-" + clientid;
+                    //$(title).html(clientname + "'s Tickets");
+                    $(".ticketsbody").html(data);
+                    $("#" + id + ".statusli").addClass("active");
+                    //remove and class class of counter
+                    $('.conversationstatus').each(function() {
+                        $(this).removeClass('badge-success');
+                        $(this).addClass('badge-default');
+                    });
+                    // add active class to current tab
+                    $('.statusli#' + id).addClass('active');
+                    //remove and class class of current tab counter
+                    $('#' + id + '.conversationstatus').removeClass('badge-default');
+                    $('#' + id + '.conversationstatus').addClass('badge-success');
+                    $("#idpresearchstring-" + clientid + ".presearchstring").removeClass("hidden");
+                    $("#idsearchstring-" + clientid + ".searchstring").html(" <b>' " + searchstring + " '</b>");
+                    $(".cls-searchtext").val('');
+                    return false;
+                });
+            });
+        $(document).on('click',
+            '.clearsearch',
+            function() {
+                var clientid = $(this).attr("data-clientid");
+                if ($("#searchvalue-" + clientid + ".clssearchtext").val() != '') {
+                    var id = $("#currentstatus").val();
+                    $("#idsearchtext-" + clientid + ".clssearchtext").val('');
+                    $("#idsearchstring-" + clientid + ".searchstring").html('');
+                    $("#searchvalue-" + clientid + ".searchvalue").val('');
+                    $("#idpresearchstring-" + clientid + ".presearchstring").addClass("hidden");
+                    $(".clsbtnsearch").prop("disabled", true);
+                    $("#" + id + '.statusli').click();
+                }
+                return false;
+            });
+        $(document).on('click',
+            '.statusli',
+            function() {
+                var projectid = $(".projectdropdown").val();
+                var id = $(this).attr("data-id");
+                $("#currentstatus").val(id);
+                var clientid = $(this).attr("data-clientid");
+                var topic = $("#searchvalue-" + clientid + ".searchvalue").val();
+                $.ajax({
+                    url: '/TicketsByClient/GetTicketsByProject/',
+                    data: {
+                        id: id,
+                        projectid: projectid,
+                        clientid: clientid,
+                        topic: topic
+                    },
+                    type: 'GET',
+
+                }).done(function(data) {
+                    if (data.error) {
+                        alert('failed');
+                        return false;
+                    }
+                    var body = "#panel-client-body-" + clientid;
+                    //$(title).html(clientname + "'s Tickets");
+                    $(".ticketsbody").html(data);
+                    //$(body + ".panel-body").html(data);
+                    $(".statusli").removeClass("active");
+                    $("#" + id + ".statusli").addClass("active");
+                    $('.conversationstatus').each(function() {
+                        $(this).removeClass('badge-success');
+                        $(this).addClass('badge-default');
+                    });
+                    // add active class to current tab
+                    $('.statusli#' + id).addClass('active');
+                    //remove and class class of current tab counter
+                    $('#' + id + '.conversationstatus').removeClass('badge-default');
+                    $('#' + id + '.conversationstatus').addClass('badge-success');
+                    return false;
+                });
+
+            });
+        $(document).on('click',
+            '.projectsli',
+            function() {
+                $(".Addcredentialsli").hide();
+                var clientid = $("#activeclient").val();
+                $(this).addClass('active');
+                $('.tickets').removeClass('active');
+                $('.rulesli ').removeClass('active');
+                $('.credentialli').removeClass('active');
+                $.ajax({
+                    url: '/TicketsByClient/getprojects/',
+                    data: {
+                        clientid: clientid
+                    },
+                    type: 'GET',
+
+                }).done(function(data) {
+                    if (data.error) {
+                        alert('failed');
+                        return false;
+                    }
+                    var title = ".panel-title#panel-client-title-" + clientid;
+                    var clientname = $(title).attr('data-name');
+                    var body = "#panel-client-body-" + clientid;
+                    $(title).html(clientname + "'s Projects");
+                    $(".main-panel-body").html(data);
+                });
+            });
+
+        $(document).on('click',
+            '.rulesli',
+            function() {
+                $(".Addcredentialsli").hide();
+                var clientid = $("#activeclient").val();
+                $(this).addClass('active');
+                $('.tickets').removeClass('active');
+                $('.projectsli').removeClass('active');
+                $('.credentialli').removeClass('active');
+                $.ajax({
+                    url: '/TicketsByClient/GetRules/',
+                    data: {
+                        clientid: clientid
+                    },
+                    type: 'GET',
+                }).done(function(data) {
+                    if (data.error) {
+                        alert('failed');
+                        return false;
+                    }
+                    var title = ".panel-title#panel-client-title-" + clientid;
+                    var clientname = $(title).attr('data-name');
+                    var body = "#panel-client-body-" + clientid;
+                    $(title).html(clientname + "'s Assignment Rules");
+                    $(".main-panel-body").html(data);
+                });
+            });
+
+        $(document).on('click',
+            '.credentialli',
+            function() {
+                var clientid = $("#activeclient").val();
+                $(this).addClass('active');
+                $('.tickets').removeClass('active');
+                $('.projectsli').removeClass('active');
+                $('.rulesli').removeClass('active');
+                $.ajax({
+                    url: '/ClientManager/ClientCredentials/',
+                    data: {
+                        id: clientid
+                    },
+                    type: 'GET',
+                }).done(function(data) {
+                    if (data.error) {
+                        alert('failed');
+                        return false;
+                    }
+                    var title = ".panel-title#panel-client-title-" + clientid;
+                    var clientname = $(title).attr('data-name');
+                    var body = "#panel-client-body-" + clientid;
+                    $(title).html(clientname + "'s Credentials");
+                    $(".main-panel-body").html(data);
+                    $(".Addcredentialsli").show();
+                });
+            });
+        $(document).on('click',
+            '.status',
+            function() {
+                var id = $(this).data("id");
+                var statusid;
+                if ($(this).is(":checked")) {
+                    statusid = true;
+                } else {
+                    statusid = false;
+                }
+                $.ajax({
+                    url: "/rules/status/",
+                    data: {
+                        id: id,
+                        statusid: statusid
+                    },
+                    type: 'POST'
+                }).done(function(data) {
+                    if (data.error) {
+                        swal("error", data.errortext, "error");
+                        return false;
+                    }
+                    swal("Status has been updated", data.successtext, "success");
+                    return false;
+                });
+            });
+        $(document).on('click',
+            '.btnaddcredentials',
+            function() {
+                var id = $(this).data("id");
+                $.ajax({
+                    url: '/credentials/create/',
+                    type: 'GET',
+                }).done(function(data) {
+                    if (data.error) {
+                        //var source = $("#error-notification-template").html();
+                        //var template = Handlebars.compile(source);
+                        //var html = template(data);
+                        //$("#modeladdtimebodydiv").prepend(html);
+                        alert("Failed");
+                        return false;
+                    }
+                    var title = "Add Credentials";
+                    $(".credentialmodeltitle").text(title);
+                    $('#credentialformmodeldiv').html(data);
+                    $('select').select2();
+                    $("#Addcredentialmodel").modal('show');
+                    //$("#" + tcktitemid + ".notimeadded").remove();
+                    //var source = $("#Add-time-after-template").html();
+                    //var template = Handlebars.compile(source);
+                    //var html = template(data);
+                    //$("#" + tcktitemid + ".addtimeafter").append(html);
+                    return false;
+                });
+            });
+        $(document).on('submit',
+            '#addcredentials',
+            function(e) {
+                e.preventDefault(); // prevent the form's normal submission
+                var dataToPost = $(this).serialize();
+                $.post("/credentials/create", dataToPost)
+                    .done(function(response, status, jqxhr) {
+                        sweetAlert("", "The credentials has been added successfully!", "success");
+                        $(".credentialli").click();
+                        $("#Addcredentialmodel").modal('hide');
+                        return false;
+                    })
+                    .fail(function(jqxhr, status, error) {
+                        // this is the ""error"" callback
+                        //sweetAlert("", error.errortext, "error");
+                    });
+            });
+        $(document).on('click',
+            ".editcredentialsbtn",
+            function() {
+                $(".credentialmodeltitle").text('');
+                var btn = $(this);
+                var id = $(this).data('id');
+                $.ajax({
+                    url: '/credentials/edit/' + id,
+                    type: 'GET',
+                }).done(function(data) {
+                    if (data.error) {
+                        //var source = $("#error-notification-template").html();
+                        //var template = Handlebars.compile(source);
+                        //var html = template(data);
+                        //$("#modeladdtimebodydiv").prepend(html);
+                        alert("Failed");
+                        return false;
+                    }
+                    $('#credentialformmodeldiv').html(data);
+                    var projectid = $("#projectid").val();
+                    var proid = "<input type='hidden' value='" + projectid + "' id='projectid' name='projectid'>";
+                    $("#form-group-productid").html('');
+                    $("#form-group-productid").hide();
+                    $("#editcredentials").append(proid);
+                    $('select').select2();
+                    $("#Addcredentialmodel").modal('show');
+                    //$("#" + tcktitemid + ".notimeadded").remove();
+                    //var source = $("#Add-time-after-template").html();
+                    //var template = Handlebars.compile(source);
+                    //var html = template(data);
+                    //$("#" + tcktitemid + ".addtimeafter").append(html);
+                    return false;
+                });
+            });
+        $(document).on('submit',
+            '#editcredentials',
+            function(e) {
+                e.preventDefault(); // prevent the form's normal submission
+                var dataToPost = $(this).serialize();
+                $.post("/credentials/edit", dataToPost)
+                    .done(function(response, status, jqxhr) {
+                        sweetAlert("", "The credentials has been updated successfully!", "success");
+                        $(".credentialli").click();
+                        $("#Addcredentialmodel").modal('hide');
+                        return false;
+                    })
+                    .fail(function(jqxhr, status, error) {
+                        // this is the ""error"" callback
+                    });
+            });
+    });
+</script>
+<script id="success-notification-template" type="text/x-handlebars-template">
+    <div class="alert alert-success alert-styled-left alert-bordered usernotification">
+        <button data-dismiss="alert" class="close" type="button"><span>×</span><span class="sr-only">Close</span></button>
+        <span class="text-semibold">{{successtext}}</span>
+    </div>
+</script>
+<script id="error-notification-template" type="text/x-handlebars-template">
+    <div class="alert alert-danger alert-styled-left alert-bordered usernotification">
+        <button data-dismiss="alert" class="close" type="button"><span>×</span><span class="sr-only">Close</span></button>
+        <span class="text-semibold">{{errortext}}</span>
+    </div>
+</script>
+<script id="success-notification-template-ticket" type="text/x-handlebars-template">
+    <div class="alert alert-danger alert-styled-left alert-bordered usernotification">
+        <button data-dismiss="alert" class="close" type="button"><span>×</span><span class="sr-only">Close</span></button>
+        <span class="text-semibold">This {{subject}} ticket has been assigned to you.click <a href="{{link}}">here</a>for details.</span>
+    </div>
+</script>

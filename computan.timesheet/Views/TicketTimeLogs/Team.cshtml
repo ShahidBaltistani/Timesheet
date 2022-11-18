@@ -1,0 +1,243 @@
+﻿@model computan.timesheet.Models.TicketTimeViewModel
+@{ ViewBag.Title = "Team Time Log"; }
+
+@section header {
+    <div style="background-color: #fff;" class="panel page-header border-top-primary">
+        <div class="page-header-content">
+            <div class="page-title">
+                <h5>
+                    <i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Timesheet</span> - Ticket Time Logs
+                    <small class="display-block">Allows you to view and export the time logs for each ticket or project.</small>
+                </h5>
+            </div>
+            <div class="heading-elements">
+                <div class="btn-group"> </div>
+            </div>
+            <a class="heading-elements-toggle">
+                <i class="icon-menu"></i>
+            </a>
+        </div>
+        <div style="border-bottom: 0; box-shadow: none; margin-bottom: 0;" class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/"><i class="icon-home2 position-left"></i>Dashboard</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+}
+
+<div class="panel panel-primary">
+    @Html.Partial("_TimeNavTabs", "team")
+    <div class="panel-heading">
+        <h5 class="panel-title">Search Time Log</h5>
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li>
+                    <a data-action="collapse"></a>
+                </li>
+                <li>
+                    <a data-action="reload"></a>
+                </li>
+            </ul>
+        </div>
+        <a class="heading-elements-toggle">
+            <i class="icon-menu"></i>
+        </a>
+    </div>
+    <div class="panel-body">
+            @Html.Partial("_SearchFilterAdmin", Model.SearchTicketTime, new ViewDataDictionary { { "id", "1" }, { "link", ViewBag.Link }, })
+    </div>
+    <div class="panel-body" style="max-width: inherit; overflow-x: scroll;">
+        <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper no-footer">
+            <div class="datatable-scroll">
+                <table class="table datatable-button-html5-basic" id="DataTables_Table_0" role="grid" aria-describedby="DataTables_Table_0_info">
+                    <thead>
+                        @*<tr role="row">
+            <th> Client </th>
+            <th> Client Type </th>
+            <th> @Html.DisplayNameFor(model => model.SearchResults.FirstOrDefault().Project.name) </th>
+            <th> @Html.DisplayNameFor(model => model.SearchResults.FirstOrDefault().title) </th>
+            <th> @Html.DisplayNameFor(model => model.SearchResults.FirstOrDefault().description) </th>
+            <th> @Html.DisplayNameFor(model => model.SearchResults.FirstOrDefault().workdate) </th>
+            <th> @Html.DisplayNameFor(model => model.SearchResults.FirstOrDefault().timespentinminutes) </th>
+            <th> @Html.DisplayNameFor(model => model.SearchResults.FirstOrDefault().billabletimeinminutes) </th>
+            <th> Max Bill Hours </th>
+            <th> @Html.DisplayNameFor(model => model.SearchResults.FirstOrDefault().TeamUser.UserName) </th>
+            <th> @Html.DisplayNameFor(model => model.SearchResults.FirstOrDefault().Skill.name) </th>
+            <th></th>
+        </tr>*@
+
+                        <tr role="row">
+                            <th> Client </th>
+                            <th> Client Type </th>
+                            <th> ProjectName </th>
+                            <th>Title </th>
+                            <th> description </th>
+                            <th> workdate </th>
+                            <th> timespentinminutes </th>
+                            <th> billabletimeinminutes </th>
+                            <th> Max Bill Hours </th>
+                            <th> UserName) </th>
+                            <th> Skillname) </th>
+                            <th> Team Name) </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.SearchResult != null && Model.SearchResult.Count > 0)
+                        {
+                            foreach (var item in Model.SearchResult.OrderByDescending(x => x.GetWorkDate))
+                            {
+
+                                <tr>
+                                    <td> @Html.DisplayFor(modelItem => item.Client) </td>
+                                    <td> @Html.DisplayFor(modelItem => item.ClientType) </td>
+                                    <td> @Html.DisplayFor(modelItem => item.ProjectName) </td>
+                                    <td> @Html.DisplayFor(modelItem => item.title) </td>
+                                    <td> @Html.DisplayFor(modelItem => item.description) </td>
+                                    <td> @Html.DisplayFor(modelItem => item.GetWorkDate) </td>
+                                    <td> @Html.DisplayFor(modelItem => item.timespentinminutes) </td>
+                                    <td> @Html.DisplayFor(modelItem => item.billabletimeinminutes) </td>
+                                    <td> @Html.DisplayFor(modelItem => item.maxbillablehours) </td>
+                                    <td> @Html.DisplayFor(modelItem => item.UserName) </td>
+                                    <td> @Html.DisplayFor(modelItem => item.SkillName) </td>
+                                    <td> @Html.DisplayFor(modelItem => item.TeamName) </td>
+                                    <td> @Html.ActionLink("Edit", "Edit", new { item.id }, new { @class = "btn btn-info btn-xs" }) </td>
+                                </tr>
+                                @*<tr>
+                    <td> @Html.DisplayFor(modelItem => item.Project.getclientname) </td>
+                    <td> @Html.DisplayFor(modelItem => item.Project.getclienttype) </td>
+                    <td> @Html.DisplayFor(modelItem => item.Project.getprojectname) </td>
+                    <td> @Html.DisplayFor(modelItem => item.title) </td>
+                    <td> @Html.DisplayFor(modelItem => item.description) </td>
+                    <td> @Html.DisplayFor(modelItem => item.GetWorkDate) </td>
+                    <td> @Html.DisplayFor(modelItem => item.timespentinminutes) </td>
+                    <td> @Html.DisplayFor(modelItem => item.billabletimeinminutes) </td>
+                    <td> @Html.DisplayFor(modelItem => item.Project.getclientmaxhour) </td>
+                    <td> @Html.DisplayFor(modelItem => item.TeamUser.FullName) </td>
+                    <td> @Html.DisplayFor(modelItem => item.Skill.name) </td>
+                    <td> @Html.ActionLink("Edit", "Edit", new {item.id}, new {@class = "btn btn-info btn-xs"}) </td>
+                </tr>*@
+                            }
+                        }
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td>--</td><td>--</td><td>--</td><td>--</td><td>--</td>
+                        <td class="text-center" style="font-size: 18px;">
+                            <b>Total Time</b>
+                        </td>
+                        <td>
+                            <b>@ViewBag.totalspent Hrs</b>
+                        </td>
+                        <td>
+                            <b>@ViewBag.totalbillable Hrs</b>
+                        </td><td>--</td><td>--</td><td>--</td><td>--</td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/Scripts/select2")
+}
+
+<link rel="stylesheet" type="text/css" href="/scripts/default/datepicker/css/jquery.datepick.min.css"/>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var from = $("#StartDate").val();
+        var to = $("#EndDate").val();
+        $("#projectid").select2({ width: 200 });
+        $("#clientid").select2({ width: 200 });
+        $("#TeamId").select2({ width: 200 });
+        var projectname = $("#projectid option:selected").text();
+        var cientname = $("#clientid option:selected").text();
+        if (projectname == 'Select Project' && cientname == 'Select Client') {
+            projectname = '';
+        } else if (projectname == 'Select Project' && cientname != 'Select Client') {
+            projectname = cientname;
+        } else if (projectname != 'Select Project' && cientname != 'Select Client') {
+            projectname = projectname;
+        }
+        $("#teamuserid").select2({ width: 200 });
+        $("#DataTables_Table_0").dataTable().fnDestroy();
+        $('#DataTables_Table_0').dataTable({
+            "paging": false,
+            "ordering": true,
+            fixedHeader: true,
+            "order": [[5, "desc"]],
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    footer: true,
+                    title: projectname + '--' + @ViewBag.totalbillable + ' Hrs--' + from + ' to ' + to,
+                    exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    footer: true,
+                    orientation: 'landscape',
+                    title: projectname + '--' + @ViewBag.totalbillable + ' Hrs--' + from + ' to ' + to,
+                    exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] }
+                }
+            ],
+            initComplete: function() { $('.buttons-html5').addClass('btn btn-default btn-sm'); }
+        });
+        $(".dt-buttons").append($("#excel-button-template").html());
+        $("#clientid").change(function() {
+            $("#projectid").val('').trigger('change');
+            var clientid = $(this).val();
+            if (clientid == '') {
+                $.getJSON("/tickettimeLogs/loadallprojects",
+                    function(data) {
+                        var select = $("#projectid");
+                        select.empty();
+                        select.append($('<option />', { value: '', text: "Select a project" }));
+                        $.each(data,
+                            function(index, itemData) {
+                                select.append($('<option />', { value: itemData.Value, text: itemData.Text }));
+                            });
+                    });
+            } else {
+                $.getJSON("/tickettimeLogs/loadprojectsbyclient",
+                    { id: clientid },
+                    function(data) {
+                        var select = $("#projectid");
+                        select.empty();
+                        select.append($('<option />', { value: '', text: "Select a project" }));
+                        $.each(data,
+                            function(index, itemData) {
+                                select.append($('<option />', { value: itemData.Value, text: itemData.Text }));
+                            });
+                    });
+            }
+        });
+    });
+    function copyToClipboard() {
+        debugger
+        var $temp = $("<input>");
+        $("body").append($temp);
+        var value = $.trim($('#text').text());
+        $temp.val(value).select();
+        document.execCommand("copy");
+        $temp.remove();
+        new PNotify({
+            text: "Copied!",
+            addclass: "stack-bottom-right bg-info"
+        });
+    }
+</script>
+<script id="excel-button-template" type="text/x-handlebars-template">
+    <div class="btn-group">
+        @using (Html.BeginForm("Export", "tickettimelogs", FormMethod.Post))
+        {
+            <input type="submit" value="Download Excel File" class="btn btn-primary btn-sm ml-10" />
+        }
+    </div>
+</script>

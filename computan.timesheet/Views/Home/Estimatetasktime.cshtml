@@ -1,0 +1,341 @@
+﻿@model computan.timesheet.Models.EstimateTimeViewModels
+@{ ViewBag.Title = "Estimate Task Time List"; }
+
+@section header {
+    <div style="background-color: #fff;" class="panel page-header border-top-primary">
+        <div class="page-header-content">
+            <div class="page-title">
+                <h5>
+                    <i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">TimeSheet</span> - Estimate Task Time List
+                    <small class="display-block">Estimate Task's Time List</small>
+                </h5>
+            </div>
+            <div class="heading-elements">
+                <div class="btn-group"> </div>
+            </div>
+            <a class="heading-elements-toggle">
+                <i class="icon-menu"></i>
+            </a>
+        </div>
+        <div style="border-bottom: 0; box-shadow: none; margin-bottom: 0;" class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/"><i class="icon-home2 position-left"></i>TimeSheet</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+}
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h5 class="panel-title">Estimate Task Time List</h5>
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li>
+                    <a data-action="collapse"></a>
+                </li>
+                <li>
+                    <a data-action="reload"></a>
+                </li>
+            </ul>
+        </div>
+        <a class="heading-elements-toggle">
+            <i class="icon-menu"></i>
+        </a>
+    </div>
+    <div class="panel-body">
+        @using (Html.BeginForm("Estimatetasktime", "Home", FormMethod.Post, new {@class = "form-inline"}))
+        {
+            <div class="form-group">
+                <div class="input-group">
+                    <span class="input-group-addon">
+                        <i class="icon-calendar3"></i>
+                    </span>
+                    @Html.EditorFor(model => model.searchViewModels.StartDate, new {htmlAttributes = new {Value = Model.searchViewModels.StartDate.ToString("MM/dd/yyyy"), @class = "form-control picker"}})
+                </div>
+                <div class="input-group">
+                    <span class="input-group-addon">
+                        <i class="icon-calendar3"></i>
+                    </span>
+                    @Html.EditorFor(model => model.searchViewModels.EndDate, new {htmlAttributes = new {Value = Model.searchViewModels.EndDate.ToString("MM/dd/yyyy"), @class = "form-control picker"}})
+                </div>
+                <div class="input-group">
+                    @Html.DropDownListFor(model => model.searchViewModels.userid, Model.searchViewModels.UsersCollection.OrderBy(x => x.Text), "Select User", new {@class = "form-control"})
+                    @Html.ValidationMessageFor(model => model.searchViewModels.userid)
+                </div>
+                <div class="input-group">
+                    <button type="submit" class="btn btn-success form-control">
+                        <span class="glyphicon glyphicon-search"></span> Search
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="panel-body" style="max-width: inherit; overflow-x: scroll;">
+        <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper no-footer">
+            <div class="datatable-scroll">
+                <table class="table datatable-button-html5-basic" id="estimateTimeTaskTable" role="grid" aria-describedby="DataTables_Table_0_info">
+                    <thead>
+                    <tr>
+                        <th> @Html.DisplayName("Task List") </th>
+                        <th> @Html.DisplayName("Billable Time [Minutes]") </th>
+                        <th> @Html.DisplayName("Time Spend [Minutes]") </th>
+                        <th> @Html.DisplayName("Estimated Time [Minutes]") </th>
+                        <th> @Html.DisplayName("Time Difference [Minutes]") </th>
+                        <th> </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var item in Model.taskTimeView)
+                    {
+                        <tr>
+                            <td style="width: 40%">
+                                <a href="/tickets/ticketitem/@item.TicketId">@Html.DisplayFor(modelItem => item.TicketTitle)</a>
+                            </td>
+                            <td> @Html.DisplayFor(modelItem => item.BillTime) </td>
+                            <td> @Html.DisplayFor(modelItem => item.SpentTime) </td>
+                            <td> @Html.DisplayFor(modelItem => item.EstimatedTime) </td>
+                            <td> @Html.DisplayFor(modelItem => item.TimeDifference) </td>
+                            <td>
+                                <div style="margin: 0px auto; text-align: center; width: 200px;">
+                                    <button type="button" class="btn btn-primary btn-xs Logs" value="@item.TicketId">Time Log</button>&nbsp;
+                                    <button type="button" class="btn btn-primary btn-xs timeEstimateMeta" value="@item.TicketId">Meta</button>
+                                    <button type="button" class="btn btn-primary btn-xs timeReport" value="@item.TicketId" data-title="@item.TicketTitle">Report</button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@*Ticket Time log Modal*@
+<div id="TimeLogModal" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width: 900px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h2 class="modal-title" style="text-align: center">Ticket Time Log</h2>
+            </div>
+            <div class="modal-body">
+                <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="datatable-scroll">
+                        <table class="table logtable" style="width: 100%" id="logTable">
+                            <thead>
+                            <tr>
+                                <th> @Html.DisplayName("Description") </th>
+                                <th> @Html.DisplayName("User Name") </th>
+                                <th> @Html.DisplayName("Work Date") </th>
+                                <th> @Html.DisplayName("Time Spend [Minutes]") </th>
+                                <th> @Html.DisplayName("Billable Time [Minutes]") </th>
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="ticketMeta" role="dialog">
+    <div class="modal-dialog" style="width: 900px !important;">
+        <div class="modal-content">
+            <div class="panel panel-primary" style="margin-bottom: 0px;">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Ticket Time Estimate Meta</h4>
+                    <div class="heading-elements">
+                        <button type="button" class="close" data-dismiss="modal" style="font-size: 30pt; font-weight: bolder;">&times;</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <span id="ticketMetaInformation"> </span>
+                        </div>
+                        <div class="form-group">
+                            <div class="text-center">
+                                <input type="button" value="Ok" class="btn btn-default" data-dismiss="modal"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="ticketReport" role="dialog">
+    <div class="modal-dialog" style="width: 900px !important;">
+        <div class="modal-content">
+            <div class="panel panel-primary" style="margin-bottom: 0px;">
+                <div class="panel-heading">
+                    <h4 class="panel-title TicketReportTitle"></h4>
+                    <div class="heading-elements">
+                        <button type="button" class="close" data-dismiss="modal" style="font-size: 30pt; font-weight: bolder;">&times;</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <span id="ticketReportInformation"> </span>
+                        </div>
+                        <div class="form-group">
+                            <div class="text-center">
+                                <input type="button" value="Ok" class="btn btn-default" data-dismiss="modal"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .dataTables_scrollHeadInner { width: 100% !important; }
+
+    .dataTables_scrollHeadInner table { width: 100% !important; }
+
+    table.logtable td:not(:first-child), th:not(:first-child) { text-align: center; }
+
+    table.logtable thead tr th:first-child,
+    table.logtable tbody tr td:first-child {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        word-break: break-all;
+    }
+</style>
+<script type="text/javascript">
+    $(function() {
+        $("#searchViewModels_userid").select2({ width: 270 });
+        $(".picker").datepicker({ dateFormat: 'mm/dd/yy' });
+        $(".picker").css('width', "120px");
+        $("#estimateTimeTaskTable").dataTable().fnDestroy();
+        $('#estimateTimeTaskTable').dataTable({
+            buttons: {
+                dom: { button: { className: 'btn btn-default  btn-sm' } },
+                buttons: [
+                    { extend: 'copyHtml5', exportOptions: { columns: 'th:not(:last-child)' } },
+                    { extend: 'excelHtml5', exportOptions: { columns: 'th:not(:last-child)' } },
+                    { extend: 'csvHtml5', exportOptions: { columns: 'th:not(:last-child)' } },
+                    { extend: 'pdfHtml5', exportOptions: { columns: 'th:not(:last-child)' } }
+                ]
+            },
+            initComplete: function() {
+                $('.buttons-html5').addClass('btn btn-default btn-sm');
+                $('.buttons-print').addClass('btn btn-default btn-sm');
+            },
+        });
+        $('.dataTables_length select').select2({ minimumResultsForSearch: Infinity, width: 'auto' });
+    });
+    var table = $('#logTable').DataTable({
+        dom: 'Bfrtip',
+        language: { search: '', searchPlaceholder: "Search..." },
+        scrollY: 250,
+        autoWidth: false,
+        columnDefs: [{ "width": "200px", "targets": 0 }],
+        buttons: {
+            dom: { button: { className: 'btn btn-default' } },
+            buttons: ['copyHtml5', 'excelHtml5', 'csvHtml5', 'pdfHtml5']
+        }
+    });
+    $('.Logs').click(function() {
+        var ticketid = $(this).val();
+        $.ajax({
+            url: "/Home/Ticketitemtimelog",
+            data: { ticketid: ticketid },
+            type: 'GET',
+            async: true
+        }).done(function(response) {
+            if (response.error) {
+                swal({ title: response.errortext, confirmButtonColor: "#f0b95e", type: "error" });
+            } else {
+                if (response.Logs != null) {
+                    $(response.Logs).each(function(index, value) {
+                        table.row.add([value.description, value.TeamUser.FullName, moment(value.GetWorkDate).format("D/MM/YYYY"), value.timespentinminutes, value.billabletimeinminutes]);
+                    });
+                    table.columns.adjust().draw();
+                    $('#TimeLogModal').modal('show');
+                }
+            }
+        });
+    });
+    $("#TimeLogModal").on("hidden.bs.modal", function() { table.clear().draw(); });
+    jQuery(".timeReport").click(function() {
+        var ticketid = $(this).val();
+        var title = $(this).data("title");
+        jQuery('.TicketReportTitle').html('');
+        jQuery('.TicketReportTitle').append("<b>Ticket # " + ticketid + " - " + title + "</b>");
+        $.ajax({
+            url: '/Home/TicketEstimatTimeReport?TicketId=' + ticketid,
+            type: 'GET',
+        }).done(function(data) {
+            if (data.error) {
+                jQuery('#ticketReportInformation').html('');
+                jQuery('#ticketReportInformation').append("<div style='text-align: center;font-size: large;'><b>" + JSON.stringify(data.errortext) + "</b></div>");
+                return false;
+            } else {
+                jQuery('#ticketReportInformation').html('');
+                var tablecontent = "";
+                var estimateTime = 0;
+                tablecontent += "<table class='table table-xxs metadatatable'><thead>";
+                tablecontent += "<tr class='bg-slate-600'><th>Estimate Date</th><th>Work Date</th><th>Estimate Time</th><th>Worker Name</th><th>Spend Time</th><th>Billable Time</th></tr></thead><tbody style='text-align:center;'>";
+                $.each(data.timeReportList,
+                    function(index, value) {
+                        if (value.EstimateDate != null) {
+                            tablecontent += "<tr class='active'><td>" + moment(value.EstimateDate).format("dddd, MMMM Do YYYY, h:mm:ss a") + "</td><td></td><td>" + value.EstimateTime + "</td><td></td><td></td><td></td></tr>";
+                            estimateTime = value.EstimateTime;
+                        } else {
+                            tablecontent += "<tr><td></td><td>" + moment(value.WorkDate).format("D/MM/YYYY") + "</td><td></td><td>" + value.FullName + "</td><td>" + value.SpendTime + "</td><td>" + value.BillableTime + "</td></tr>";
+                        }
+                    });
+                tablecontent += "<tr><td></td><td><b>Total</b></td><td><b>" + estimateTime + "</b></td><td></td><td><b>" + data.totalSpendTime + "</b></td><td><b>" + data.totalBillableTime + "</b></td></tr>";
+                tablecontent += "</tbody></table>";
+                jQuery('#ticketReportInformation').append(tablecontent);
+            }
+        });
+        $("#ticketReport").modal("show");
+    });
+    jQuery(".timeEstimateMeta").click(function() {
+        var ticketid = $(this).val();
+        $.ajax({
+            url: '/Home/LoadTicketEstimateTimeMeta?TicketId=' + ticketid,
+            type: 'GET',
+        }).done(function(data) {
+            if (data.error) {
+                jQuery('#ticketMetaInformation').html('');
+                jQuery('#ticketMetaInformation').append("<div style='text-align: center;font-size: large;'><b>" + JSON.stringify(data.errortext) + "</b></div>");
+                return false;
+            } else {
+                jQuery('#ticketMetaInformation').html('');
+                var tablecontent = "";
+                tablecontent += "<table class='table table-bordered table-xxs metadatatable'>";
+                tablecontent += "<thead>";
+                tablecontent += "<tr class='bg-slate-600'>";
+                tablecontent += "<th><b>Ticket # " + ticketid + " Time Estimate META information</b></th></tr></thead>";
+                tablecontent += "<tbody><tr class='active'><td>Created On:<b>" + data.ticketdate + "</b></td></tr>";
+                var count = 0;
+                var estimateTime = 0;
+                $.each(data.TicketMeta,
+                    function(index, element) {
+                        count = count + 1;
+                        if (count % 2 == 0) {
+                            tablecontent += "<tr class='active'><td> Estimate Time update from <b>" + estimateTime + "</b> to <b>" + element.timeestimateinminutes + "</b> by <b>" + element.updatedBy.FullName + "</b> on " + moment(element.updatedonutc).format("D/MM/YYYY") + "</td></tr>";
+                        } else {
+                            tablecontent += "<tr class=''><td> Estimate Time update from <b>" + estimateTime + "</b> to <b>" + element.timeestimateinminutes + "</b> by <b>" + element.updatedBy.FullName + "</b> on " + moment(element.updatedonutc).format("D/MM/YYYY") + "</td></tr>";
+                        }
+                        estimateTime = element.timeestimateinminutes;
+                    });
+                tablecontent += "</tbody></table>";
+                jQuery('#ticketMetaInformation').append(tablecontent);
+            }
+        });
+        $("#ticketMeta").modal("show");
+    });
+</script>

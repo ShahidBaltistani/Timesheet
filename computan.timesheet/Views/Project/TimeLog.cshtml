@@ -1,0 +1,298 @@
+﻿@model computan.timesheet.Models.ProDashboardViewModel
+@{ ViewBag.Title = "TimeLog"; }
+
+@section secondarysidebar {
+    <!-- Secondary sidebar -->
+    <div class="sidebar sidebar-secondary sidebar-default">
+        <div class="sidebar-content">
+            <!-- Actions -->
+            <div class="sidebar-category">
+                <div class="category-title">
+                    <span>Actions</span>
+                    <ul class="icons-list">
+                        <li>
+                            <a href="#" data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="category-content">
+                    <div class="row row-condensed">
+                        <div class="col-xs-6">
+                            <a class="addfiles btn bg-blue btn-block btn-float btn-float-lg">
+                                <i class="icon-file-plus"></i> <span>Add File</span>
+                            </a>
+                            <button data-id="@Model.project.id" target="_blank" class="btn bg-indigo-300 btn-block btn-float btn-float-lg btnaddcredentials">
+                                <i class="icon-key"></i> <span>New Creden</span>
+                            </button>
+                        </div>
+                        <div class="col-xs-6">
+                            <a href="/projects/edit/@Model.project.id" target="_blank" class="btn bg-purple-300 btn-block btn-float btn-float-lg">
+                                <i class="icon-files-empty2"></i> <span>Edit Project</span>
+                            </a>
+                            <button class="btn bg-grey-300 btn-block btn-float btn-float-lg notes">
+                                <i class="icon-notebook"></i> <span>Notes</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-category cts-sidebar">
+                <div class="category-title">
+                    <span>Tickets by status</span>
+                    <ul class="icons-list">
+                        <li>
+                            <a href="#" data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="category-content no-padding">
+                    <ul class="navigation navigation-alt navigation-accordion filterbystatus">
+                        @foreach (var item in Model.sidebarstatus)
+                        {
+                            <li>
+                                <a href="/project/index/@Model.project.id/@item.id" class="@(item.id == ViewBag.ActiveStatus ? "active" : "")">
+                                    @item.name <span class="badge badge-success position-left">@item.count</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+            <div class="sidebar-category">
+                <div class="category-title">
+                    <span>Members worked on</span>
+                    <ul class="icons-list">
+                        <li>
+                            <a href="#" data-action="collapse" class=""></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="category-content" style="display: block;">
+                    <ul class="media-list">
+                        @if (Model.projectMembers != null && Model.projectMembers.Count() > 0)
+                        {
+                            foreach (var item in Model.projectMembers.OrderByDescending(x => x.active))
+                            {
+                                <li class="media">
+                                    <a href="#" class="media-left">
+                                        <img src="/images/placeholder.jpg" class="img-sm img-circle" alt="">
+                                    </a>
+                                    <div class="media-body">
+                                        <a href="#" class="media-heading text-semibold">@item.username</a>
+                                    </div>
+                                    <div class="media-right media-middle">
+                                        <span class="status-mark @(item.active ? "border-success" : "border-danger")"></span>
+                                    </div>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <li class="media">
+                                <span class="text-size-mini text-muted display-block">Sorry no member found.</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /secondary sidebar -->
+}
+
+@section header{
+    <div class="page-header">
+        <div class="page-header-content">
+        </div>
+        <div class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/"><i class="icon-home2 position-left"></i> Home</a>
+                </li>
+                <li>
+                    <a href="/projectdashboard/@Model.project.id">@Model.project.name</a>
+                </li>
+            </ul>
+            <a class="breadcrumb-elements-toggle">
+                <i class="icon-menu-open"></i>
+            </a>
+        </div>
+    </div>
+}
+
+<div class="panel panel-default" id="maincontent">
+    <div class="panel-heading">
+        <h5 class="panel-title">@Model.project.name</h5>
+    </div>
+    <div class="panel-body">
+        <div id="tasklist">
+            @Html.Partial("_ProjectNavTab", "timelog", new ViewDataDictionary {{"projectid", Model.project.id}})
+            <div class="contentdiv">
+                <div class="panel-body" style="max-width: inherit; overflow-x: scroll;">
+                    <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper no-footer">
+                        <div class="datatable-scroll">
+                            <table class="table datatable-button-html5-basic" id="DataTables_Table_mytimelog" role="grid" aria-describedby="DataTables_Table_0_info">
+                                <thead>
+                                <tr role="row">
+                                    <th> @Html.DisplayName("Logged By") </th>
+                                    <th> @Html.DisplayName("Title") </th>
+                                    <th> @Html.DisplayName("Description") </th>
+                                    <th> @Html.DisplayName("Work Date") </th>
+                                    <th> @Html.DisplayName("Time Spent") </th>
+                                    <th> @Html.DisplayName("Billable") </th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach (var item in Model.ProjectTimelog)
+                                {
+                                    <tr>
+                                        <td> @Html.DisplayFor(modelItem => item.username) </td>
+                                        <td> @Html.DisplayFor(modelItem => item.tickettitle) </td>
+                                        <td> @Html.DisplayFor(modelItem => item.description) </td>
+                                        <td> @Html.DisplayFor(modelItem => item.GetWorkDate) </td>
+                                        <td> @Html.DisplayFor(modelItem => item.spent) </td>
+                                        <td> @Html.DisplayFor(modelItem => item.billable) </td>
+                                        <td>
+                                            <a href="/TicketTimeLogs/Edit/@item.id" class="btn btn-info" target="_blank">Edit</a>
+                                        </td>
+                                    </tr>
+                                }
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <td>--</td><td>--</td><td>--</td>
+                                    <td class="text-center" style="font-size: 18px;">
+                                        <b>Total Time</b>
+                                    </td>
+                                    <td style="font-weight: bold" id="totalspenttime" data-stotal="@ViewBag.totalspent">
+                                        <b>@ViewBag.totalspent Hrs</b>
+                                    </td>
+                                    <td style="font-weight: bold" id="totalbilltime" data-btotal="@ViewBag.totalbillable">
+                                        <b>@ViewBag.totalbillable Hrs</b>
+                                    </td><td></td>
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Upload Project Files Model-->
+<div class="modal fade" id="uploadfielmodel" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Upload Project File</h4>
+            </div>
+            <div class="modal-body" id="modeldiv">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <div id="notificationdiv"></div>
+                        <div class="col-md-offset-2 col-md-5">
+                            @Html.TextBox("projectfile", null, new {@class = "", type = "file"})
+                            <input type="hidden" value="@Model.project.id" class="modelprojectid"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="reset" id="btnuploadfile" value="Upload" class="btn btn-primary"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Add Credential Model-->
+<div class="modal fade" id="Addcredentialmodel" role="dialog">
+    <div class="modal-dialog" style="width: 60%;">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">
+                    <span class="credentialmodeltitle"></span>
+                </h4>
+            </div>
+            <div class="modal-body" id="credentialformmodeldiv" style="height: 600px; max-height: 600px; overflow-y: scroll"> </div>
+        </div>
+    </div>
+</div>
+<!--Time Log Edit-->
+<div class="modal fade" id="AddTimeLogModel" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="panel panel-primary" style="margin-bottom: 0px;">
+                <div class="panel-heading">
+                    <h4 class="panel-title ticket-title">vfdg</h4>
+                    <div class="heading-elements">
+                        <button type="button" class="close" data-dismiss="modal" style="font-size: 30pt; font-weight: bolder;">&times;</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <input type="hidden" value="" id="ticketItemID" name="ticketItemID"/>
+                    <div class="category-content">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">Project</span>
+                                    <input type="hidden" name="ProjectID" id="ProjectID" value=""/>
+                                    @Html.TextBox("Project", null, new {@class = "form-control", disabled = "disabled", maxlength = 10})
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">Skill</span>
+                                    <input type="hidden" name="SkillID" id="SkillID" value=""/>
+                                    @Html.TextBox("Skill", null, new {@class = "form-control", disabled = "disabled", maxlength = 10})
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">Work Date</span>
+                                    @Html.TextBox("workdate", null, new {@class = "form-control", maxlength = 10})
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <span class="input-group-addon">Spent Minutes</span>
+                                    @Html.TextBox("timespentinminutes", null, new {@class = "form-control", maxlength = 4})
+                                    <span class="input-group-addon">Billable Minutes</span>
+                                    @Html.TextBox("billabletimeinminutes", null, new {@class = "form-control", maxlength = 4, tabindex = -1})
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.TextArea("description", null, new {@class = "form-control", rows = "2"})
+                            </div>
+                            <div class="form-group">
+                                <input type="button" id="btnSaveTime" value="Save Time" class="btn btn-primary savetimeTicket"/>
+                                <input type="button" data-dismiss="modal" value="Cancel" class="btn btn-default"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/Scripts/custom/projectDashboard.min.js"></script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+<script id="error-notification-template" type="text/x-handlebars-template">
+    <div class="alert alert-danger alert-styled-left alert-bordered usernotification">
+        <button data-dismiss="alert" class="close" type="button"><span>×</span><span class="sr-only">Close</span></button>
+        <span class="text-semibold">{{errortext}}</span>
+    </div>
+</script>
+<script id="success-notification-template" type="text/x-handlebars-template">
+    <div class="alert alert-success alert-styled-left alert-bordered usernotification">
+        <button data-dismiss="alert" class="close" type="button"><span>×</span><span class="sr-only">Close</span></button>
+        <span class="text-semibold">{{successtext}}</span>
+    </div>
+</script>

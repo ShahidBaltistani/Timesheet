@@ -1,0 +1,23 @@
+﻿@model computan.timesheet.Models.TicketTimeSearchViewModel
+@using (Html.BeginForm("mybuckets", "TicketTimeLogs", FormMethod.Post, new {@class = "form-inline"}))
+{
+    <div class="input-group">
+        <h5 class="panel-title">My Tasks</h5>
+    </div>
+    <div class="input-group">
+        <div class="has-feedback has-feedback-left">
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <i class="icon-calendar3"></i>
+                </span>
+                @Html.EditorFor(model => model.StartDate, new {htmlAttributes = new {Value = Model.StartDate.ToString("MM/dd/yyyy"), @class = "form-control picker"}})
+            </div>
+        </div>
+    </div>
+    <div class="input-group">
+        <input type="submit" value="Search" class="btn btn-sm btn-success center-block">
+    </div>
+}
+<script type="text/javascript">
+    $(function() { $(".picker").datepicker({ dateFormat: 'mm/dd/yy' }); });
+</script>

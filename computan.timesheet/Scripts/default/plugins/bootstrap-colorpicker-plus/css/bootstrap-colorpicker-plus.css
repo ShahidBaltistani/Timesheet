@@ -1,0 +1,45 @@
+.colorpickerplus {
+    display: none;
+    left: 0;
+    max-height: 300px;
+    max-width: 185px;
+    position: absolute;
+    top: 0;
+    z-index: 2499;
+}
+
+.colorpickerplus-dropdown .dropdown-menu { width: 185px; }
+
+.colorpickerplus-container div { position: relative; }
+
+.colorpickerplus-container {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    margin: auto;
+    overflow: hidden;
+    padding: 10px;
+}
+
+.colorpickerplus-container .colorpickerplus-colors-row, .colorpickerplus .colorpickerplus-custom-colors, .colorpickerplus .colorpickerplus-primary-colors {
+    overflow: hidden;
+    width: 100%;
+}
+
+.colorpickerplus-container .colorpickerplus-custom-colors { margin-bottom: 10px; }
+
+.colorpickerplus-container .colorpickerplus-primary-colors { }
+
+.colorpickerplus-container .colorcell, .colorpickerplus-container .nonecell {
+    border: 1px solid #eee;
+    float: left;
+    height: 16px;
+    margin: 0;
+    padding: 0;
+    width: 16px;
+}
+
+.colorpickerplus-container .colorpickerplus-custom-colors .colorcell { border: 1px solid #ddd; }
+
+.colorpickerplus-container .colorpickerplus-custom-colors .selected { border: 1px solid #000; }
+
+.colorpickerplus-container .colorcell:hover, .colorpickerplus-container .selected { border: 1px solid #000; }

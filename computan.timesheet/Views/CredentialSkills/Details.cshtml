@@ -1,0 +1,24 @@
+﻿@model computan.timesheet.core.CredentialSkills
+@{ ViewBag.Title = "Details"; }
+<h2>Details</h2>
+<div>
+    <h4>CredentialSkills</h4> <hr/>
+    <dl class="dl-horizontal">
+        <dt> @Html.DisplayNameFor(model => model.Skill.name) </dt>
+        <dd> @Html.DisplayFor(model => model.Skill.name) </dd>
+        <dt> @Html.DisplayNameFor(model => model.credentailid) </dt>
+        <dd> @Html.DisplayFor(model => model.credentailid) </dd>
+        <dt> @Html.DisplayNameFor(model => model.createdonutc) </dt>
+        <dd> @Html.DisplayFor(model => model.createdonutc) </dd>
+        <dt> @Html.DisplayNameFor(model => model.updatedonutc) </dt>
+        <dd> @Html.DisplayFor(model => model.updatedonutc) </dd>
+        <dt> @Html.DisplayNameFor(model => model.ipused) </dt>
+        <dd> @Html.DisplayFor(model => model.ipused) </dd>
+        <dt> @Html.DisplayNameFor(model => model.userid) </dt>
+        <dd> @Html.DisplayFor(model => model.userid) </dd>
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new {Model.id}) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

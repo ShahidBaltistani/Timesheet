@@ -1,0 +1,76 @@
+﻿@model IEnumerable<Microsoft.AspNet.Identity.EntityFramework.IdentityRole>
+@{ ViewBag.Title = "Index"; }
+
+@section header {
+    <div style="background-color: #fff;" class="panel page-header border-top-primary">
+        <div class="page-header-content">
+            <div class="page-title">
+                <h5>
+                    <i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Timesheet</span> - Manage Roles
+                    <small class="display-block">Manage Application Roles</small>
+                </h5>
+            </div>
+            <div class="heading-elements">
+                <div class="btn-group">
+                    <a href="/RolesAdmin/Create" class="btn btn-primary"><i class="icon-list3 position-left"></i>Add New Roles</a>
+                </div>
+            </div>
+            <a class="heading-elements-toggle">
+                <i class="icon-menu"></i>
+            </a>
+        </div>
+        <div style="border-bottom: 0; box-shadow: none; margin-bottom: 0;" class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/Home/index"><i class="icon-home2 position-left"></i>Home</a>
+                </li>
+                <li>
+                    <a href="/RolesAdmin/index">Roles</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+}
+
+<div class="panel panel-flat">
+    <div class="panel-heading">
+        <h5 class="panel-title">List Application Users</h5>
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li>
+                    <a data-action="collapse"></a>
+                </li>
+                <li>
+                    <a data-action="reload"></a>
+                </li>
+            </ul>
+        </div>
+        <a class="heading-elements-toggle">
+            <i class="icon-menu"></i>
+        </a>
+    </div>
+    <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper no-footer">
+        <div class="datatable-scroll">
+            <table class="table datatable-button-html5-basic" id="DataTables_Table_0" role="grid" aria-describedby="DataTables_Table_0_info">
+                <thead>
+                <tr role="row">
+                    <th> @Html.DisplayNameFor(model => model.Name) </th>
+                    <th> </th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td> @Html.DisplayFor(modelItem => item.Name) </td>
+                        <td>
+                            @Html.ActionLink("Edit", "Edit", new {id = item.Id}, new {@class = "btn btn-info btn-xs"}) |
+                            @Html.ActionLink("Delete", "Delete", new {id = item.Id}, new {@class = "btn btn-info btn-xs"})
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,46 @@
+﻿@model computan.timesheet.Models.VerifyCodeViewModel
+@{ 
+    ViewBag.Title = "Enter Verification Code";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";}
+@*<h2>@ViewBag.Title.</h2>*@
+<div class="login-container">
+    <span class="dot"></span> <span class="dot2"></span> <span class="dot3"></span> <span class="dot4"></span>
+    @using (Html.BeginForm("VerifyCode", "Account", new { Model.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.Hidden("provider", Model.Provider)
+        @Html.Hidden("Email", Model.Email)
+        @Html.Hidden("Token", Model.Token)
+        @Html.Hidden("ReturnUrl", Model.ReturnUrl)
+        <div class="panel panel-body login-form login-backend">
+            <div class="back2">
+                <div class="center">
+                    <div class="text-center">
+                        <img src="~/computanLogo.png" class="logo1" />
+                        <h5 class="content-group-lg"> Verification Page! <small class="display-block">Enter Code to continue</small> </h5>
+                    </div>
+                    <div class="form-group has-feedback has-feedback-left">
+                        @Html.TextBoxFor(m => m.Code, new { @class = "form-control" })
+                        <div class="form-control-feedback">
+                            <i class="icon-lock text-muted"></i>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            @Html.CheckBoxFor(m => m.RememberBrowser)
+                            @Html.LabelFor(m => m.RememberBrowser)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn orange-bg btn-block token-button">Submit <i class="icon-circle-right2 position-right"></i></button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
+ </div>
+<link href="~/Content/Custom/login-custom.min.css" rel="stylesheet" />
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

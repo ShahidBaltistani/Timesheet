@@ -1,0 +1,113 @@
+﻿@model computan.timesheet.core.CredentialLevel
+@{ ViewBag.Title = "Credential Level"; }
+
+@section header {
+    <div style="background-color: #fff;" class="panel page-header border-top-primary">
+        <div class="page-header-content">
+            <div class="page-title">
+                <h5>
+                    <i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Timesheet</span> - Manage Credential Level
+                    <small class="display-block">Add Credential Level</small>
+                </h5>
+            </div>
+            <div class="heading-elements">
+                <div class="btn-group">
+                    <a href="/credentiallevels/index" class="btn btn-primary"><i class="icon-list3 position-left"></i>List Credential Levels</a>
+                </div>
+            </div>
+            <a class="heading-elements-toggle">
+                <i class="icon-menu"></i>
+            </a>
+        </div>
+        <div style="border-bottom: 0; box-shadow: none; margin-bottom: 0;" class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/Home/index"><i class="icon-home2 position-left"></i>Home</a>
+                </li>
+                <li>
+                    <a href="/credentiallevels/index">Credential Level</a>
+                </li>
+                <li>
+                    <a href="/credentiallevels/create">Add Credential Level</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+}
+
+<div class="panel panel-flat">
+    <div class="panel-heading">
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li>
+                    <a data-action="collapse"></a>
+                </li>
+                <li>
+                    <a data-action="reload"></a>
+                </li>
+            </ul>
+        </div>
+        <a class="heading-elements-toggle">
+            <i class="icon-menu"></i>
+        </a>
+    </div>
+    <div class="panel-body">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-horizontal">
+                <h4>Add Credential Level</h4>
+                <hr/>
+                @Html.ValidationSummary(true, "", new {@class = "text-danger"})
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @Html.LabelFor(model => model.name, new {@class = "control-label"})
+                        @Html.EditorFor(model => model.name, new {htmlAttributes = new {@class = "form-control"}})
+                        @Html.ValidationMessageFor(model => model.name, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @Html.LabelFor(model => model.LevelNumber, new {@class = "control-label"})
+                        @Html.EditorFor(model => model.LevelNumber, new {htmlAttributes = new {@class = "form-control"}})
+                        @Html.ValidationMessageFor(model => model.LevelNumber, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.isactive, new {@class = "control-label col-md-1"})
+                    <div class="col-md-1">
+                        <div class="checkbox">
+                            @Html.EditorFor(model => model.isactive)
+                            @Html.LabelFor(m => m.isactive, "Active", new {@class = "lbl-active label label-success", style = "margin-left: 18px; padding-left: 4px;"})
+                            @Html.LabelFor(m => m.isactive, "In-Active", new {@class = "lbl-deactive label label-danger", style = "margin-left: 18px; padding-left: 4px;"})
+                            @Html.ValidationMessageFor(model => model.isactive, "", new {@class = "text-danger"})
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12 text-center">
+                        <input type="submit" value="Create" class="btn btn-primary"/>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+<script src="~/Scripts/default/plugins/jquery.alphanum.min.js"></script>
+<script type="text/javascript">
+    $("#LevelNumber").numeric();
+    $(document).ready(function() {
+        ChangeStatus();
+        $("#isactive").change(function() { ChangeStatus(); });
+
+        function ChangeStatus() {
+            if ($("#isactive").is(':checked')) {
+                $(".lbl-active").show();
+                $(".lbl-deactive").hide();
+            } else {
+                $(".lbl-active").hide();
+                $(".lbl-deactive").show();
+            }
+        }
+    });
+</script>

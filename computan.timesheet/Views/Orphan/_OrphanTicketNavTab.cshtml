@@ -1,0 +1,12 @@
+﻿@model string
+<ul class="nav nav-tabs nav-tabs-highlight">
+    <li class="@(Model == "orphan" ? "active" : "")">
+        <a href="/Orphan/GetAllOrphanedTickets"><i class="fa fa-envelope label-icon-sm"></i>Orphaned</a>
+    </li>
+    <li class="@(Model == "supress" ? "active" : "")">
+        <a href="/Orphan/GetAllSuppressTickets"><i class="fa fa-ban label-icon-sm"></i>Suppress</a>
+    </li>
+    <li class="@(Model == "unAssigned" ? "active" : "")">
+        <a href="/Orphan/UnAssignedTickets"><i class="fa fa-warning label-icon-sm"></i>Un-Assigned</a>
+    </li>
+</ul>

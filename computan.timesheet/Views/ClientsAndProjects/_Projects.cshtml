@@ -1,0 +1,85 @@
+﻿@model IEnumerable<computan.timesheet.core.Project>
+<div class="panel-heading">
+    <h5 class="panel-title paneltitleofprojects">Projects</h5>
+    <div class="heading-elements">
+        <ul class="icons-list">
+            <li>
+                <a data-action="collapse" class="projectpanelcollapse"></a>
+            </li>
+        </ul>
+    </div>
+    <a class="heading-elements-toggle">
+        <i class="icon-menu"></i>
+    </a>
+</div>
+<div class="panel-body panel-collapse" id="projectpanelbody">
+    @if (Model != null && Model.Count() > 0)
+    {
+        foreach (var item in Model)
+        {
+            <div class="col-md-4">
+                <div class="panel border-left-lg border-left-primary">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6 class="no-margin-top">
+                                    <a href="/projects/edit/@item.id"><i class="icon-task"></i>&nbsp;&nbsp;@item.name</a>
+                                </h6>
+                                @*<p class="mb-15">@item.website</p>*@
+                                @*<a href="#"><img src="~/images/placeholder.jpg" class="img-circle img-xs" alt=""></a>
+                                    <a href="#"><img src="~/images/placeholder.jpg" class="img-circle img-xs" alt=""></a>
+                                    <a href="#"><img src="~/images/placeholder.jpg" class="img-circle img-xs" alt=""></a>
+                                    <a href="#" class="text-default">&nbsp;<i class="icon-plus22"></i></a>*@
+                            </div>
+                            <div class="col-md-4">
+                                <ul class="list task-details">
+                                    @*<li class="dropdown">
+                                            Priority: &nbsp;
+                                            <a href="#" class="label label-primary dropdown-toggle" data-toggle="dropdown">Normal <span class="caret"></span></a>
+                                            <ul class="dropdown-menu dropdown-menu-right active">
+                                                <li><a href="#"><span class="status-mark position-left bg-danger"></span> Highest priority</a></li>
+                                                <li><a href="#"><span class="status-mark position-left bg-info"></span> High priority</a></li>
+                                                <li class="active"><a href="#"><span class="status-mark position-left bg-primary"></span> Normal priority</a></li>
+                                                <li><a href="#"><span class="status-mark position-left bg-success"></span> Low priority</a></li>
+                                            </ul>
+                                        </li>*@
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        <ul>
+                            @if (item.SubProjects != null && item.SubProjects.Count() > 0)
+                            {
+                                <li>
+                                    <a href="#" data-id="@item.id" data-name="@item.name" class="subprojects">Sub-Projects</a>
+                                </li>
+                            }
+                        </ul>
+                        <ul class="pull-right">
+                            <li class="">
+                                <a href="#" class="loadtasks" data-id="@item.id" data-name="@item.name">Tasks</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-md-4">
+            <div class="panel border-left-lg border-left-primary">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h6 class="no-margin-top">
+                                <a href="#"><i class="icon-task"></i>&nbsp;&nbsp;Sorry, No project found.</a>
+                            </h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

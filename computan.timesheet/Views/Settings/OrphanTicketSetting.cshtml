@@ -1,0 +1,32 @@
+﻿@model List<computan.timesheet.Models.Settings.SubscribeTeamViewModel>
+@{ ViewBag.Title = "Settings"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+<div class="sidebar-detached">
+    <div class="sidebar sidebar-default">
+        <div class="sidebar-category">
+            <div class="category-title"> <span>Navigation</span> </div>
+            @Html.Partial("_SettingMenu", "subscribeTeam")
+        </div>
+    </div>
+</div>
+<div class="container-detached">
+    <div class="content-detached">
+        <div class="panel">
+            <div class="panel-heading bg-teal-700">
+                <div class="row"> <h4 class="panel-title"> <span>Orphaned Tickets Setting</span> </h4> </div>
+            </div>
+            <div class="panel-body">
+                @foreach (var item in Model)
+                {
+                    <label class="container">
+                        @item.name
+                        <input type="checkbox" id="subscribeTeam" data-id="@item.Id" value="@item.Id" @(item.Ischecked ? "checked" : "")>
+                        <span class="checkmark"></span>
+                    </label>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<link href="~/Content/Settings/OrphanTicketSubscribe.css" rel="stylesheet" />
+<script src="~/Scripts/custom/Settings/Settings.min.js"></script>

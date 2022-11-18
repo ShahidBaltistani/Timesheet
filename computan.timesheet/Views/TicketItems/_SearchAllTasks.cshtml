@@ -1,0 +1,81 @@
+﻿<style>
+    .nospace {
+        padding-left: 1px;
+        padding-right: 1px;
+    }
+
+    .form-inline .col-md-2 label { display: block; }
+
+    .form-inline .input-group { width: 100%; }
+
+    .form-inline .searchtasks {
+        background-color: #f4b762;
+        border-color: #f4b762;
+    }
+
+    .form-inline .searchtasks:hover {
+        background-color: #fff;
+        color: #f4b762;
+    }
+
+    .form-inline .searchtasks:active:hover { border-color: #f4b762; }
+
+    .form-inline input { margin-top: 0; }
+
+    .form-inline .input-group i { font-size: 20px; }
+</style>
+@using (Html.BeginForm("", "", FormMethod.Post, new {@class = "form-inline"}))
+{
+    <div class="row">
+        <div class="col-md-2 nospace">
+            <label>From Date </label>
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <i class="icon-calendar3"></i>
+                </span>
+                <input type="text" class="form-control picker" id="fromdate" name="fromdate" placeholder="From Date" required="required"/>
+            </div>
+        </div>
+        <div class="col-md-2 nospace">
+            <label>To Date </label>
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <i class="icon-calendar3"></i>
+                </span>
+                <input type="text" class="form-control picker" id="todate" name="todate" placeholder="To Date" required="required"/>
+            </div>
+        </div>
+        <div class="col-md-2 nospace">
+            <label>Client </label>
+            @Html.DropDownList("clientid", ViewBag.clientid as SelectList, "Select Client", new {@class = "form-control"})
+        </div>
+        <div class="col-md-2 nospace">
+            <label>Project </label>
+            @Html.DropDownList("projectid", ViewBag.projectid as SelectList, "Select Project", new {@class = "form-control"})
+        </div>
+        <div class="col-md-2">
+            <label>&nbsp; </label>
+            <input type="submit" value="Search" class="btn btn-sm btn-primary form-control searchtasks">
+        </div>
+    </div>
+}
+<script type="text/javascript">
+    $(function() {
+        // set current date with minus one week
+        var today = new Date();
+        today.setDate(today.getDate() - 7);
+        var day = new Date(today),
+            year = ((day.getMonth() - 2) < 0) ? (day.getFullYear() - 1) : day.getFullYear(),
+            month = ((day.getMonth() - 2) < 0) ? (12 + (day.getMonth() - 2)) : (day.getMonth() + 1),
+            date = (month) + '-' + (day.getDate()) + '-' + year;
+        var currentdateminusoneweek = (month) + '-' + day.getDate() + '-' + year;
+        // set current date
+        day = new Date(),
+            year = ((day.getMonth() - 2) < 0) ? (day.getFullYear() - 1) : day.getFullYear(),
+            month = ((day.getMonth() - 2) < 0) ? (12 + (day.getMonth() - 2)) : (day.getMonth() + 1),
+            date = (month) + '-' + (day.getDate()) + '-' + year;
+        var currentdate = (month) + '-' + day.getDate() + '-' + year;
+        $("#fromdate").datepicker({ dateFormat: 'm-dd-yy', }).val(currentdateminusoneweek);
+        $("#todate").datepicker({ dateFormat: 'm-dd-yy' }).val(currentdate);
+    });
+</script>

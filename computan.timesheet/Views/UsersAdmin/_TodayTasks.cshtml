@@ -1,0 +1,35 @@
+﻿@model IEnumerable<computan.timesheet.Models.AllTaskViewModel>
+<div class="table-responsive">
+    <table class="table table-striped" id="todytask">
+        <tbody>
+        @if (Model != null && Model.Count() > 0)
+        {
+            var count = 1;
+            foreach (var item in Model.OrderByDescending(o => o.assignedon))
+            {
+                <tr class="currentrow" data-rownumber="@count" data-taskid="@item.taskid">
+                    <td>
+                        <h6 class="no-margin-top">
+                            <a href="/ticketitems/TicketItem/@item.id" target="_blank"><i class="icon-user"></i>&nbsp;&nbsp;@item.subject</a>
+                        </h6>
+                        <a class="modellink" id="@item.id" data-id="@item.id">
+                            <small class="display-block">@item.shortbody</small>
+                        </a>
+                    </td>
+                </tr>
+                count = count + 1;
+            }
+        }
+        else
+        {
+            <tr>
+                <td class="text-center">
+                    <h6 class="no-margin-top">
+                        <a href="#"><i class="icon-task"></i>&nbsp;&nbsp;Sorry, No task found.</a>
+                    </h6>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

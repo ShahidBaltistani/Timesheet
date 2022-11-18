@@ -1,0 +1,62 @@
+﻿@using System.Data
+@model DataTable
+@{ float val = 0; }
+<div class="panel-body" style="overflow-x:scroll; max-width:inherit;">
+    <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper no-footer">
+        <div class="datatable-scroll">
+            <table class="table table-striped detail-report">
+                <thead>
+                    <tr role="row">
+                        @if (Model.Columns.Count > 0)
+                        {
+                            foreach (var column in Model.Columns)
+                            {
+                                <th>
+                                    @column.ToString().Replace("Users_Name", "Name")
+                                </th>
+                            }
+                        }
+                        else
+                        {
+                            <th> Name </th>
+                        }
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Rows.Count > 0)
+                    {
+
+
+                        foreach (DataRow row in Model.Rows)
+                        {
+                            <tr>
+                                @foreach (DataColumn col in Model.Columns)
+                                {
+                                    if (float.TryParse(row[col.ColumnName].ToString(), out val))
+                                    {
+                                        <td>@Math.Round(val, 2)</td>
+                                    }
+                                    else
+                                    {
+                                        <td>@(row[col.ColumnName] is System.DBNull ? 0 : row[col.ColumnName])</td>
+                                    }
+                                }
+                            </tr>
+                        }
+
+                    }
+                    else
+                    {
+                        <tr>
+                            <td class="text-center">
+                                <h6 class="no-margin-top"><a href="#"><i class="icon-task"></i>&nbsp;&nbsp;Sorry, No time log found.</a></h6>
+                            </td>
+                        </tr>
+
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,41 @@
+﻿@model computan.timesheet.Models.TicketViewModel
+@Html.DropDownList("projectid", ViewBag.projects as SelectList, "All Projects", new {@class = "projectdropdown", data_clientid = ViewBag.clientid})
+<br/> <br/>
+<ul class="nav nav-tabs nav-tabs-highlight">
+    @foreach (var items in ViewBag.conversationstatus)
+    {
+        bool isactive = ViewBag.currentsubtab == items.name;
+        <li class='statusli' id="@items.id" data-id="@items.id" data-clientid="@ViewBag.clientid">
+            <a href="#" data-id="@items.id" class="mytaskstatuslink" id="@items.id">
+                <span class="@(isactive ? "badge badge-success" : "badge badge-default") position-left conversationstatus" data-id="@items.id" id="@items.id">@items.ticketcount</span>@items.name
+            </a>
+        </li>
+    }
+</ul>
+<table class="table table-hover table-ticket">
+    <thead>
+    <tr class="bg-teal-400">
+        <th style="width: 25px;">
+            <input type="checkbox" class="checkall"/>
+        </th>
+        <th> Task Details </th>
+    </tr>
+    </thead>
+    <tbody id="productList">
+    @if (Model.tickets.Count() > 0)
+    {
+        @Html.Partial("_ConversationRow")
+    }
+    else
+    {
+        <tr>
+            <td colspan="4">
+                <h5 class="panel-title"> <i class="icon-envelop5 position-left"></i> Sorry, no Ticket found. </h5>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+<script type="text/javascript">
+    $(".projectdropdown").select2();
+</script>

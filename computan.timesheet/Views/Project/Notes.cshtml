@@ -1,0 +1,250 @@
+﻿@model computan.timesheet.Models.ProDashboardViewModel
+@{ ViewBag.Title = "Notes"; }
+
+@section secondarysidebar {
+    <!-- Secondary sidebar -->
+    <div class="sidebar sidebar-secondary sidebar-default">
+        <div class="sidebar-content">
+            <!-- Actions -->
+            <div class="sidebar-category">
+                <div class="category-title">
+                    <span>Actions</span>
+                    <ul class="icons-list">
+                        <li>
+                            <a href="#" data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="category-content">
+                    <div class="row row-condensed">
+                        <div class="col-xs-6">
+                            @*<a href="/projects/create" target="_blank" class="btn bg-teal-400 btn-block btn-float btn-float-lg"><i class="icon-folder"></i> <span>Add Project</span></a>*@
+                            <a class="addfiles btn bg-blue btn-block btn-float btn-float-lg">
+                                <i class="icon-file-plus"></i> <span>Add File</span>
+                            </a>
+                            <button data-id="@Model.project.id" target="_blank" class="btn bg-indigo-300 btn-block btn-float btn-float-lg btnaddcredentials">
+                                <i class="icon-key"></i> <span>New Creden</span>
+                            </button>
+                        </div>
+                        <div class="col-xs-6">
+                            <a href="/projects/edit/@Model.project.id" target="_blank" class="btn bg-purple-300 btn-block btn-float btn-float-lg">
+                                <i class="icon-files-empty2"></i> <span>Edit Project</span>
+                            </a>
+                            <button class="btn bg-grey-300 btn-block btn-float btn-float-lg notes">
+                                <i class="icon-notebook"></i> <span>Notes</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-category cts-sidebar">
+                <div class="category-title">
+                    <span>Tickets by status</span>
+                    <ul class="icons-list">
+                        <li>
+                            <a href="#" data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="category-content no-padding">
+                    <ul class="navigation navigation-alt navigation-accordion filterbystatus">
+                        @foreach (var item in Model.sidebarstatus)
+                        {
+                            <li>
+                                <a href="/project/index/@Model.project.id/@item.id" class="@(item.id == ViewBag.ActiveStatus ? "active" : "")">
+                                    @item.name <span class="badge badge-success position-left">@item.count</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+            <div class="sidebar-category">
+                <div class="category-title">
+                    <span>Members worked on</span>
+                    <ul class="icons-list">
+                        <li>
+                            <a href="#" data-action="collapse" class=""></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="category-content" style="display: block;">
+                    <ul class="media-list">
+                        @if (Model.projectMembers != null && Model.projectMembers.Count() > 0)
+                        {
+                            foreach (var item in Model.projectMembers.OrderByDescending(x => x.active))
+                            {
+                                <li class="media">
+                                    <a href="#" class="media-left">
+                                        <img src="/images/placeholder.jpg" class="img-sm img-circle" alt="">
+                                    </a>
+                                    <div class="media-body">
+                                        <a href="#" class="media-heading text-semibold">@item.username</a>
+                                    </div>
+                                    <div class="media-right media-middle">
+                                        <span class="status-mark @(item.active ? "border-success" : "border-danger")"></span>
+                                    </div>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <li class="media">
+                                <span class="text-size-mini text-muted display-block">Sorry no member found.</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /secondary sidebar -->
+}
+
+@section header{
+    <div class="page-header">
+        <div class="page-header-content"> </div>
+        <div class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/"><i class="icon-home2 position-left"></i> Home</a>
+                </li>
+                <li>
+                    <a href="/projectdashboard/@Model.project.id">@Model.project.name</a>
+                </li>
+            </ul>
+            <a class="breadcrumb-elements-toggle">
+                <i class="icon-menu-open"></i>
+            </a>
+        </div>
+    </div>
+}
+
+<div class="panel panel-default" id="maincontent">
+    <div class="panel-heading">
+        <h5 class="panel-title">@Model.project.name</h5>
+    </div>
+    <div class="panel-body">
+        <div id="tasklist">
+            @Html.Partial("_ProjectNavTab", "notes", new ViewDataDictionary {{"projectid", Model.project.id}})
+            <div class="contentdiv">
+                <div class="panel panel-flat">
+                    <div class="panel-body">
+                        <ul class="media-list chat-list chat-list-inverse content-group ulmsg">
+                            @if (Model.notes != null && Model.notes.Count() > 0)
+                            {
+                                foreach (var item in Model.notes)
+                                {
+                                    <li class="media">
+                                        <div class="media-left">
+                                            <a href="#">
+                                                <img src="~/Content/images/placeholder.jpg" data-id="@item.id" class="img-circle notesimg" alt="" title="@item.addedbyuser.FullName">
+                                            </a>
+                                        </div>
+                                        <div class="media-body">
+                                            <div class="media-content">@item.comments</div>
+                                            @if (ViewBag.currentuser == item.addedbyuserid)
+                                            {
+                                                <span class="media-annotation display-block mt-10">
+                                                    <b>@item.addedbyuser.FullName&nbsp;</b>@string.Format("{0:f}", item.createdonutc)&nbsp;
+                                                    <span data-id="@item.id" class="editnotemsg">
+                                                        <b>Edit</b>
+                                                    </span> &nbsp;
+                                                    <span data-id="@item.id" class="deletenotemsg">
+                                                        <b>Delete</b>
+                                                    </span>
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="media-annotation display-block mt-10">
+                                                    <b>@item.addedbyuser.FullName&nbsp;</b>@string.Format("{0:f}", item.createdonutc)
+                                                </span>
+                                            }
+                                        </div>
+                                    </li>
+                                }
+                            }
+                            else
+                            {
+                                <li class="media">
+                                    <span class="media-annotation display-block mt-10">
+                                        <b>Sorry, no note found!</b>
+                                    </span>
+                                </li>
+                            }
+                        </ul>
+                        <textarea name="enter-message" id="msg" class="form-control content-group" rows="3" cols="1" placeholder="Enter your message..."></textarea>
+                        <div class="row">
+                            <div class="col-xs-6"> </div>
+                            <div class="col-xs-6 text-right">
+                                <button type="button" data-id="@Model.project.id" class="btn bg-teal-400 btn-labeled btn-labeled-right btnsendmsg">
+                                    <b>
+                                        <i class="icon-circle-right2"></i>
+                                    </b>Add Note
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Upload Project Files Model-->
+<div class="modal fade" id="uploadfielmodel" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Upload Project File</h4>
+            </div>
+            <div class="modal-body" id="modeldiv">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <div id="notificationdiv"></div>
+                        <div class="col-md-offset-2 col-md-5">
+                            @Html.TextBox("projectfile", null, new {@class = "", type = "file"})
+                            <input type="hidden" value="@Model.project.id" class="modelprojectid"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="reset" id="btnuploadfile" value="Upload" class="btn btn-primary"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Add Credential Model-->
+<div class="modal fade" id="Addcredentialmodel" role="dialog">
+    <div class="modal-dialog" style="width: 60%;">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">
+                    <span class="credentialmodeltitle"></span>
+                </h4>
+            </div>
+            <div class="modal-body" id="credentialformmodeldiv" style="height: 600px; max-height: 600px; overflow-y: scroll"> </div>
+        </div>
+    </div>
+</div>
+<script src="~/Scripts/custom/projectDashboard.min.js"></script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+<script id="error-notification-template" type="text/x-handlebars-template">
+    <div class="alert alert-danger alert-styled-left alert-bordered usernotification">
+        <button data-dismiss="alert" class="close" type="button"><span>×</span><span class="sr-only">Close</span></button>
+        <span class="text-semibold">{{errortext}}</span>
+    </div>
+</script>
+<script id="success-notification-template" type="text/x-handlebars-template">
+    <div class="alert alert-success alert-styled-left alert-bordered usernotification">
+        <button data-dismiss="alert" class="close" type="button"><span>×</span><span class="sr-only">Close</span></button>
+        <span class="text-semibold">{{successtext}}</span>
+    </div>
+</script>

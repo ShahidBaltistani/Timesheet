@@ -1,0 +1,77 @@
+﻿@model computan.timesheet.core.NotificationEntityAction
+@{ ViewBag.Title = "Delete"; }
+
+@section header {
+    <div style="background-color: #fff;" class="panel page-header border-top-primary">
+        <div class="page-header-content">
+            <div class="page-title">
+                <h5>
+                    <i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Timesheet</span> - Manage Entity Actions
+                    <small class="display-block">Manage Entity Actions</small>
+                </h5>
+            </div>
+            <div class="heading-elements">
+                <div class="btn-group">
+                    @*<a href="/teammember/index" class="btn btn-primary"><i class="icon-list3 position-left"></i> List Team Members</a>*@
+                </div>
+            </div>
+            <a class="heading-elements-toggle">
+                <i class="icon-menu"></i>
+            </a>
+        </div>
+        <div style="border-bottom: 0; box-shadow: none; margin-bottom: 0;" class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/Home/Index"><i class="icon-home2 position-left"></i>Home</a>
+                </li>
+                <li>
+                    <a href="#">Entity Actions</a>
+                </li>
+                <li>
+                    <a href="/notificationentityactions/delete/@ViewContext.RouteData.Values["id"]">Delete Entity Actions</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+}
+
+<div class="panel panel-flat">
+    <div class="panel-heading">
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li>
+                    <a data-action="collapse"></a>
+                </li>
+                <li>
+                    <a data-action="reload"></a>
+                </li>
+            </ul>
+        </div>
+        <a class="heading-elements-toggle">
+            <i class="icon-menu"></i>
+        </a>
+    </div>
+    <div class="panel-body">
+        <h3>Are you sure you want to delete this?</h3>
+        <div>
+            <h4>NotificationEntityAction</h4>
+            <hr/>
+            <dl class="dl-horizontal">
+                <dt> @Html.DisplayNameFor(model => model.notificationentity.name) </dt>
+                <dd> @Html.DisplayFor(model => model.notificationentity.name) </dd>
+                <dt> @Html.DisplayNameFor(model => model.name) </dt>
+                <dd> @Html.DisplayFor(model => model.name) </dd>
+                <dt> @Html.DisplayNameFor(model => model.isActive) </dt>
+                <dd> @Html.DisplayFor(model => model.isActive) </dd>
+            </dl>
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-actions no-color">
+                    <input type="submit" value="Delete" class="btn btn-default"/> |
+                    @Html.ActionLink("Back to List", "Index", new {id = Model.entityid}, new {@class = "btn btn-default"})
+                </div>
+            }
+        </div>
+    </div>
+</div>

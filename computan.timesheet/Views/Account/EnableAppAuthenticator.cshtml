@@ -1,0 +1,56 @@
+﻿@model computan.timesheet.Models.AppAuthenticatorViewModel
+@{
+    ViewBag.Title = "Enter Verification Code";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+    }
+
+<div class="login-container">
+    <span class="dot"></span> <span class="dot2"></span> <span class="dot3"></span> <span class="dot4"></span>
+    @using (Html.BeginForm("EnableAppAuthenticator", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(m => m.SecretKey)
+        @Html.HiddenFor(m => m.BarcodeUrl)
+        @Html.HiddenFor(m => m.Email)
+        @Html.HiddenFor(m => m.Token)
+        @Html.HiddenFor(m => m.RememberMe)
+        @*@Html.HiddenFor(m => m.ReturnUrl)*@
+
+
+        <div class="panel panel-body login-form login-backend">
+            <div class="back2">
+                <div class="center">
+                    <div class="text-center">
+                        @*<img src="~/computanLogo.png" class="logo1" />*@
+                        <h5 class="content-group-lg">  <small class="display-block">Scan Bar Code to continue</small> </h5>
+                    </div>
+                    <div class="text-center">
+                        <img src="http://qrcode.kaywa.com/img.php?s=4&d=@(Model.BarcodeUrl)" />
+                    </div>
+                    <br />
+                    <div class="form-group has-feedback has-feedback-left">
+                        <input type="text" readonly value="@Model.SecretKey" class = "form-control" />
+                    </div>
+                    <div class="form-group has-feedback has-feedback-left">
+                        @Html.TextBoxFor(m => m.Code, new { @class = "form-control" })
+                        <div class="form-control-feedback">
+                            <i class="icon-lock text-muted"></i>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn orange-bg btn-block token-button">Enable <i class="icon-circle-right2 position-right"></i></button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
+  
+</div>
+<link href="~/Content/Custom/login-custom.min.css" rel="stylesheet" />
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+
+

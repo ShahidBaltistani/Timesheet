@@ -1,0 +1,9 @@
+.simplecolorpicker.fontawesome span.color[data-selected]:after {
+    -webkit-font-smoothing: antialiased;
+    content: '\f00c'; /* Ok/check mark */
+
+    font-family: 'FontAwesome';
+
+    margin-left: 1px;
+    margin-right: 1px;
+}

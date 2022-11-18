@@ -1,0 +1,125 @@
+﻿@model computan.timesheet.Models.TicketTimeViewModel
+@{ ViewBag.Title = "My Time Log"; }
+
+@section header {
+    <div style="background-color: #fff;" class="panel page-header border-top-primary">
+        <div class="page-header-content">
+            <div class="page-title">
+                <h5>
+                    <i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Timesheet</span> - My Time Logs
+                    <small class="display-block">Allows you to view and export the time logs for each ticket or project.</small>
+                </h5>
+            </div>
+            <a class="heading-elements-toggle">
+                <i class="icon-menu"></i>
+            </a>
+        </div>
+        <div style="border-bottom: 0; box-shadow: none; margin-bottom: 0;" class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/"><i class="icon-home2 position-left"></i>Dashboard</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/Scripts/select2")
+}
+
+<div class="panel panel-primary">
+    @Html.Partial("_TimeNavTabs", "index")
+    <div class="panel-heading">
+        <h5 class="panel-title">Search My Time Log</h5>
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li>
+                    <a data-action="collapse"></a>
+                </li>
+                <li>
+                    <a data-action="reload"></a>
+                </li>
+            </ul>
+        </div>
+        <a class="heading-elements-toggle">
+            <i class="icon-menu"></i>
+        </a>
+    </div>
+    <div class="panel-body"> @Html.Partial("_SearchFilter", Model.SearchTicketTime, new ViewDataDictionary {{"id", "1"}}) </div>
+    <div class="panel-body" style="max-width: inherit; overflow-x: scroll;">
+        <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper no-footer">
+            <div class="datatable-scroll">
+                <table class="table datatable-button-html5-basic" id="DataTables_Table_mytimelog" role="grid" aria-describedby="DataTables_Table_0_info">
+                    <thead>
+                    <tr role="row">
+                        <th> @Html.DisplayNameFor(model => model.SearchResults.FirstOrDefault().Project.name) </th>
+                        <th> @Html.DisplayNameFor(model => model.SearchResults.FirstOrDefault().Skill.name) </th>
+                        <th> @Html.DisplayNameFor(model => model.SearchResults.FirstOrDefault().title) </th>
+                        <th> @Html.DisplayNameFor(model => model.SearchResults.FirstOrDefault().description) </th>
+                        <th> @Html.DisplayNameFor(model => model.SearchResults.FirstOrDefault().workdate) </th>
+                        <th> @Html.DisplayNameFor(model => model.SearchResults.FirstOrDefault().timespentinminutes) </th>
+                        <th> @Html.DisplayNameFor(model => model.SearchResults.FirstOrDefault().billabletimeinminutes) </th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var item in Model.SearchResults)
+                    {
+                        <tr>
+                            <td> @Html.DisplayFor(modelItem => item.Project.name) </td>
+                            <td> @Html.DisplayFor(modelItem => item.Skill.name) </td>
+                            <td>
+                                <a href="/tickets/ticketitem/@item.TicketItem.ticketid" target="_blank">@Html.DisplayFor(modelItem => item.title)</a>
+                            </td>
+                            <td> @Html.DisplayFor(modelItem => item.description) </td>
+                            <td> @Html.DisplayFor(modelItem => item.GetWorkDate) </td>
+                            <td> @Html.DisplayFor(modelItem => item.timespentinminutes) </td>
+                            <td> @Html.DisplayFor(modelItem => item.billabletimeinminutes) </td>
+                            <td>
+                                @Html.ActionLink("Edit", "Edit", new {item.id}, new {@class = "btn btn-info btn-xs"})
+                                <a class="btn btn-info btn-xs deletetimelog" href="/tickettimelogs/delete/@item.id" data-stime="@item.timespentinminutes" data-btime="@item.billabletimeinminutes">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td>--</td><td>--</td><td>--</td><td>--</td>
+                        <td class="text-center" style="font-size: 18px;">
+                            <b>Total Time</b>
+                        </td>
+                        <td style="font-weight: bold" id="totalspenttime" data-stotal="@ViewBag.totalspent">
+                            <b>@ViewBag.totalspent Hrs</b>
+                        </td>
+                        <td style="font-weight: bold" id="totalbilltime" data-btotal="@ViewBag.totalbillable">
+                            <b>@ViewBag.totalbillable Hrs</b>
+                        </td><td>--</td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#projectid").select2({ width: 450 });
+        $("#DataTables_Table_mytimelog").dataTable().fnDestroy();
+        $('#DataTables_Table_mytimelog').dataTable({
+            "paging": false,
+            dom: 'Bfrtip',
+            buttons: {
+                dom: { button: { className: 'btn btn-default  btn-sm' } },
+                buttons: [
+                    { extend: 'copyHtml5', footer: true, exportOptions: { columns: 'th:not(:last-child)' } },
+                    { extend: 'excelHtml5', footer: true, exportOptions: { columns: 'th:not(:last-child)' } },
+                    { extend: 'csvHtml5', footer: true, exportOptions: { columns: 'th:not(:last-child)' } },
+                    { extend: 'pdfHtml5', footer: true, exportOptions: { columns: 'th:not(:last-child)' } }
+                ]
+            },
+            "order": [[4, "desc"]]
+        });
+    });
+</script>

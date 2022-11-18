@@ -1,0 +1,36 @@
+﻿@model string
+<div class="form-group">
+    <div class="input-group">
+        <span class="input-group-addon" id="basic-addon1">Assigned To:</span>
+        <input name="ticketAssignedUsersInput" type="text" class="assignedusersinput"/>
+        <span class="input-group-addon" id="basic-addon2" style="cursor: pointer;" data-toggle="modal" data-target="#ticketAssignModal">
+            <span class="icon-play"></span>
+        </span>
+    </div>
+</div>
+<ul class="nav nav-tabs bg-slate nav-tabs-component">
+    <li class="@(Model == "ticketitem" ? "active" : "")">
+        <a href="/tickets/ticketitem/@ViewData["ticketId"]"><i class="icon icon-stack4 label-icon-sm"></i>Detail</a>
+    </li>
+    <li class="@(Model == "comments" ? "active" : "")">
+        <a href="/tickets/comments/@ViewData["ticketId"]" data-ticketid="@ViewData["ticketId"]" class="displaycomment_comment">
+            <i class="fa fa-comments-o label-icon-sm"></i>Comments (@ViewData["TicketCommentCount"])
+        </a>
+    </li>
+    <li class="@(Model == "credentials" ? "active" : "")">
+        <a href="/tickets/credentials/@ViewData["ticketId"]/@ViewData["ticketProjectId"]" id="Credentials" data-ticketid="@ViewData["ticketId"]" class="displaycomment_comment">
+            <i class="icon icon-book label-icon-sm"></i>Credentials
+        </a>
+    </li>
+    <li class="@(Model == "Ticketitemtimelog" ? "active" : "")">
+        <a href="/tickets/Ticketitemtimelog/@ViewData["ticketId"]" id="Timelog" data-ticketid="@ViewData["ticketId"]" class="displaycomment_comment">
+            <i class="fa fa-clock-o label-icon-sm"></i>Time Logs
+        </a>
+    </li>
+    @if (Model == "credentials")
+    {
+        <li class="pull-right add-credential">
+            <a class="displaycomment_comment">Add credential</a>
+        </li>
+    }
+</ul>

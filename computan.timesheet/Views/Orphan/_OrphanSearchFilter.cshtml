@@ -1,0 +1,38 @@
+﻿@model computan.timesheet.Models.OrphanTickets.OrphanSearchViewModel
+@using (Html.BeginForm("GetAllOrphanedTickets", "Orphan", FormMethod.Post, new {@class = "form-inline"}))
+{
+<div class="form-group">
+    <div class="input-group">
+        <span class="input-group-addon">
+            <i class="icon-calendar3"></i>
+        </span>
+        @Html.TextBoxFor(model => model.StartDate, new {Value = Model.StartDate.ToString("MM/dd/yyyy"), @class = "form-control picker  default-margin-for"})
+    </div>
+    <div class="input-group">
+        <span class="input-group-addon">
+            <i class="icon-calendar3"></i>
+        </span>
+        @Html.TextBoxFor(model => model.EndDate, new {Value = Model.EndDate.ToString("MM/dd/yyyy"), @class = "form-control picker  default-margin-for"})
+    </div>
+    <div class="input-group">
+        @Html.DropDownListFor(model => model.TeamId, Model.Teams.OrderBy(x => x.Text), "Select Team", new {@class = "form-control orphanTeam"})
+    </div>
+    <div class="input-group">
+        @Html.DropDownListFor(model => model.StatusId, Model.Status.OrderBy(x => x.Text), "Select Status", new {@class = "form-control orphanStatus"})
+    </div>
+    <div class="input-group">
+        @Html.DropDownListFor(model => model.AgeId, Model.Ages, "Select Age", new {@class = "form-control orphanAge"})
+    </div>
+    <div class="input-group">
+        <button type="submit" class="btn btn-success form-control">
+            <span class="glyphicon glyphicon-search"></span> Search
+        </button>
+    </div>
+</div>
+}
+<script type="text/javascript">
+    $(function() {
+        $(".picker").datepicker({ dateFormat: 'mm/dd/yy' });
+        $(".picker").css('width', "100px");
+    });
+</script>

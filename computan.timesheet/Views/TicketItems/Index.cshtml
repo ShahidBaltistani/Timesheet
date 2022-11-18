@@ -1,0 +1,1025 @@
+﻿@model IEnumerable<computan.timesheet.core.TicketItem>
+@{ ViewBag.Title = "Ticket Items"; }
+
+@section header {
+    <div style="background-color: #fff;" class="panel page-header border-top-primary">
+        <div class="page-header-content">
+            <div class="page-title">
+                <h5>
+                    <i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">TimeSheet</span> - Manage Ticket Items
+                    <small class="display-block">Manage Ticket Items</small>
+                </h5>
+            </div>
+            <div class="heading-elements">
+                <div class="btn-group"> </div>
+            </div>
+            <a class="heading-elements-toggle">
+                <i class="icon-menu"></i>
+            </a>
+        </div>
+        <div style="border-bottom: 0; box-shadow: none; margin-bottom: 0;" class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/"><i class="icon-home2 position-left"></i>TimeSheet</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+}
+
+<div id="notification"></div>
+@foreach (var item in Model)
+{
+    <div class="panel panel-flat">
+    <div class="panel-heading">
+        <h5 class="panel-title">@item.subject</h5>
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li>
+                    <a data-action="collapse"></a>
+                </li>
+            </ul>
+        </div>
+        <a class="heading-elements-toggle">
+            <i class="icon-menu"></i>
+        </a>
+    </div>
+    <div class="row">
+    <div class="col-lg-9">
+        <!-- Task overview -->
+        <div class="panel panel-flat">
+            <div class="panel-heading mt-5">
+                <h5 class="panel-title">
+                    <small class="display-block">
+                        <b>Date: </b>@item.lastmodifiedtime
+                    </small>
+                    <small class="display-block">
+                        <b>From: </b>@item.from
+                    </small>
+                    <small class="display-block">
+                        <b>To: </b>@item.displayto
+                    </small>
+                    <small class="display-block">
+                        <b>Cc: </b>@item.displaycc
+                    </small>
+                </h5>
+                @{ var Isassign = item.TicketItemLog.Where(i => i.ticketitemid == item.id && i.assignedtousersid == ViewBag.currentuserid).FirstOrDefault(); }
+                @if (Isassign == null)
+                {
+                    <div class="heading-elements">
+                        <a ID="lnkStartWorking" class="btn bg-teal-400 btn-sm btn-labeled btn-labeled-right heading-btn startworking" data-id="@item.id" data-statusid="@item.TicketStatus.id" data-projectid="@item.projectid" data-skillid="@item.skillid">
+                            Start Working
+                            <b>
+                                <i class="icon-alarm-check"></i>
+                            </b>
+                        </a>
+                    </div>
+                }
+                <a class="heading-elements-toggle">
+                    <i class="icon-menu"></i>
+                </a>
+            </div>
+            <div class="panel-body"> @Html.Raw(item.uniquebody) </div>
+            <div class="panel-footer"> </div>
+        </div>
+        <!-- /task overview -->
+    </div>
+    <div class="col-lg-3">
+    <div class="panel panel-flat" style="position: static;">
+        <div class="panel-heading">
+            <h6 class="panel-title"><i class="icon-watch position-left"></i>Task Time</h6>
+            <div class="heading-elements">
+                <ul class="icons-list">
+                    <li>
+                        <a data-action="collapse" class=""></a>
+                    </li>
+                </ul>
+            </div>
+            <a class="heading-elements-toggle">
+                <i class="icon-menu"></i>
+            </a>
+        </div>
+        <div class="panel-body" style="display: block;">
+            <ul class="media-list media-list-linked addtimeafter" id="@item.id">
+                @if (item.TicketTimeLog.Count > 0 && item.TicketTimeLog != null)
+                {
+                    foreach (var timeitem in item.TicketTimeLog)
+                    {
+                        <li class="media">
+                            <div class="media-left">
+                                <img src="/Content/images/placeholder.jpg" class="img-sm img-circle" alt=""/>
+                            </div>
+                            <div class="media-body">
+                                <div class="media-heading">
+                                    <span class="text-semibold">@timeitem.User.FullName</span> <span class="media-annotation pull-right">@timeitem.timespentinminutes Mins</span>
+                                </div>
+                                <span class="text-muted">@timeitem.workdate.</span>
+                            </div>
+                        </li>
+                    }
+                }
+                else
+                {
+                    <li>
+                        <span class="notimeadded" id="@item.id">Sorry,no time added found for this email</span>
+                    </li>
+                }
+            </ul>
+        </div>
+        <div class="panel-footer" style="display: block;">
+            <ul id="@item.id" class="addtimeul">
+                @if (Isassign != null)
+                {
+                    <li>
+                        <a id="lnkAddTime" class="addtasktime" data-title="@item.subject" data-projectid="@item.projectid" data-ticketitemid="@item.id" data-skillid="@item.skillid">
+                            <i class="icon-add"></i>
+                        </a>
+                    </li>
+                }
+            </ul>
+            <ul>
+                Status:
+                <li class="btn-group btn-group-xs ticketstatusbar colors" data-toggle="buttons">
+                    @foreach (var status in ViewBag.ticketstatuslist)
+                    {
+                        if (item.statusid == 1)
+                        {
+                            <label class="@(status.id == item.statusid ? "btn btn-default active" : "btn btn-default")" @*class="btn btn-default"*@>
+                                <input type="radio" name="statustyperadio" value="@status.id" autocomplete="off" data-id="@item.id" data_itemid=@item.id class="itemstatus"> @status.name
+                            </label>
+                        }
+                        else
+                        {
+                            <label class="@(status.id == item.statusid ? "btn btn-default active" : "btn btn-default")" @*class="btn btn-default"*@>
+                                <input type="radio" name="statustyperadio" value="@status.id" autocomplete="off" data-id="@item.id" data_itemid=@item.id class="itemstatus"> @status.name
+                            </label>
+                        }
+                    }
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!-- Timer -->
+    <div class="panel panel-flat">
+        <div class="panel-heading">
+            <h6 class="panel-title"><i class="icon-watch position-left"></i>Assigned Users</h6>
+            <div class="heading-elements">
+                <ul class="icons-list">
+                    <li>
+                        <a data-action="collapse" class=""></a>
+                    </li>
+                </ul>
+            </div>
+            <a class="heading-elements-toggle">
+                <i class="icon-menu"></i>
+            </a>
+        </div>
+        <div class="panel-body assigneduserslist" id="@item.id" style="display: block;">
+            @if (item.TicketItemLog.Count > 0 && item.TicketItemLog != null)
+            {
+                foreach (var items in item.TicketItemLog.Where(u => u.ticketitemid == item.id))
+                {
+                    <ul class="media-list media-list-linked">
+                        <li class="media">
+                            <div class="media-left">
+                                @foreach (var useritem in ViewBag.users)
+                                {
+                                    if (useritem.Id == items.assignedtousersid)
+                                    {
+                                        if (useritem.ProfileImage != "")
+                                        {
+                                            <img src="/Images/UserProfileImage/@useritem.ProfileImage" class="img-sm img-circle" onerror="this.onerror = null;this.src = '/Content/images/placeholder.jpg';" alt="alt">
+                                        }
+                                        else
+                                        {
+                                            <img src="/Content/images/placeholder.jpg" class="img-sm img-circle" alt="alt">
+                                        }
+                                    }
+                                }
+                            </div>
+                            <div class="media-body media-middle text-semibold">
+                                <span>@items.user.FullName</span>
+                                <div class="media-annotation assigneduserliststatusname" id="@items.ticketitemid@items.assignedtousersid">
+                                    @Html.Raw(items.TicketStatus.name)
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                }
+            }
+        </div>
+        <div class="panel-footer assignuserlistfooter" id="@item.id" style="display: block;">
+            <ul id="ulAddTimeAction">
+                <li>
+                    <a class="assignusers" data-projectid="@item.projectid" data-ticketitemid="@item.id" data-skillid="@item.skillid">
+                        <i class="icon-add"></i>
+                    </a>
+                </li>
+                @if (item.statusid == 1)
+                {
+                    <li>
+                        <a class="inherituser" data-projectid="@item.projectid" data-ticketitemid="@item.id" data-skillid="@item.skillid">
+                            <span class="glyphicon glyphicon-check"></span>
+                        </a>
+                    </li>
+                }
+            </ul>
+            <ul class="pull-right">
+                @if (item.TicketItemLog.Count > 0 && item.TicketItemLog != null)
+                {
+                    var count = 0;
+                    foreach (var items in item.TicketItemLog.Where(u => u.assignedtousersid == ViewBag.currentuserid && u.ticketitemid == item.id))
+                    {
+                        count++;
+                        if (count == 1)
+                        {
+                            li
+                        class=
+                            "btn-group btn-group-xs ticketstatusbar colors"
+                            data - toggle = "buttons" >
+                                            @foreach(var status in ViewBag.ticketstatuslist)
+                            {
+                                if (item.statusid == 1)
+                                {
+                                <
+                                    label
+                                class=
+                                    "@(status.id == item.statusid ? "
+                                    btn
+                                    btn - default
+                                    active
+                                    " : "
+                                    btn
+                                    btn - default
+                                    " )" >
+                                    <
+                                    input type = "radio"
+                                    name = "statustyperadio"
+                                    value = "@status.id"
+                                    autocomplete = "off"
+                                    data_userid = items.assignedtousersid
+                                    data_assignmentid = items.ticketitemid
+                                    data - id = "@items.ticketitemid"
+                                class=
+                                    "usertatus"
+                                    disabled = "disabled" > status.name
+                                               </
+                                    label >
+                                }
+                                else
+                                {
+                                <
+                                    label
+                                class=
+                                    "@(status.id == item.statusid ? "
+                                    btn
+                                    btn - default
+                                    active
+                                    " : "
+                                    btn
+                                    btn - default
+                                    " )" >
+                                    <
+                                    input type = "radio"
+                                    name = "statustyperadio"
+                                    value = "@status.id"
+                                    autocomplete = "off"
+                                    data_userid = items.assignedtousersid
+                                    data_assignmentid = items.ticketitemid
+                                    data - id = "@items.ticketitemid"
+                                class=
+                                    "usertatus" > status.name
+                                    </
+                                    label >
+                                }
+                            }
+                        </
+                            li >
+                        }
+                    }
+                }
+            </ul>
+        </div>
+    </div>
+    <!-- /timer -->
+    <!-- Task details -->
+    <div class="panel panel-flat panel-collapsed">
+        <div class="panel-heading">
+            <h6 class="panel-title"><i class="icon-files-empty position-left"></i>Task details</h6>
+            <div class="heading-elements">
+                <ul class="icons-list">
+                    <li>
+                        <a data-action="collapse" class=""></a>
+                    </li>
+                </ul>
+            </div>
+            <a class="heading-elements-toggle">
+                <i class="icon-menu"></i>
+            </a>
+        </div>
+        <table class="table table-borderless table-xs content-group-sm" style="display: table;">
+            <tbody>
+            <tr>
+                <td><i class="icon-briefcase position-left"></i>Project:</td>
+                <td class="text-right">
+                    <span class="pull-right">@Html.DropDownListFor(modelitem => item.projectid, new SelectList(ViewBag.projects, "Value", "Text", item.projectid), "Please Select", new {data_id = item.id, @class = "itemprojectid"})</span>
+                </td>
+            </tr>
+            <tr>
+                <td><i class="icon-briefcase position-left"></i>Skill:</td>
+                <td class="text-right">
+                    <span class="pull-right">@Html.DropDownListFor(modelitem => item.skillid, new SelectList(ViewBag.skills, "id", "name", item.skillid), "Please Select", new {data_id = item.id, @class = "itemskillid"})</span>
+                </td>
+            </tr>
+            <tr>
+                <td><i class="icon-alarm-add position-left"></i>Received:</td>
+                <td class="text-right">
+                    <asp:Literal ID="ltUpdatedDate">@item.datetimereceived.ToString("MM/dd/yyyy")</asp:Literal>
+                </td>
+            </tr>
+            <tr>
+                <td><i class="icon-alarm-check position-left"></i>Created:</td>
+                <td class="text-right">
+                    <asp:Literal ID="ltCreatedDate">@item.datetimecreated.ToString("MM/dd/yyyy")</asp:Literal>
+                </td>
+            </tr>
+            <tr>
+                <td><i class="icon-file-check position-left"></i>Status:</td>
+                <td class="text-right">@item.TicketStatus.name</td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="panel-footer" style="display: block;"> </div>
+    </div>
+    <!-- /task details -->
+    <!-- Attached files -->
+    <div class="panel panel-flat panel-collapsed">
+        <div class="panel-heading">
+            <h6 class="panel-title"><i class="icon-link position-left"></i>Attached files</h6>
+            <div class="heading-elements">
+                <ul class="icons-list">
+                    <li>
+                        <a data-action="collapse" class="rotate-180"></a>
+                    </li>
+                </ul>
+            </div>
+            <a class="heading-elements-toggle">
+                <i class="icon-menu"></i>
+            </a>
+        </div>
+        <div class="panel-body" style="display: none;">
+            @if (item.TicketItemAttachment.Count > 0 && item.TicketItemAttachment != null)
+            {
+                var hasattechments = false;
+                foreach (var items in item.TicketItemAttachment.Where(i => i.contenttype != "Inline"))
+                {
+                    hasattechments = true;
+                    <ul class="media-list">
+                        <li class="media">
+                            <div class="media-left media-middle">
+                                @if (items.name.Contains(".docx") || items.name.Contains(".doc"))
+                                {
+                                    <i class="icon-file-word icon-2x text-muted"></i>
+                                }
+                                else if (items.name.Contains(".xlsx"))
+                                {
+                                    <i class="icon-file-excel icon-2x text-muted"></i>
+                                }
+                                else if (items.name.Contains(".pptx") || items.name.Contains(".ppt") || items.name.Contains(".pptm"))
+                                {
+                                    <i class="icon-file-presentation icon-2x text-muted"></i>
+                                }
+                                else if (items.name.Contains(".pdf"))
+                                {
+                                    <i class="icon-file-pdf icon-2x text-muted"></i>
+                                }
+                                else if (items.name.Contains(".jpg") || items.name.Contains(".gif") || items.name.Contains(".bmp") || items.name.Contains(".png") || items.name.Contains(".jpeg"))
+                                {
+                                    <i class="icon-image2 icon-2x text-muted"></i>
+                                }
+                                else if (items.name.Contains(".zip") || items.name.Contains(".rar"))
+                                {
+                                    <i class="icon-file-zip icon-2x text-muted"></i>
+                                }
+                                else
+                                {
+                                    <i class="icon-file-empty icon-2x text-muted"></i>
+                                }
+                            </div>
+                            <div class="media-body">
+                                @if (items.name.Contains(".") || items.path.Contains("."))
+                                {
+                                    <a href="@items.path" class="media-heading text-semibold" download>@items.name.Substring(0, items.name.LastIndexOf("."))</a>
+                                }
+                                <ul class="list-inline list-inline-separate list-inline-condensed text-size-mini text-muted">
+                                    <li>@items.name</li>
+                                </ul>
+                            </div>
+                            <div class="media-right media-middle">
+                                <ul class="icons-list">
+                                    <li>
+                                        <a href="@items.path" download>
+                                            <i class="icon-download"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                    </ul>
+                }
+                if (!hasattechments)
+                {
+                    <span>Sorry, no attachment found.</span>
+                }
+            }
+            else
+            {
+                <span>Sorry, no attachment found.</span>
+            }
+        </div>
+    </div>
+    <!-- /attached files -->
+    </div>
+    </div>
+    </div>
+}
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Start Working</h4>
+            </div>
+            <div class="modal-body" id="modelbodydiv">
+                <div class="form-group">
+                    @Html.Label("Project", new {@class = "control-label col-md-2"})
+                    <div class="col-md-10">
+                        @Html.DropDownList("projectid", new SelectList(ViewBag.projects, "Value", "Text"), "Please Select Project", new {@class = "form-control"})
+                    </div>
+                </div>
+                <br/>
+                <div class="form-group">
+                    @Html.Label("Skill", new {@class = "control-label col-md-2"})
+                    <div class="col-md-10">
+                        @Html.DropDownList("skillid", new SelectList(ViewBag.skills, "id", "name"), "Please Select Skill", new {@class = "form-control"})
+                    </div>
+                </div>
+                <br/>
+                <div class="form-group">
+                    @Html.Label("Quoted Time", new {@class = "control-label col-md-2"})
+                    <div class="col-md-10">
+                        @Html.TextBox("quotabletime", null, new {placeholder = "Add Time In Minutes", @class = "form-control"})
+                    </div>
+                </div>
+                <br/>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="reset" id="startworkingpopup" value="Start" class="btn btn-primary startworkingpopup"/>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer"> </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="addtimemodel" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Add Time</h4>
+            </div>
+            <div class="modal-body" id="modeladdtimebodydiv">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        @Html.Label("Title", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" id="title"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Project", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.DropDownList("projectid_addtime", new SelectList(ViewBag.projects, "Value", "Text"), "Please Select", new {@class = "form-control"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Skill", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.DropDownList("skillid_addtime", new SelectList(ViewBag.skills, "id", "name"), "Please Select", new {@class = "form-control"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Work Date*", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.TextBox("workdate", null, new {@class = "form-control"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Spent*", new {@class = "control-label col-md-2"})
+                        <div class="col-md-4">
+                            @Html.DropDownList("timespentinminutes", (IEnumerable<SelectListItem>) ViewBag.timespentinminutes, "Select Time")
+                        </div>
+                        @Html.Label("Billable", new {@class = "control-label col-md-2"})
+                        <div class="col-md-4">
+                            @Html.DropDownList("billabletimeinminutes", (IEnumerable<SelectListItem>) ViewBag.billabletimeinminutes, "Select Time", new {TabIndex = "-1"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Description*", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.TextArea("description", null, new {@class = "form-control", rows = "3"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Comments", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.Editor("comments", new {htmlAttributes = new {@class = "form-control"}})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="reset" id="addtimepopup" value="Add" class="btn btn-primary addtimepopupbtn"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="assignuseradmin" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Assign Users</h4>
+            </div>
+            <div class="modal-body" id="modelassignuseradmindiv">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        @Html.Label("Project", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.DropDownList("projectid_assignuser", new SelectList(ViewBag.projects, "Value", "Text"), "Please Select", new {@class = "form-control"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Skill", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.DropDownList("skillid_assignuser", new SelectList(ViewBag.skills, "id", "name"), "Please Select", new {@class = "form-control"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-2">Users</label>
+                        @{ var countuser = 0; }
+                        @foreach (var users in ViewBag.users)
+                        {
+                            if (countuser >= 4)
+                            {
+                                <label class="control-label col-md-2">&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                countuser = 0;
+                            }
+                            countuser++;
+                            <div class="col-md-5" style="float: left; position: relative;">
+                                @Html.CheckBox("userid", new {@class = "userslist", data_userid = users.Id, id = users.Id})
+                                <label for="@users.Id" class="">@users.FirstName @users.LastName</label>
+                            </div>
+                        }
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="reset" id="assignuserspopup" value="Add" class="btn btn-primary assignuserspopup"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="pagenumber" value="1"/>
+<input type="hidden" id="TicketStatusId" value="@ViewBag.statusid"/>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/Scripts/select2")
+}
+
+<link rel="stylesheet" type="text/css" href="/scripts/default/datepicker/css/jquery.datepick.min.css"/>
+<script src="~/Scripts/default/plugins/jquery.alphanum.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $.fn.modal.Constructor.prototype.enforceFocus = function() {};
+        $("#timespentinminutes").select2({ width: 150 });
+        $("#billabletimeinminutes").select2({ width: 150 });
+        $("#projectid_addtime").select2();
+        $("#skillid_addtime").select2();
+        $("#projectid_assignuser").select2();
+        $("#skillid_assignuser").select2();
+        $("#projectid").select2();
+        $(".itemprojectid").select2({ width: 150 });
+        $(".itemskillid").select2({ width: 150 });
+        $("#skillid").select2();
+        $("#quotabletime").numeric({
+            allowMinus: false,
+            allowThouSep: false
+        });
+        var date0 = $('#workdate').datepick({ dateFormat: 'mm/dd/yyyy' }).val();
+        $('#workdate').datepick();
+
+        function leftPad(num, length) {
+            var result = '' + num;
+            while (result.length < length) {
+                result = '0' + result;
+            }
+            return result;
+        }
+
+        var fullDate = new Date();
+        var day = leftPad(fullDate.getDate(), 2);
+        var twoDigitMonth = ((fullDate.getMonth().length + 1) === 1) ? (fullDate.getMonth() + 1) : '0' + (fullDate.getMonth() + 1);
+        var currentDate = twoDigitMonth + "/" + day + "/" + fullDate.getFullYear();
+        $("#workdate").val(currentDate);
+        var id;
+        var ticketitemid;
+        var title;
+        $(document).on('click',
+            ".addtasktime",
+            function() {
+                var pid = $(this).data("projectid");
+                var sid = $(this).data("skillid");
+                ticketitemid = $(this).data("ticketitemid");
+                title = $(this).data("title");
+                pid = parseInt(pid);
+                sid = parseInt(sid);
+                $("#title").val(title);
+                if (pid != "") {
+                    $("#projectid_addtime").val(pid).trigger("change");
+                }
+                if (sid != "") {
+                    $("#skillid_addtime").val(sid).trigger("change");
+                }
+                $('#addtimemodel').modal('show');
+            });
+        $(document).on('click',
+            ".assignusers",
+            function() {
+                var pid = $(this).data("projectid");
+                var sid = $(this).data("skillid");
+                ticketitemid = $(this).data("ticketitemid");
+                if (pid != "") {
+                    $("#projectid_assignuser").val(pid).trigger("change");
+                }
+                if (sid != "") {
+                    $("#skillid_assignuser").val(sid).trigger("change");
+                }
+                $('#assignuseradmin').modal('toggle');
+
+            });
+
+        var startworking;
+        $(document).on('click',
+            ".startworking",
+            function() {
+                id = $(this).data("id");
+                startworking = $(this);
+                var pid = $(this).data("projectid");
+                var sid = $(this).data("skillid");
+                if (pid != "") {
+                    $("#projectid").val(pid).trigger("change");
+                }
+                if (sid != "") {
+                    $("#skillid").val(sid).trigger("change");
+                }
+                $('#myModal').modal('toggle');
+            });
+        var previous_user_status;
+        $(document).on('focusin', ".usertatus", function() { previous_user_status = $(this).val(); });
+        $(document).on('change',
+            ".usertatus",
+            function() {
+                var userid = $(this).data("userid");
+                var ticketitemid = $(this).data("assignmentid");
+                var statusid = $(this).val();
+                if (statusid == 1) {
+                    sweetAlert("Sorry...", " You can change status to back.", "error");
+                    $(this).val(previous_user_status);
+                    return false;
+                }
+                $.ajax({
+                    url: '/ticketitems/ChangeUserStatus/' + ticketitemid + '/' + statusid,
+                    data: '',
+                    type: 'GET'
+                }).done(function(data) {
+                    if (data.error) {
+                        new PNotify({ title: 'Error', text: data.error, type: 'error' });
+                        return false;
+                    }
+                    $("#" + ticketitemid + userid + ".assigneduserliststatusname").html(data.statusname);
+                    new PNotify({ title: 'Success', text: 'Your task status has been updated.', type: 'success' });
+                    return false;
+                });
+            });
+        $(document).on('click',
+            ".startworkingpopup",
+            function() {
+                var statusid = 2;
+                var pid = $("#projectid option:selected").val();
+                var sid = $("#skillid option:selected").val();
+                var quotedtime = $("#quotabletime").val();
+                if (quotedtime == "") {
+                    quotedtime = 0;
+                }
+                if (pid == "" || sid === "") {
+                    sweetAlert("Sorry", "peasle select project and skill", "error");
+                    return false;
+                }
+                $.ajax({
+                    url: '/ticketitems/Startworking/',
+                    data: { id: id, status: statusid, projectid: pid, quotedtime: quotedtime, skillid: sid },
+                    type: 'POST'
+                }).done(function(data) {
+                    if (data.error) {
+                        new PNotify({ title: 'Error', text: 'Something went wrongs.', type: 'error' });
+                        return false;
+                    }
+                    new PNotify({ title: 'Success', text: 'This task has been assigned to you.', type: 'success' });
+                    $('#myModal').modal('toggle');
+                    var itemid = startworking.data("id");
+                    var tktstatsus = $("select#" + itemid + ".itemstatus").val();
+                    if (tktstatsus == 1 || tktstatsus == 2 || tktstatsus == 3) {
+                        $("select#" + itemid + ".itemstatus").val(2).removeAttr('disabled');
+                    }
+                    startworking.hide();
+                    var source = $("#new-assign-user-template").html();
+                    var template = Handlebars.compile(source);
+                    var html = template(data);
+                    $("#" + itemid + ".assigneduserslist").append(html);
+                    var source = $("#new-assign-user-dropdownstatus-template").html();
+                    var template = Handlebars.compile(source);
+                    var html = template(data);
+                    $("#" + itemid + ".assignuserlistfooter").append(html);
+                    var source = $("#Add-time-option-template").html();
+                    var template = Handlebars.compile(source);
+                    var html = template(data);
+                    $("#" + itemid + ".addtimeul").append(html);
+                    return false;
+                });
+            });
+        $(document).on('focusin', ".itemstatus", function() { previous_user_status = $(this).val(); });
+        $(document).on('change',
+            ".itemstatus",
+            function() {
+                var id = $(this).data("id");
+                var statusid = $(this).val();
+                if (statusid == 1) {
+                    sweetAlert("Sorry...", " You can change status to back.", "error");
+                    $(this).val(previous_user_status);
+                    return false;
+                }
+                $.ajax({
+                    url: '/ticketitems/TicketItemstatusupdate/',
+                    data: { id: id, status: statusid, quotedtime: 0 },
+                    type: 'POST'
+                }).done(function(data) {
+                    if (data.error) {
+                        new PNotify({ title: 'Error', text: 'Something went wrong..', type: 'error' });
+                        return false;
+                    }
+                    $.each(data.updatedusers,
+                        function(index, value) {
+                            $("#" + value.assignmentid + value.userid + ".assigneduserliststatusname").html(value.statusname);
+                            $("#" + value.assignmentid + ".usertatus").val(value.statusid);
+                        });
+                    new PNotify({
+                        title: 'Success',
+                        text: 'This ticket status has been updated.',
+                        type: 'success'
+                    });
+                    return false;
+                });
+            });
+
+        $(document).on('click',
+            ".addtimepopupbtn",
+            function() {
+                var tcktitemid = ticketitemid;
+                var pid = $("#projectid_addtime").val();
+                var sid = $("#skillid_addtime").val();
+                var spenttime = $("#timespentinminutes").val();
+                var billtime = $("#billabletimeinminutes").val();
+                var workdate = $("#workdate").val();
+                var description = $("#description").val();
+                var comments = $("#comments").val();
+                if (spenttime == "" || workdate == "" || description == "") {
+                    sweetAlert("Sorry...", "All fields having * are Required.", "error");
+                    return false;
+                }
+                $.ajax({
+                    url: '/TicketTimeLogs/addtime/',
+                    data: { tcktitemid: tcktitemid, pid: pid, sid: sid, spenttime: spenttime, billtime: billtime, workdate: workdate, title: title, description: description, comments: comments },
+                    type: 'POST'
+                }).done(function(data) {
+                    if (data.error) {
+                        var source = $("#error-notification-template").html();
+                        var template = Handlebars.compile(source);
+                        var html = template(data);
+                        $("#modeladdtimebodydiv").prepend(html);
+                        return false;
+                    }
+                    new PNotify({ title: 'Success', text: 'Time has been added successfully.', type: 'success' });
+                    $('#addtimemodel').modal('toggle');
+                    $("#" + tcktitemid + ".notimeadded").remove();
+                    var source = $("#Add-time-after-template").html();
+                    var template = Handlebars.compile(source);
+                    var html = template(data);
+                    $("#" + tcktitemid + ".addtimeafter").append(html);
+                    return false;
+                });
+            });
+        $(document).on('click',
+            ".assignuserspopup",
+            function() {
+                var pid = $("#projectid_assignuser").val();
+                var sid = $("#skillid_assignuser").val();
+                if (pid == "" || sid === "") {
+                    sweetAlert("Sorry", "please select project and skill.", "error");
+                    return false;
+                }
+                var users = "";
+                $("input:checkbox[class=userslist]").each(function() {
+                    if (this.checked) {
+                        users = users + $(this).data("userid") + ";";
+                    }
+                });
+                $.ajax({
+                    url: '/TicketItems/MutiUsersAssignment/',
+                    data: { pid: pid, sid: sid, ticketitemid: ticketitemid, users: users },
+                    type: 'POST'
+                }).done(function(data) {
+                    if (data.error) {
+                        new PNotify({ title: 'Error', text: 'Something went wrong..', type: 'error' });
+                        return false;
+                    }
+                    $.each(data.userlist,
+                        function(index, value) {
+                            var source = $("#new-assign-user-template").html();
+                            var template = Handlebars.compile(source);
+                            var html = template(value);
+                            $("#" + ticketitemid + ".assigneduserslist").append(html);
+                        });
+                    $('#assignuseradmin').modal('toggle');
+                    new PNotify({
+                        title: 'Success',
+                        text: 'The task has been assigned to selected users.',
+                        type: 'success'
+                    });
+                    return false;
+                });
+            });
+        //assign ticket to users using Inherit Feature
+        $(document).on('click',
+            ".inherituser",
+            function() {
+                var tcktitemid = $(this).attr("data-ticketitemid");
+                var pid = $(this).attr("data-projectid");
+                var sid = $(this).attr("data-skillid");
+                $.ajax({
+                    url: '/TicketItems/InheritTaskAssignment/',
+                    data: { ticketitemid: tcktitemid },
+                    type: 'POST'
+                }).done(function(data) {
+                    if (data.error) {
+                        new PNotify({ title: 'Error', text: data.errortext, type: 'error' });
+                        return false;
+                    }
+                    $.each(data.userlist,
+                        function(index, value) {
+                            var source = $("#new-assign-user-template").html();
+                            var template = Handlebars.compile(source);
+                            var html = template(value);
+                            $("#" + tcktitemid + ".assigneduserslist").append(html);
+                        });
+                    //$('#assignuseradmin').modal('toggle');
+                    new PNotify({ title: 'Success', text: 'The task has been assigned to selected users.', type: 'success' });
+                    return false;
+                });
+            });
+        //update ticket item project
+        $(document).on('change',
+            ".itemprojectid",
+            function() {
+                var ticketitemid = $(this).data("id");
+                var projectid = $(this).val();
+                $.ajax({
+                    url: '/ticketitems/changeproject/',
+                    data: { ticketitemid: ticketitemid, projectid: projectid, },
+                    type: 'POST'
+                }).done(function(data) {
+                    if (data.error) {
+                        var source = $("#error-notification-template").html();
+                        var template = Handlebars.compile(source);
+                        var html = template(data);
+                        $("#modeladdtimebodydiv").prepend(html);
+                        return false;
+                    }
+                    new PNotify({ title: 'Success', text: 'project has been update successfully.', type: 'success' });
+                    return false;
+                });
+            });
+        //update ticket item skill
+        $(document).on('change',
+            ".itemskillid",
+            function() {
+                var ticketitemid = $(this).data("id");
+                var skillid = $(this).val();
+                $.ajax({
+                    url: '/ticketitems/changeskill/',
+                    data: { ticketitemid: ticketitemid, skillid: skillid, },
+                    type: 'POST'
+                }).done(function(data) {
+                    if (data.error) {
+                        var source = $("#error-notification-template").html();
+                        var template = Handlebars.compile(source);
+                        var html = template(data);
+                        $("#modeladdtimebodydiv").prepend(html);
+                        return false;
+                    }
+                    new PNotify({ title: 'Success', text: 'Skill has been update successfully.', type: 'success' });
+                    return false;
+                });
+            });
+        Handlebars.registerHelper('formatTime',
+            function(date, format) {
+                var mmnt = moment(date);
+                return mmnt.format(format);
+            });
+    });
+</script>
+<!--Templates-->
+<script id="success-notification-template" type="text/x-handlebars-template">
+    <div class="alert alert-success alert-styled-left alert-bordered usernotification">
+        <button data-dismiss="alert" class="close" type="button"><span>×</span><span class="sr-only">Close</span></button>
+        <span class="text-semibold">{{successtext}}</span>
+    </div>
+</script>
+<script id="error-notification-template" type="text/x-handlebars-template">
+    <div class="alert alert-danger alert-styled-left alert-bordered usernotification">
+        <button data-dismiss="alert" class="close" type="button"><span>×</span><span class="sr-only">Close</span></button>
+        <span class="text-semibold">{{errortext}}</span>
+    </div>
+</script>
+<script id="new-assign-user-template" type="text/x-handlebars-template">
+    <ul class="media-list media-list-linked">
+        <li class="media">
+            <div class="media-left">
+                {{#if hasprofileimage}}
+                    <img src="/Images/UserProfileImage/{{profileimage}}" class="img-sm img-circle" onerror="this.onerror = null; this.src = '/Content/images/placeholder.jpg';" alt="alt">
+                {{else}}
+                    <img src="/Content/images/placeholder.jpg" class="img-sm img-circle" alt="alt">
+                {{/if}}
+            </div>
+            <div class="media-body media-middle text-semibold">
+                <span>{{username}}</span>
+                <div class="media-annotation assigneduserliststatusname" id="{{assignmentid}}{{userid}}">
+                    {{useritemstatus}}
+                </div>
+            </div>
+        </li>
+    </ul>
+</script>
+<script id="new-assign-user-dropdownstatus-template" type="text/x-handlebars-template">
+    <ul class="pull-right">
+        <li>
+            <b>Status:</b>&nbsp;<select class="usertatus" data-assignmentid="{{assignmentid}}" data-userid="{{userid}}" data-val="true" data-val-number="The field Status must be a number." data-val-required="The Status field is required." id="{{assignmentid}}" name="items.statusid">
+                <option value="1">Not Assigned</option>
+                <option selected="selected" value="2">In Progress</option>
+                <option value="3">On Hold</option>
+                <option value="4">Resolved</option>
+                <option value="5">Closed</option>
+                <option value="6">Duplicate</option>
+                <option value="7">Invalid</option>
+                <option value="8">Wont Fix</option>
+            </select>
+        </li>
+    </ul>
+</script>
+<script id="Add-time-after-template" type="text/x-handlebars-template">
+    <li class="media">
+        <div class="media-left">
+            {{#if hasprofileimage}}
+                <img src="/Images/UserProfileImage/{{profileimage}}" class="img-sm img-circle" onerror="this.onerror = null; this.src = '/Content/images/placeholder.jpg';" alt="alt">
+            {{else}}
+                <img src="/Content/images/placeholder.jpg" class="img-sm img-circle" alt="alt">
+            {{/if}}
+        </div>
+        <div class="media-body">
+            <div class="media-heading"><span class="text-semibold">{{username}}</span> <span class="media-annotation pull-right">{{timespentinminutes}} Mins</span></div>
+            <span class="text-muted">{{formatTime  Workdate "MM/DD/YYYY h:mm:ss a"}}</span>
+        </div>
+    </li>
+</script>
+<script id="Add-time-option-template" type="text/x-handlebars-template">
+    <li><a id="lnkAddTime" class="addtasktime" data-title="{{subject}}" data-projectid="{{projectid}}" data-ticketitemid="{{id}}" data-skillid="{{skillid}}"><i class="icon-add"></i></a></li>
+</script>

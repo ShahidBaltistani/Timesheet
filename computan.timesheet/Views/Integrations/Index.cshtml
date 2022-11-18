@@ -1,0 +1,116 @@
+﻿@model computan.timesheet.Models.FreedCamp.FreedCampViewModel
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="sidebar-detached">
+    <div class="sidebar sidebar-default">
+        <div class="sidebar-content">
+            <div class="sidebar-category">
+                <div class="category-title">
+                    <span>Navigation</span>
+                    <ul class="icons-list">
+                        <li>
+                            <a href="#" data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="category-content no-padding">
+                    <ul class="navigation navigation-alt navigation-accordion">
+                        <li class="active">
+                            <a href="/Integrations/Index"><i class="icon-earth"></i>Freedcamp</a>
+                        </li>
+                        <li class="">
+                            <a href="/Integrations/RocketWebhookEndPoints"><i class="icon-rocket"></i>Rocket EndPoint</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-detached">
+    <div class="content-detached">
+        <div class="panel">
+            <div class="panel-heading bg-teal-700">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="col-xs-10">
+                            <h4 class="panel-title">
+                                <span>Edit Freedcamp Setting</span>
+                            </h4>
+                        </div>
+                        <div class="col-xs-2">
+                            <div class="dropdown panel-title" style="padding-left: 60px;">
+                                <a class="dropdown-toggle" href="#" data-toggle="dropdown" aria-expanded="false">
+                                    Manage<span class="caret" style="padding-left: 5px;"></span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-right" style="margin-top: 5px;">
+                                    <li>
+                                        <a href="/freedcampproject/index"><i class=""></i> Manage Projects</a>
+                                    </li>
+                                    <li>
+                                        <a href="/freedcampapi/dojob"><i class=""></i> Sync Now</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                @using (Html.BeginForm("Index", "Integrations"))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-horizontal">
+                        @Html.ValidationSummary(true, "", new {@class = "text-info"})
+                        @Html.HiddenFor(model => model.Id)
+                        @Html.HiddenFor(model => model.Name)
+                        <div class="form-group">
+                            <div class="col-md-6">
+                                @Html.LabelFor(model => model.Name, new {@class = "control-label"})
+                                @Html.EditorFor(model => model.Name, new {htmlAttributes = new {@class = "form-control", disabled = "disabled"}})
+                                @Html.ValidationMessageFor(model => model.Name, "", new {@class = "text-danger"})
+                            </div>
+                            <div class="col-md-6">
+                                @Html.Label("Base URL", new {@class = "control-label"})
+                                @Html.EditorFor(model => model.BaseUrl, new {htmlAttributes = new {@class = "form-control"}})
+                                @Html.ValidationMessageFor(model => model.BaseUrl, "", new {@class = "text-danger"})
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-6">
+                                @Html.Label("Public Key", new {@class = "control-label"})
+                                @Html.EditorFor(model => model.Publickey, new {htmlAttributes = new {@class = "form-control"}})
+                                @Html.ValidationMessageFor(model => model.Publickey, "", new {@class = "text-danger"})
+                            </div>
+                            <div class="col-md-6">
+                                @Html.Label("Private Key", new {@class = "control-label"})
+                                @Html.EditorFor(model => model.Privatekey, new {htmlAttributes = new {@class = "form-control"}})
+                                @Html.ValidationMessageFor(model => model.Privatekey, "", new {@class = "text-danger"})
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.Label("Is Enabled", new {@class = "control-label col-md-2"})
+                            <div class="col-md-10">
+                                <div class="checkbox">
+                                    @Html.EditorFor(model => model.IsEnabled)
+                                    @Html.ValidationMessageFor(model => model.IsEnabled, "", new {@class = "text-danger"})
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-12 text-center">
+                                <input type="submit" value="Save" class="btn btn-primary btn-md"/>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var body = document.body;
+    body.classList.add('has-detached-left');
+</script>

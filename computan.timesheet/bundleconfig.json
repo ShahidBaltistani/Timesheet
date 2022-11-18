@@ -1,0 +1,320 @@
+[
+  {
+    "outputFileName": "Scripts/default/datepicker/jquery.datepick.min.js",
+    "inputFiles": [
+      "Scripts/default/datepicker/jquery.datepick.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/handlebars-v4.0.5.min.js",
+    "inputFiles": [
+      "Scripts/handlebars-v4.0.5.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/jquery-2.2.4.min.js",
+    "inputFiles": [
+      "Scripts/jquery-2.2.4.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/jquery.validate.min.js",
+    "inputFiles": [
+      "Scripts/jquery.validate.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/jquery.validate.unobtrusive.min.js",
+    "inputFiles": [
+      "Scripts/jquery.validate.unobtrusive.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/default/js/core/app.min.js",
+    "inputFiles": [
+      "Scripts/default/js/core/app.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/default/js/core/common.min.js",
+    "inputFiles": [
+      "Scripts/default/js/core/common.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/default/js/pages/components_modals.min.js",
+    "inputFiles": [
+      "Scripts/default/js/pages/components_modals.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/default/js/pages/components_notifications_pnotify.min.js",
+    "inputFiles": [
+      "Scripts/default/js/pages/components_notifications_pnotify.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/default/js/pages/login.min.js",
+    "inputFiles": [
+      "Scripts/default/js/pages/login.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/default/js/plugins/pickers/daterangepicker.min.js",
+    "inputFiles": [
+      "Scripts/default/js/plugins/pickers/daterangepicker.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/custom/Global.min.js",
+    "inputFiles": [
+      "Scripts/custom/Global.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/custom/arrow.min.js",
+    "inputFiles": [
+      "Scripts/custom/arrow.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/custom/Base64js.min.js",
+    "inputFiles": [
+      "Scripts/custom/Base64js.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/custom/client.min.js",
+    "inputFiles": [
+      "Scripts/custom/client.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/custom/CommonForTickets.min.js",
+    "inputFiles": [
+      "Scripts/custom/CommonForTickets.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/custom/Integration.min.js",
+    "inputFiles": [
+      "Scripts/custom/Integration.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/custom/mynotification.min.js",
+    "inputFiles": [
+      "Scripts/custom/mynotification.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/custom/myticket.min.js",
+    "inputFiles": [
+      "Scripts/custom/myticket.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/custom/projectDashboard.min.js",
+    "inputFiles": [
+      "Scripts/custom/projectDashboard.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/custom/rules.min.js",
+    "inputFiles": [
+      "Scripts/custom/rules.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/custom/sendemail.min.js",
+    "inputFiles": [
+      "Scripts/custom/sendemail.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/custom/task.min.js",
+    "inputFiles": [
+      "Scripts/custom/task.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/custom/team.min.js",
+    "inputFiles": [
+      "Scripts/custom/team.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/custom/ticket.min.js",
+    "inputFiles": [
+      "Scripts/custom/ticket.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/custom/ticketitem.min.js",
+    "inputFiles": [
+      "Scripts/custom/ticketitem.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/default/plugins/autosize/autosize.min.js",
+    "inputFiles": [
+      "Scripts/default/plugins/autosize/autosize.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/default/js/pages/datatables_extension_buttons_html5.min.js",
+    "inputFiles": [
+      "Scripts/default/js/pages/datatables_extension_buttons_html5.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/default/plugins/jquery.alphanum.min.js",
+    "inputFiles": [
+      "Scripts/default/plugins/jquery.alphanum.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/default/js/custom.min.js",
+    "inputFiles": [
+      "Scripts/default/js/custom.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/default/js/jquery.smartmenus.min.js",
+    "inputFiles": [
+      "Scripts/default/js/jquery.smartmenus.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/default/js/jquery.smartmenus.bootstrap.min.js",
+    "inputFiles": [
+      "Scripts/default/js/jquery.smartmenus.bootstrap.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/default/js/jquery.simpleGallery.min.js",
+    "inputFiles": [
+      "Scripts/default/js/jquery.simpleGallery.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/default/js/jquery.simpleLens.min.js",
+    "inputFiles": [
+      "Scripts/default/js/jquery.simpleLens.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/default/js/slick.min.js",
+    "inputFiles": [
+      "Scripts/default/js/slick.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/default/js/nouislider.min.js",
+    "inputFiles": [
+      "Scripts/default/js/nouislider.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/default/js/classie.min.js",
+    "inputFiles": [
+      "Scripts/default/js/classie.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/default/js/megamenu.min.js",
+    "inputFiles": [
+      "Scripts/default/js/megamenu.js"
+    ]
+  },
+  {
+    "outputFileName": "Content/Custom/AdminDashboard.min.css",
+    "inputFiles": [
+      "Content/Custom/AdminDashboard.css"
+    ]
+  },
+  {
+    "outputFileName": "Content/Custom/Tickets/ticketitem.min.css",
+    "inputFiles": [
+      "Content/Custom/Tickets/ticketitem.css"
+    ]
+  },
+  {
+    "outputFileName": "Content/Custom/Tickets/TicketsIndex.min.css",
+    "inputFiles": [
+      "Content/Custom/Tickets/TicketsIndex.css"
+    ]
+  },
+  {
+    "outputFileName": "Content/Custom/Tickets/TicketsSentItem.min.css",
+    "inputFiles": [
+      "Content/Custom/Tickets/TicketsSentItem.css"
+    ]
+  },
+  {
+    "outputFileName": "Content/Custom/Tickets/Tickets.min.css",
+    "inputFiles": [
+      "Content/Custom/Tickets/Tickets.css"
+    ]
+  },
+  {
+    "outputFileName": "Content/Custom/login-custom.min.css",
+    "inputFiles": [
+      "Content/Custom/login-custom.css"
+    ]
+  },
+  {
+    "outputFileName": "Content/fonts.googleapis.min.css",
+    "inputFiles": [
+      "Content/fonts.googleapis.css"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/custom/CascadingDropdown.min.js",
+    "inputFiles": [
+      "Scripts/custom/CascadingDropdown.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/custom/jquery.matchHeight.min.js",
+    "inputFiles": [
+      "Scripts/custom/jquery.matchHeight.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/custom/ticketsbyinbox.min.js",
+    "inputFiles": [
+      "Scripts/custom/ticketsbyinbox.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/plugins/AjaxProgress/jq-ajax-progress.min.js",
+    "inputFiles": [
+      "Scripts/plugins/AjaxProgress/jq-ajax-progress.js"
+    ]
+  },
+  {
+    "outputFileName": "Content/Settings/OrphanTicketSubscribe.min.css",
+    "inputFiles": [
+      "Content/Settings/OrphanTicketSubscribe.css"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/custom/Settings/Settings.min.js",
+    "inputFiles": [
+      "Scripts/custom/Settings/Settings.js"
+    ]
+  },
+  {
+    "outputFileName": "Scripts/orphan/orphanTickets.min.js",
+    "inputFiles": [
+      "Scripts/orphan/orphanTickets.js"
+    ]
+  },
+  {
+    "outputFileName": "Content/default/css/core.min.css",
+    "inputFiles": [
+      "Content/default/css/core.css"
+    ]
+  }
+]

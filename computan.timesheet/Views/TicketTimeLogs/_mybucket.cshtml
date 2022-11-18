@@ -1,0 +1,64 @@
+﻿@model computan.timesheet.Models.TicketTimeViewModel
+@using (Html.BeginForm("Addbuckettime", "TicketTimeLogs", FormMethod.Post))
+{
+    <div class="form-horizontal">
+        <div class="panel-body">
+            <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper no-footer" style="overflow: auto !important">
+                <div class="datatable-scroll">
+                    <table cellspacing="0" cellpadding="0" class="table table-responsive" id="buckettable">
+                        <thead>
+                        <tr role="row">
+                            <th> @Html.DisplayNameFor(model => model.SearchResults.FirstOrDefault().description) </th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @for (var i = 0; i < Model.SearchResults.Count; i++)
+                        {
+                            <tr class="topictr" id="@Model.SearchResults[i].id">
+                                <td colspan="2">
+                                    <b>Title:</b>&nbsp;@Html.DisplayFor(modelItem => Model.SearchResults[i].title)&nbsp;
+                                    <b>Project:</b>&nbsp;@Html.DisplayFor(modelItem => Model.SearchResults[i].Project.name)
+                                </td>
+                            </tr>
+                            <tr class="datatr" id="@Model.SearchResults[i].id">
+                                @Html.HiddenFor(modelitem => Model.SearchResults[i].id, new {@class = "id"})
+                                <td colspan="2">
+                                    <div class="form-inline">
+                                        <div class="form-group">
+                                            @Html.TextAreaFor(modelItem => Model.SearchResults[i].description, new {@class = "bucketdescription", style = "width:800px;", rows = "2"})
+                                        </div>
+                                        <div class="form-group">
+                                            @Html.DropDownListFor(modelItem => Model.SearchResults[i].timespentinminutes, (IEnumerable<SelectListItem>) ViewData["item.timespentinminutes"], "Select Time", new {@class = "timespent"})
+                                        </div>
+                                        <div class="form-group">
+                                            @Html.DropDownListFor(modelItem => Model.SearchResults[i].billabletimeinminutes, (IEnumerable<SelectListItem>) ViewData["item.billabletimeinminutes"], "Select Time", new {@class = "timebill"})
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a class="btn btn-danger deletetimelog" href="/tickettimelogs/delete/@Model.SearchResults[i].id">Delete</a>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        @if (Model.SearchResults != null && Model.SearchResults.Count > 0)
+        {
+            <div class="form-group savebtn">
+                <div class="col-lg-offset-1">
+                    <input type="submit" value="save" class="btn-success btn-lg addtimeinbucketbtn"/>
+                </div>
+            </div>
+        }
+        else
+        {
+            <center>
+                <span>Sorry, no bucket found</span>
+            </center>
+        }
+    </div>
+}

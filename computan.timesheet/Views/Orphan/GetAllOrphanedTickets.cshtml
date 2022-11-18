@@ -1,0 +1,83 @@
+﻿@model computan.timesheet.Models.OrphanTickets.OrphanViewModel
+@{
+    ViewBag.Title = "Orphan";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="panel">
+    @Html.Partial("_OrphanTicketNavTab", "orphan")
+    <div class="panel-body">
+        @Html.Partial("_OrphanSearchFilter", Model.OrphanSearch, new ViewDataDictionary {{"id", "1"}})
+    </div>
+    <div class="panel-body">
+        <table class="table datatable-button-html5-basic" id="DataTables_Table_0" role="grid" aria-describedby="Orphan-Tickets_info">
+            <thead>
+                <tr role="row">
+                    <th> TeamName </th>
+                    <th> Title </th>
+                    <th> Age [Days] </th>
+                    <th> Status </th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.OrphanTickets)
+            {
+                <tr>
+                    <td> @item.TeamName </td>
+                    <td>
+                        <a href="/tickets/ticketitem/@item.id">@item.topic</a>
+                    </td>
+                    <td> @item.Age </td>
+                    <td> @item.StatusName </td>
+                    <td>
+                        <a class="btn btn-primary" id="suppressBtn" href="#" data-id="@item.id" value="Orphan">Suppress</a>
+                        <a class="btn btn-danger" id="trashBtn" href="/tickets/ChnageTicketStatus?id=@item.id&status=8&isExternal=true" data-id="@item.id" value="Trash">Trash</a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
+<script src="~/Scripts/orphan/orphanTickets.js"></script>
+<script>
+    $(document).ready(function() {
+        var issubscribe = '@ViewBag.Subscribe';
+        if (issubscribe == '') {
+            $(".datatable-header").after("<div><a href='/Settings/OrphanedTicketSetting'>You need to subscribe to a Dashboard first in order to see the Orphaned Tickets.</a></div>");
+            $('.datatable-header').each(function() {
+                this.style.setProperty('border', 'none', 'important');
+            });
+        }
+     @*var data = '@ViewBag.message';
+        if (data == 'success') {
+            new PNotify({
+                title: 'Success',
+                text: "Deleted Successfully !",
+                type: 'success'
+            });
+        } else if (data == 'warning') {
+            new PNotify({
+                title: 'Error',
+                text: "Already Deleted!",
+                type: 'error'
+            });
+        }*@
+
+         var data = '@TempData["DeleteMessage"]';
+        if (performance.navigation.type == 2) {
+            data = '';
+            tsdata = '';
+        }
+        if (data != '') {
+            new PNotify({
+                title: 'Deleted',
+                text: data,
+                type: data == 'Deleted succesfully' ? 'succes' : 'error'
+            });
+            data = '';
+        }
+
+    });
+</script>

@@ -1,0 +1,37 @@
+﻿@model computan.timesheet.Models.TicketTimeSearchViewModel
+@using (Html.BeginForm("QualityControl", "TicketTimeLogs", FormMethod.Post, new {@class = "form-inline"}))
+{
+    <div class="input-group">
+        <span class="input-group-addon">
+            <i class="icon-calendar3"></i>
+        </span>
+        @Html.TextBoxFor(model => model.StartDate, new {Value = Model.StartDate.ToString("MM/dd/yyyy"), @class = "form-control picker  default-margin-for"})
+    </div>
+    <div class="input-group">
+        <span class="input-group-addon">
+            <i class="icon-calendar3"></i>
+        </span>
+        @Html.TextBoxFor(model => model.EndDate, new {Value = Model.EndDate.ToString("MM/dd/yyyy"), @class = "form-control picker  default-margin-for"})
+    </div>
+    <div class="input-group">
+        @Html.DropDownListFor(model => model.clientid, Model.ClientCollection.OrderBy(x => x.Text), "Select Client", new {@class = "form-control"})
+        @Html.ValidationMessageFor(model => model.clientid)
+    </div>
+    <div class="input-group">
+        @Html.DropDownListFor(model => model.projectid, Model.ProjectCollection.OrderBy(x => x.Text), "Select Project", new {@class = "form-control"})
+        @Html.ValidationMessageFor(model => model.projectid)
+    </div>
+    <div class="input-group">
+        @Html.DropDownListFor(model => model.teamuserid, Model.UsersCollection.OrderBy(x => x.Text), "Select User", new {@class = "form-control"})
+        @Html.ValidationMessageFor(model => model.teamuserid)
+    </div>
+    <div class="input-group">
+        <button type="submit" class="btn btn-success form-control"> <span class="glyphicon glyphicon-search"></span> Search </button>
+    </div>
+}
+<script type="text/javascript">
+    $(function() {
+        $(".picker").datepicker({ dateFormat: 'mm/dd/yy' });
+        $(".picker").css('width', "100px");
+    });
+</script>

@@ -1,0 +1,69 @@
+﻿@model computan.timesheet.Models.FreedCamp.FreedCampProjectViewModel
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="panel panel-default" id="maincontent">
+    <div class="panel">
+        <div class="panel-heading bg-teal-700">
+            <div class="row">
+                <h4 class="panel-title ticket-title">
+                    <span>Update Freed Camp Project </span>
+                </h4>
+            </div>
+        </div>
+        <div class="panel-body">
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-horizontal">
+                    <h4>FreedCampProjectViewModel</h4>
+                    <hr/>
+                    @Html.ValidationSummary(true, "", new {@class = "text-danger"})
+                    @Html.HiddenFor(model => model.id)
+                    @Html.HiddenFor(model => model.fcprojectid)
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Name, new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.EditorFor(model => model.Name, new {htmlAttributes = new {@class = "form-control", disabled = "disabled"}})
+                            @Html.ValidationMessageFor(model => model.tsporjecid, "", new {@class = "text-danger"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.tsporjecid, new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.DropDownListFor(model => model.tsporjecid, new SelectList(Model.projects, "id", "name", Model.tsporjecid), "Select Project", new {htmlAttributes = new {@class = "form-control"}})
+                            @Html.ValidationMessageFor(model => model.tsporjecid, "", new {@class = "text-danger"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.skill, new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.DropDownListFor(model => model.skill, new SelectList(Model.skillslist, "id", "name", Model.skill), "Select Skill", new {htmlAttributes = new {@class = "form-control"}})
+                            @Html.ValidationMessageFor(model => model.skill, "", new {@class = "text-danger"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.isActive, new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            <div class="checkbox">
+                                @Html.EditorFor(model => model.isActive)
+                                @Html.ValidationMessageFor(model => model.isActive, "", new {@class = "text-danger"})
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="Save" class="btn btn-default"/>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/Scripts/select2")
+}

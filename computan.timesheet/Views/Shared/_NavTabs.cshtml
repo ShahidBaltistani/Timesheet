@@ -1,0 +1,33 @@
+﻿@model string
+<ul class="nav nav-tabs nav-tabs-highlight">
+    <li class="@(Model == "clients" ? "active" : "")">
+        <a href="/clients/"><i class="icon icon-users label-icon-sm"></i>Clients</a>
+    </li>
+    <li class="@(Model == "projects" ? "active" : "")">
+        <a href="/projects/"><i class="fa fa-tasks label-icon-sm"></i>Projects</a>
+    </li>
+    @if (Request.IsAuthenticated && User.IsInRole("Admin"))
+    {
+        <li class="@(Model == "credentials" ? "active" : "")">
+            <a href="/credentials/"><i class="icon icon-book label-icon-sm"></i>Credentials</a>
+        </li>
+        <li class="@(Model == "teams" ? "active" : "")">
+            <a href="/teams/"><i class="icon icon-people label-icon-sm"></i>Teams</a>
+        </li>
+        <li class="@(Model == "skills" ? "active" : "")">
+            <a href="/skills/"><i class="icon icon-brain label-icon-sm"></i>Skills</a>
+        </li>
+    }
+    <li class="@(Model == "contacts" ? "active" : "")">
+        <a href="/contacts/"><i class="icon icon-phone label-icon-sm"></i>Contacts</a>
+    </li>
+    @if (Request.IsAuthenticated && User.IsInRole("Admin"))
+    {
+        <li class="@(Model == "usersadmin" ? "active" : "")">
+            <a href="/usersadmin/"><i class="icon icon-user label-icon-sm"></i>Users</a>
+        </li>
+        <li class="@(Model == "PMToolReport" ? "active" : "")">
+            <a href="/clients/PMToolReport"><i class="icon icon-list3 label-icon-sm"></i>PM Tool Report</a>
+        </li>
+    }
+</ul>

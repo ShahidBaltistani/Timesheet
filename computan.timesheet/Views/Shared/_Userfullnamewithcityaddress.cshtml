@@ -1,0 +1,19 @@
+﻿@model computan.timesheet.Models.UserFullName
+@if (Model.image != null && File.Exists(Server.MapPath("/images/UserProfileImage/" + Model.image)))
+{
+    <a href="/home/myprofile" class="media-left">
+        <img src="@Html.Raw("/images/UserProfileImage/" + Model.image)" class="img-circle img-sm" alt="">
+    </a>
+}
+else
+{
+    <a href="/home/myprofile" class="media-left">
+        <img src="~/Content/images/placeholder.jpg" class="img-circle img-sm" alt="">
+    </a>
+}
+<div class="media-body">
+    <span class="media-heading text-semibold">@Model.fullname</span>
+    <div class="text-size-mini text-muted">
+        <i class="icon-pin text-size-small"></i> &nbsp;@(Model.city)@(string.IsNullOrEmpty(Model.country) ? string.Empty : ", " + Model.country)
+    </div>
+</div>

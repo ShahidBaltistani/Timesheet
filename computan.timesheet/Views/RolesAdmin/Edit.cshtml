@@ -1,0 +1,82 @@
+﻿@model computan.timesheet.Models.RoleViewModel
+@{ ViewBag.Title = "Edit User Role"; }
+
+@section header {
+    <div style="background-color: #fff;" class="panel page-header border-top-primary">
+        <div class="page-header-content">
+            <div class="page-title">
+                <h5>
+                    <i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Timesheet</span> - Manage Users Roles
+                    <small class="display-block">Manage Application Users Roles</small>
+                </h5>
+            </div>
+            <div class="heading-elements">
+                <div class="btn-group">
+                    <a href="/RolesAdmin/index" class="btn btn-primary"><i class="icon-list3 position-left"></i> List Roles</a>
+                </div>
+            </div>
+            <a class="heading-elements-toggle">
+                <i class="icon-menu"></i>
+            </a>
+        </div>
+        <div style="border-bottom: 0; box-shadow: none; margin-bottom: 0;" class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/Home/index"><i class="icon-home2 position-left"></i>Home</a>
+                </li>
+                <li>
+                    <a href="/RolesAdmin/index">Roles</a>
+                </li>
+                <li>
+                    <a href="/RolesAdmin/create">Add New Role</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+}
+
+<div class="panel panel-flat">
+    <div class="panel-heading">
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li>
+                    <a data-action="collapse"></a>
+                </li>
+                <li>
+                    <a data-action="reload"></a>
+                </li>
+            </ul>
+        </div>
+        <a class="heading-elements-toggle">
+            <i class="icon-menu"></i>
+        </a>
+    </div>
+    <div class="panel-body">
+        @using (Html.BeginForm("Edit", "RolesAdmin", FormMethod.Post, new {@class = "form-horizontal", role = "form"}))
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-horizontal">
+                <h4>Edit User Role</h4>
+                <hr/>
+                @Html.ValidationSummary(true)
+                @Html.HiddenFor(model => model.Id)
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <label class="control-label" for="Name">Role Name</label>
+                        @Html.TextBoxFor(model => model.Name, new {@class = "form-control"})
+                        @Html.ValidationMessageFor(model => model.Name)
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12 text-center">
+                        <input type="submit" value="Save" class="btn btn-primary"/>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

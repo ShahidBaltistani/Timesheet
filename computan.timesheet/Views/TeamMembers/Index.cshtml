@@ -1,0 +1,173 @@
+﻿@model IEnumerable<computan.timesheet.Models.TeamMemberViewModel>
+@{ ViewBag.Title = "Index"; }
+
+@section header {
+    <div style="background-color: #fff;" class="panel page-header border-top-primary">
+        <div class="page-header-content">
+            <div class="page-title">
+                <h5>
+                    <i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Timesheet</span> - Manage Team Members
+                    <small class="display-block">Manage Team Members</small>
+                </h5>
+            </div>
+            <div class="heading-elements">
+                <div class="btn-group">
+                    <a href="/teammembers/create/@ViewContext.RouteData.Values["id"]" class="btn btn-primary"><i class="icon-list3 position-left"></i>Add Member</a>
+                </div>
+            </div>
+            <a class="heading-elements-toggle">
+                <i class="icon-menu"></i>
+            </a>
+        </div>
+        <div style="border-bottom: 0; box-shadow: none; margin-bottom: 0;" class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/Home/Index"><i class="icon-home2 position-left"></i>Home</a>
+                </li>
+                <li>
+                    <a href="#">Team Members</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+}
+
+<div class="panel panel-flat">
+    <div class="panel-heading">
+        <h5 class="panel-title">@ViewBag.team</h5>
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li>
+                    <a data-action="collapse"></a>
+                </li>
+                <li>
+                    <a data-action="reload"></a>
+                </li>
+            </ul>
+        </div>
+        <a class="heading-elements-toggle">
+            <i class="icon-menu"></i>
+        </a>
+    </div>
+    <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper no-footer">
+        <div class="datatable-scroll">
+            <table class="table datatable-button-html5-basic" id="DataTables_Table_0" role="grid" aria-describedby="DataTables_Table_0_info">
+                <thead>
+                <tr role="row">
+                    <th>@Html.DisplayNameFor(model => model.name)</th>
+                    <th>@Html.DisplayNameFor(model => model.email)</th>
+                    <th>@Html.DisplayNameFor(model => model.lead)</th>
+                    <th>Designation</th>
+                    <th>Status</th>
+                    <th>Options</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr id="@item.id">
+                        <td> @Html.DisplayFor(modelItem => item.name) </td>
+                        <td> @Html.DisplayFor(modelItem => item.email) </td>
+                        <td> @Html.DisplayFor(modelItem => item.lead) </td>
+                        <td>
+                            @if (item.manager)
+                            {
+                                <span class="label label-default">PM</span>
+                            }
+                            @if (item.teamlead)
+                            {
+                                <span class="label label-warning">TL</span>
+                            }
+                        </td>
+                        <td>
+                            <span class="label @(item.active ? "label-success" : "label-danger")">@(item.active ? "Active" : "Inactive")</span>
+                        </td>
+                        <td>
+                            @Html.ActionLink("Edit", "Edit", new {item.id}, new {@class = "btn btn-info btn-xs"})
+                            @Html.ActionLink("Delete", "Delete", new {item.id}, new {@class = "btn btn-info btn-xs"})
+                            <button class="movedteammember btn btn-info btn-xs" data-usersid="@item.userid" data-memberid="@item.id">Move</button>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!--Modals-->
+<div class="modal fade" id="TeammemnermovedModal" role="dialog">
+    <div class="modal-dialog" style="width: 900px !important;" data-ticketid="">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="panel panel-primary" style="margin-bottom: 0px;">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Moved Team Member</h4>
+                    <div class="heading-elements">
+                        <button type="button" class="close" data-dismiss="modal" style="font-size: 30pt; font-weight: bolder;">&times;</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label class="input-group-addon">Teams</label>
+                                @Html.DropDownList("newteamid", new SelectList(ViewBag.teams, "Value", "Text"), "Please Select", new {@class = "form-control"})
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="text-center">
+                                <input id="btnmovedteammember" type="button" data-teammemberid="0" value="Moved Team Member" class="btn btn-primary assign-single-ticket"/>
+                                <input type="button" value="Cancel" class="btn btn-default" data-dismiss="modal"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var usersID;
+    var teamMemberID;
+    $("#newteamid").select2();
+    jQuery(function() {
+        jQuery(document).on("click",
+            ".movedteammember",
+            function() {
+                usersID = jQuery(this).data('usersid');
+                teamMemberID = jQuery(this).data('memberid');
+                jQuery("#btnmovedteammember").data('teammemberid', teamMemberID);
+                jQuery("#ticketprojectid").val("").trigger("change");
+                var ticketid = jQuery(this).data("ticketid");
+                jQuery("#ticketAssignModal").find(".modal-dialog").attr("data-ticketid", ticketid);
+                jQuery('#TeammemnermovedModal').modal('toggle');
+            });
+        //Clicked on 'Moved Team Member' button
+        jQuery(document).on("click",
+            "#btnmovedteammember",
+            function() {
+                var teamID = jQuery('#newteamid').val();
+                var TeamMemberID = jQuery(this).data('teammemberid');
+                if (!!teamID) {
+                    $.ajax({
+                        url: '/TeamMembers/MoveUser/',
+                        data: { teamid: teamID, usersid: usersID, teamMemberid: teamMemberID },
+                        type: 'GET',
+                    }).done(function(data) {
+                        if (data.error) {
+                            new PNotify({ title: 'Selection Error', text: data.contextText, type: 'warning' });
+                            return false;
+                        } else {
+                            new PNotify({ title: 'Success Message', text: data.contextText, type: 'success' });
+                            var Removerow = jQuery('tr#' + TeamMemberID);
+                            Removerow.animate({ backgroundColor: 'yellow' }, 1000).fadeOut(1000, function() { Removerow.remove(); });
+                            jQuery('#TeammemnermovedModal').modal('toggle');
+                        }
+                    });
+                } else {
+                    new PNotify({ title: 'Warning!', text: 'Please select Team!', type: 'warning' });
+                    return false;
+                }
+            });
+    });
+</script>

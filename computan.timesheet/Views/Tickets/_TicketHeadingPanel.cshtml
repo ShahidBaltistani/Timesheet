@@ -1,0 +1,68 @@
+﻿@model computan.timesheet.Models.TicketItemViewModel
+<div class="panel-heading bg-teal-700">
+    <div class="row">
+        <div class="col-xs-12 col-lg-7">
+            <h4 class="panel-title ticket-title">
+                <i class="@(Model.Ticket.tickettypeid == 1 ? "icon-envelop5" : "icon-envelop3") position-left icon-medium"></i>
+
+                <span id="text" class="text-semibold">
+                    @Model.Ticket.topic
+                </span><a onclick="copyToClipboard()" style="color:#FFF;">&nbsp; &nbsp;<i class="fa fa-clipboard" title="Copy to Clipboard"></i></a>
+                <span class="ticketidonspan" value="@Model.Ticket.id"></span>
+            </h4>
+        </div>
+        <div class="col-xs-12 col-lg-5">
+            <div class="heading-elements">
+                <ul class="icons-list" style="margin-top: 13px;">
+                    <li>
+                        <button class="btn btn-primary btn-xs ticketMeta" data-ticketidmeta="@Model.Ticket.id" data-toggle="tooltip" title="Ticket history">Ticket Meta</button>
+                    </li>
+                    <li>
+                        <button class="btn btn-default btn-xs" id="statuschangedValuedAjax" data-toggle="tooltip" title="Ticket status">@Model.Ticket.ConversationStatus.name</button>
+                    </li>
+                    @if (ViewBag.subscribeTeam != null)
+                    {
+                        <li>
+                            <button class="btn btn-danger btn-xs ticketStatus orphanDetail" id="suppressBtn" data-id="@Model.Ticket.id">@(ViewBag.orphan == null ? "Suppress" : "Un-Suppress")</button>
+                        </li>
+                    }
+                    <li>
+                        <div class="btn-group" id="StatusDropdown">
+                            @if (Model.Ticket.statusid <= 2 || Model.Ticket.statusid == 5)
+                            {
+                                <button type="button" class="btn btn-xs bg-danger-700 changeticketstatus" data-statusid="3">Close</button>
+                                <button type="button" class="btn btn-xs bg-danger-700 dropdown-toggle" data-toggle="dropdown">
+                                    <span class="caret"></span>
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-xs bg-success-700 changeticketstatus" data-statusid="2">Open</button>
+                                <button type="button" class="btn btn-xs bg-success-700 dropdown-toggle" data-toggle="dropdown">
+                                    <span class="caret"></span>
+                                </button>
+                            }
+                            <ul class="dropdown-menu" role="menu" style="left: -90px;">
+                                <li class="changeticketstatus" data-statusid="2">
+                                    <a href="#">Open</a>
+                                </li>
+                                <li class="changeticketstatus" data-statusid="3">
+                                    <a href="#">Close</a>
+                                </li>
+                                <li class="changeticketstatus" data-statusid="4">
+                                    <a href="#">OnHold</a>
+                                </li>
+                                <li class="changeticketstatus" data-statusid="7">
+                                    <a href="#">Review</a>
+                                </li>
+                                <li class="changeticketstatus" data-statusid="8">
+                                    <a href="#">Trash</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

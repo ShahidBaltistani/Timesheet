@@ -1,0 +1,66 @@
+﻿@model IEnumerable<computan.timesheet.Models.NotificationMessageViewModel>
+@{ ViewBag.Title = "Index"; }
+
+@section header {
+    <div style="background-color: #fff;" class="panel page-header border-top-primary">
+        <div class="page-header-content">
+            <div class="page-title">
+                <h5>
+                    <i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Timesheet</span> - Manage Notifications
+                    <small class="display-block">Manage Notification</small>
+                </h5>
+            </div>
+            <a class="heading-elements-toggle">
+                <i class="icon-menu"></i>
+            </a>
+        </div>
+        <div style="border-bottom: 0; box-shadow: none; margin-bottom: 0;" class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/Home/index"><i class="icon-home2 position-left"></i>Home</a>
+                </li>
+                <li>
+                    <a href="/notification/index">Notification</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+}
+
+<div class="panel panel-flat">
+    <div class="panel-heading">
+        <h5 class="panel-title">List Notifications</h5>
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li>
+                    <a data-action="collapse"></a>
+                </li>
+                <li>
+                    <a data-action="reload"></a>
+                </li>
+            </ul>
+        </div>
+        <a class="heading-elements-toggle">
+            <i class="icon-menu"></i>
+        </a>
+    </div>
+    <div class="panel-body">
+        <input type="button" id="readall" class="btn btn-success pull-right " value="Read All Selected" style="margin-bottom: 5px"/>
+        <input type="button" id="unreadall" class="btn btn-success pull-right" value="Unread All Selected" style="margin-bottom: 5px; margin-right: 5px;"/>
+        <table class="table table-responsive table-striped table-xxs">
+            <thead>
+            <tr class="border-double bg-teal-700">
+                <th>
+                    <input type="checkbox" class="selectall"/>
+                </th>
+                <th> @Html.DisplayName("Notification") </th>
+                <th> @Html.DisplayName("Date") </th>
+                <th> </th>
+            </tr>
+            </thead>
+            <tbody id="notificationcontainer">
+            @Html.Partial("_MyNotification", Model, new ViewDataDictionary {{"pagenum", "0"}})
+            </tbody>
+        </table>
+    </div>
+</div>

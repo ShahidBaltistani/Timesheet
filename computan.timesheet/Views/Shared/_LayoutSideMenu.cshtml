@@ -1,0 +1,137 @@
+﻿@model computan.timesheet.Models.SideMenuViewModel
+<div class="sidebar-category sidebar-category-visible">
+    <div class="category-content no-padding">
+        <ul class="navigation navigation-main navigation-accordion">
+            <!-- Main alltickets -->
+            @{ var isactive = false; }
+            @if (ViewBag.currentTab == "loadalltickets" || ViewBag.currentTab == "taskbystatus" || ViewBag.currentTab == "mytasks")
+            {
+                isactive = true;
+            }
+            <li class='@(isactive ? "active" : "")'>
+                <a class="has-ul">
+                    <i class=" icon-envelop5"></i><span>Tickets</span>
+                </a>
+                <ul class="hidden-ul" style="display: @(isactive ? "block" : "none")">
+                    <li class='@(ViewBag.currentTab == "mytasks" ? "active" : "")'>
+                        <a href="/tickets/mytickets/2" class="">
+                            <i class="icon-ticket"></i><span>My Tasks</span>
+                        </a>
+                    </li>
+                    <li class='@(ViewBag.currentTab == "loadalltickets" ? "active" : "")'>
+                        <a href="/tickets/index/0" class="">
+                            <i class="icon-ticket"></i><span>All Tickets</span>
+                        </a>
+                    </li>
+                    <li class='@(ViewBag.currentTab == "taskbystatus" ? "active" : "")'>
+                        <a href="/tickets/index/1" class="">
+                            <i class="icon-ticket"></i><span>New Tasks</span>
+                        </a>
+                    </li>
+                    <li class='@(ViewBag.currentTab == "addmanualticket" ? "active" : "")'>
+                        <a href="/manualticket/create" class="">
+                            <i class="icon-ticket"></i><span>Add Manual Ticket</span>
+                        </a>
+                    </li>
+                    <li class='@(ViewBag.currentTab == "manualticket" ? "active" : "")'>
+                        <a href="/manualticket/index/2" class="">
+                            <i class="icon-ticket"></i><span>Manual Tickets</span>
+                        </a>
+                    </li>
+                    <li class='@(ViewBag.currentTab == "flagged" ? "active" : "")'>
+                        <a href="/tickets/flagged" class="">
+                            <i class="icon-ticket"></i><span>Flagged Tickets</span>
+                        </a>
+                    </li>
+                    <li class='@(ViewBag.currentTab == "Getallorphantickets" ? "active" : "")'>
+                        <a href="/Orphan/GetAllOrphanedTickets" class="">
+                            <i class="icon-ticket"></i><span>Orphaned Tickets</span>
+                        </a>
+                    </li>
+                </ul>
+
+            </li>
+            <li class='@(ViewBag.currentTab == "MailBox" ? "active" : "")'>
+                <a class="has-ul">
+                    <i class="icon-mailbox"></i><span>Mail Box</span>
+                </a>
+                <ul class="hidden-ul" style="display: @(ViewBag.currentTab == "MailBox" ? "block" : "none");">
+                    <li class='@(ViewBag.currentTab == "email" ? "active" : "")'>
+                        <a href="/email/send" class="">
+                            <i class="icon-mail5"></i><span>New Email</span>
+                        </a>
+                    </li>
+                    <li class='@(ViewBag.currentTab == "draft" ? "active" : "")'>
+                        <a href="/tickets/draft" class="">
+                            <i class="icon-mail5"></i><span>Drafts</span>
+                        </a>
+                    </li>
+                    <li class='@(ViewBag.currentTab == "sentitem" ? "active" : "")'>
+                        <a href="/tickets/sentitem" class="">
+                            <i class="icon-mail5"></i><span>Sent Items</span>
+                        </a>
+                    </li>
+                    <li class='@(ViewBag.currentSubTab == "sentitems" ? "active" : "")'>
+                        <a href="/Sentitemlogs" class="">
+                            <i class="icon-mail5"></i><span>Sent Log</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            @if (Request.IsAuthenticated && User.IsInRole("Admin"))
+            {
+                <li class='@(ViewBag.currentTab == "features" ? "active" : "")'>
+                    <a class="has-ul">
+                        <i class="icon-grid"></i><span>Manage Features</span>
+                    </a>
+                    <ul class="hidden-ul" style="display: @(ViewBag.currentTab == "features" ? "block" : "none");">
+                        <li class='@(ViewBag.currentSubTab == "ClientsAndProject" ? "active" : "")'>@Html.ActionLink("Clients & Projects", "Index", "clientsandprojects")</li>
+                        <li class='@(ViewBag.currentSubTab == "Clients" ? "active" : "")'>@Html.ActionLink("Clients", "Index", "Clients")</li>
+                        <li class='@(ViewBag.currentSubTab == "Projects" ? "active" : "")'>@Html.ActionLink("Projects", "Index", "Projects")</li>
+                        <li class='@(ViewBag.currentSubTab == "credentials" ? "active" : "")'>@Html.ActionLink("Credentials", "Index", "Credentials")</li>
+                        <li class='@(ViewBag.currentSubTab == "Rules" ? "active" : "")'>@Html.ActionLink("Assignment Rules", "Index", "Rules")</li>
+                        <li class='@(ViewBag.currentSubTab == "Manage Users" ? "active" : "")'>@Html.ActionLink("Manage Users", "Index", "UsersAdmin")</li>
+                        <li class='@(ViewBag.currentSubTab == "Teams" ? "active" : "")'>@Html.ActionLink("Teams", "Index", "Teams")</li>
+                        <li class='@(ViewBag.currentSubTab == "Skills" ? "active" : "")'>@Html.ActionLink("Skills", "Index", "Skills")</li>
+                        <li class='@(ViewBag.currentSubTab == "Contacts" ? "active" : "")'>@Html.ActionLink("Contacts", "Index", "Contacts")</li>
+                        <li class='@(ViewBag.currentSubTab == "Workloadreport" ? "active" : "")'>@Html.ActionLink("Work Load Report", "Workloadreport", "Home")</li>
+                        <li class='@(ViewBag.currentSubTab == "Integration" ? "active" : "")'>@Html.ActionLink("Integration", "index", "Integrations")</li>
+                        <li class=''>
+                            <a href="/graphapi/mails" class="">
+                                <span>Sync Now</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            }
+            @if (Request.IsAuthenticated && User.IsInRole("Admin"))
+            {
+                <li>
+                    <a class="has-ul">
+                        <i class="icon-grid"></i><span>Billing Features</span>
+                    </a>
+                    <ul class="hidden-ul">
+                        <li class='@(ViewBag.currentSubTab == "billing" ? "active" : "")'>@Html.ActionLink("Billing", "Index", "billings")</li>
+                        <li class='@(ViewBag.currentSubTab == "billing" ? "active" : "")'>@Html.ActionLink("Client Billing Cycles", "Index", "ClientBillingCycles")</li>
+                        <li class='@(ViewBag.currentSubTab == "billing" ? "active" : "")'>@Html.ActionLink("Notification Limit", "notificationlimit", "billings")</li>
+                    </ul>
+                </li>
+            }
+            @if (Request.IsAuthenticated && !User.IsInRole("Admin"))
+            {
+                <li class='@(ViewBag.currentTab == "features" ? "active" : "")'>
+                    <a class="has-ul">
+                        <i class="icon-grid"></i><span>Manage Features</span>
+                    </a>
+                    <ul class="hidden-ul" style="display: @(ViewBag.currentTab == "features" ? "block" : "none");">
+                        <li class='@(ViewBag.currentSubTab == "Clients" ? "active" : "")'>@Html.ActionLink("Clients", "Index", "Clients")</li>
+                        <li class='@(ViewBag.currentSubTab == "Projects" ? "active" : "")'>@Html.ActionLink("Projects", "Index", "Projects")</li>
+                        <li class='@(ViewBag.currentSubTab == "Rules" ? "active" : "")'>@Html.ActionLink("Assignment Rules", "Index", "Rules")</li>
+                        <li class='@(ViewBag.currentSubTab == "Contacts" ? "active" : "")'>@Html.ActionLink("Contacts (Search & Add)", "Index", "Contacts")</li>
+                        <li class='@(ViewBag.currentSubTab == "credentials" ? "active" : "")'>@Html.ActionLink("Credentials (Search & Add)", "IndexDev", "Credentials")</li>
+                    </ul>
+                </li>
+            }
+        </ul>
+    </div>
+</div>

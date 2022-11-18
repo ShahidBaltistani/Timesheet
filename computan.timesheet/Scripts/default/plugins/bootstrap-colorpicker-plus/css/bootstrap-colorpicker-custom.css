@@ -1,0 +1,15 @@
+﻿.color-fill-icon {
+    background-color: #fff;
+    border: 1px solid #000;
+    display: inline-block;
+    height: 16px;
+    margin: 2px;
+    width: 16px;
+}
+
+.dropdown-color-fill-icon {
+    float: left;
+    margin-left: 0;
+    margin-right: 0;
+    position: relative;
+}

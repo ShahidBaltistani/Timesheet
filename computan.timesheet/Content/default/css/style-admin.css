@@ -1,0 +1,375 @@
+.ajaxloader {
+    /* width of the spinner gif */
+    height: 130px;
+    left: 50%;
+    margin-left: -64px;
+    /* half width of the spinner gif */
+    margin-top: -64px;
+    overflow: auto;
+    position: fixed;
+    /* half height of the spinner gif */
+    text-align: center;
+    top: 50%;
+    width: 128px;
+    z-index: 99999;
+    /*hight of the spinner gif +2px to fix IE8 issue */
+}
+
+div.AnyTime-win { z-index: 9999; }
+
+.validation-summary-valid { display: none; }
+
+/*
+    * Ticket Table
+*/
+
+.table-ticket > thead > tr > th,
+.table-ticket > tbody > tr > th,
+.table-ticket > tfoot > tr > th,
+.table-ticket > thead > tr > td,
+.table-ticket > tbody > tr > td,
+.table-ticket > tfoot > tr > td { vertical-align: middle; }
+
+.table-ticket > tbody > tr > th,
+.table-ticket > tfoot > tr > th,
+.table-ticket > thead > tr > th {
+    line-height: 1.53846;
+    padding: 10px 8px;
+}
+
+.table-ticket > tbody > tr > td,
+.table-ticket > tfoot > tr > td,
+.table-ticket > thead > tr > td {
+    line-height: 1.53846;
+    padding: 5px 8px;
+}
+
+.ticketcontainer {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;
+    width: 100%;
+}
+
+.ticketcontent {
+    float: left;
+    width: 80%;
+}
+
+.ticketactions {
+    float: right;
+    text-align: right;
+}
+
+.ticketaction {
+    color: black;
+    cursor: pointer;
+    padding: 2px;
+}
+
+.previewicon { cursor: pointer; }
+
+.cursorpointer { cursor: pointer; }
+
+.ticketstatusbar .btn {
+    font-size: 10px;
+    line-height: 15px;
+    padding: 0 5px;
+}
+
+.ticketstatusbar .active,
+.ticketstatusbar .btn-default:hover {
+    background-color: #2196f3;
+    border-color: #2196f3;
+    color: #ffffff;
+}
+
+.ticketstatusaction .btn {
+    font-size: 10px;
+    line-height: 15px;
+    padding: 0 2px;
+}
+
+.ticketstatusaction .caret::after { font-size: 12px; }
+
+.ticketstatusaction .active {
+    background-color: #2196f3;
+    border-color: #2196f3;
+    color: #ffffff;
+}
+
+.tooltip-inner { max-width: 1000px !important; }
+
+/*CUstom*/
+
+#topbucket {
+    background-color: rgba(0, 0, 0, 0.7);
+    height: 100%;
+    left: 0px;
+    opacity: 0;
+    position: absolute;
+    top: 0px;
+    transform: translate(0px, -100%) scale(0, 0);
+    transition: all 0.5s ease-in-out;
+    width: 100%;
+    z-index: 9999;
+}
+
+#topbucket .panel {
+    margin-left: 2% !important;
+    margin-top: 2% !important;
+}
+
+#topbucket.open {
+    opacity: 1;
+    transform: translate(0px, 0px) scale(1, 1);
+}
+
+#topbucket .close {
+    background-color: limegreen;
+    border-color: green;
+    color: #fff;
+    font-size: 27px;
+    opacity: 1;
+    padding: 10px 17px;
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    z-index: 9999;
+}
+
+.glockbucketpanel {
+    margin-top: -2% !important;
+    padding-left: 0 !important;
+    width: 100%;
+}
+
+.showSweetAlert {
+    border: solid black 2px;
+    z-index: 9999 !important;
+}
+
+.bucketinfo {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tooltip { z-index: 100000000 !important; }
+
+.d-block { display: block !important; }
+
+.bucketinfo:hover span {
+    background-color: black;
+    color: white;
+    overflow: visible !important;
+    text-overflow: initial;
+    white-space: normal;
+    width: 200% !important;
+    z-index: 99999 !important;
+}
+
+.bucketdescription { width: 100%; }
+
+.bucketitem { padding: 1px 20px !important; }
+
+.padding-10 { padding: 10px !important; }
+
+.filteredcontainer .navigation .label,
+.navigation .badge {
+    position: absolute;
+    right: 5px;
+}
+
+.sidebar-default .navigation li > a.active { background-color: #f5f5f5; }
+
+.deletenotemsg:hover {
+    color: red;
+    cursor: pointer;
+}
+
+.editnotemsg:hover {
+    color: red;
+    cursor: pointer;
+}
+
+.table-hover tr:hover { background-color: #c7edfc !important; }
+
+.credential_title {
+    font-family: 'Segoe UI';
+    font-size: 12pt;
+}
+
+/*
+ * Sidebar Padding for timesheet.
+*/
+
+.cts-sidebar .navigation > li > a {
+    font-weight: 500;
+    min-height: 32px;
+    padding: 6px 10px;
+}
+
+.cts-sidebar .navigation li a > i {
+    float: left;
+    margin-right: 10px;
+    margin-top: 2px;
+    top: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.cts-sidebar .ctx-sidebar-item-text {
+    max-width: 210px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.staricon {
+    background-image: url('/Images/star.png');
+    background-repeat: no-repeat;
+    height: 18px;
+    margin: 0;
+    padding: 3px 12px;
+    width: 18px;
+}
+
+.staricon-active {
+    background-image: url('/Images/star-selected.png');
+    background-repeat: no-repeat;
+    height: 18px;
+    margin: 0;
+    padding: 3px 12px;
+    width: 18px;
+}
+
+/*
+ * Add Time Sidebar Padding for timesheet.
+*/
+
+.cts-sidebar-addtime .category-content { padding: 10px 20px !important; }
+
+.cts-sidebar-addtime .form-group { margin-bottom: 2px !important; }
+
+/**
+ * Ticket CSS
+*/
+
+.ticket-container {
+    margin: 0px;
+    padding: 0px;
+}
+
+.ticket-toolbar {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.ticket-toolbar .fav { padding-right: 2px; }
+
+.ticket-toolbar .checktask { padding-right: 2px; }
+
+.wrapticket {
+    /* white-space: nowrap;*/
+    overflow: hidden;
+    width: auto;
+}
+
+.clock-icon {
+    background-image: url('/Images/clock.png');
+    background-repeat: no-repeat;
+    height: 16px;
+    padding: 0px 8px;
+    width: 16px;
+}
+
+/*
+ * Ticket Item CSS
+*/
+
+.icon-medium { font-size: 24px; }
+
+.emailcollection .sender {
+    font-family: open sans;
+    font-size: 13px;
+}
+
+.emailcollection .date-received {
+    font-size: 11px;
+    margin: 0px;
+    padding: 0px;
+}
+
+.emailcollection .minibody {
+    color: #999999;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.emailcontainer {
+    display: block;
+    overflow-x: scroll;
+}
+
+.emailcontainer .header-content { width: 100%; }
+
+.emailcontainer .mail-icon {
+    background-image: url('/Images/mail.png');
+    background-repeat: no-repeat;
+    display: inline-block;
+    height: 64px;
+    width: 64px;
+}
+
+.emailcontainer .mail-info {
+    display: inline-block;
+    padding-left: 15px;
+    vertical-align: top;
+}
+
+.emailcontainer .mail-modifiedtime {
+    margin-bottom: 0px;
+    margin-top: 5px;
+    vertical-align: top;
+}
+
+.emailcontainer .mail-sender {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 0px;
+}
+
+.emailcontainer .email-body { display: block; }
+
+.teamitem:hover,
+.teamitem.active { background-color: green; }
+
+/*****************************************************************************************
+ * Team Dashboard CSS
+*****************************************************************************************/
+
+.dashboarditem {
+    font-size: 13px;
+    padding: 0px;
+}
+
+.dashboarditem .panel-footer,
+.dashboarditem .panel-body { padding: 3px 5px; }
+
+.Sortable li {
+    cursor: pointer;
+    margin: 3px;
+}
+
+#searchtext { width: 300px; }
+
+@media screen and (max-width: 767px) {
+    #searchtext {
+        float: left;
+        margin-right: 5px;
+        width: 63%;
+    }
+}

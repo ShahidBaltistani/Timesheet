@@ -1,0 +1,98 @@
+﻿@model computan.timesheet.core.NotificationEntityAction
+@{ ViewBag.Title = "Create"; }
+
+@section header {
+    <div style="background-color: #fff;" class="panel page-header border-top-primary">
+        <div class="page-header-content">
+            <div class="page-title">
+                <h5>
+                    <i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Timesheet</span> - Manage Entity Actions
+                    <small class="display-block">Manage Entity Actions</small>
+                </h5>
+            </div>
+            <div class="heading-elements">
+                <div class="btn-group">
+                    @*<a href="/teammember/index" class="btn btn-primary"><i class="icon-list3 position-left"></i> List Team Members</a>*@
+                </div>
+            </div>
+            <a class="heading-elements-toggle">
+                <i class="icon-menu"></i>
+            </a>
+        </div>
+        <div style="border-bottom: 0; box-shadow: none; margin-bottom: 0;" class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/Home/Index"><i class="icon-home2 position-left"></i>Home</a>
+                </li>
+                <li>
+                    <a href="#">Entity Actions</a>
+                </li>
+                <li>
+                    <a href="/notificationentityactions/create/@ViewContext.RouteData.Values["id"]">Add Entity Actions</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+}
+
+<div class="panel panel-flat">
+    <div class="panel-heading">
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li>
+                    <a data-action="collapse"></a>
+                </li>
+                <li>
+                    <a data-action="reload"></a>
+                </li>
+            </ul>
+        </div>
+        <a class="heading-elements-toggle">
+            <i class="icon-menu"></i>
+        </a>
+    </div>
+    <div class="panel-body">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-horizontal">
+                <h4>NotificationEntityAction</h4>
+                <hr/>
+                @Html.ValidationSummary(true, "", new {@class = "text-danger"})
+                <div class="form-group">
+                    @Html.LabelFor(model => model.name, new {@class = "control-label col-md-2"})
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.name, new {htmlAttributes = new {@class = "form-control"}})
+                        @Html.ValidationMessageFor(model => model.name, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.entityid, "entityid", new {@class = "control-label col-md-2"})
+                    <div class="col-md-10">
+                        @Html.DropDownList("entityid", null, new {@class = "form-control", disabled = "disbaled"})
+                        @Html.ValidationMessageFor(model => model.entityid, "", new {@class = "text-danger"})
+                        @Html.Hidden("entityid", (long) ViewBag.actentityid)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.isActive, new {@class = "control-label col-md-2"})
+                    <div class="col-md-10">
+                        <div class="checkbox">
+                            @Html.EditorFor(model => model.isActive)
+                            @Html.ValidationMessageFor(model => model.isActive, "", new {@class = "text-danger"})
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Create" class="btn btn-default"/>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

@@ -1,0 +1,21 @@
+﻿@model List<computan.timesheet.core.RuleCondition>
+<table class="table">
+    <tr>
+        <th> @Html.DisplayNameFor(model => model.FirstOrDefault().RuleConditionType.name) </th>
+        <th> @Html.DisplayNameFor(model => model.FirstOrDefault().ruleconditionvalue) </th>
+        <th></th>
+    </tr>
+    <tbody class="tbodyconditions">
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td> @Html.DisplayFor(modelItem => item.RuleConditionType.name) </td>
+            <td> @Html.DisplayFor(modelItem => item.ruleconditionvalue) </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new {item.id}, new {@class = "eidtrulescondition", data_id = item.id}) |
+                @Html.ActionLink("Delete", "Delete", new {item.id}, new {@class = "deletetrulescondition", data_id = item.id})
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

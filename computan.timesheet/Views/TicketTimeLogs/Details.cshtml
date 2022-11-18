@@ -1,0 +1,38 @@
+﻿@model computan.timesheet.core.TicketTimeLog
+@{ ViewBag.Title = "Details"; }
+<h2>Details</h2>
+<div>
+    <h4>TicketTimeLog</h4> <hr/>
+    <dl class="dl-horizontal">
+        <dt> @Html.DisplayNameFor(model => model.Project.name) </dt>
+        <dd> @Html.DisplayFor(model => model.Project.name) </dd>
+        <dt> @Html.DisplayNameFor(model => model.Skill.name) </dt>
+        <dd> @Html.DisplayFor(model => model.Skill.name) </dd>
+        <dt> @Html.DisplayNameFor(model => model.TicketItem.emailmessageid) </dt>
+        <dd> @Html.DisplayFor(model => model.TicketItem.emailmessageid) </dd>
+        <dt> @Html.DisplayNameFor(model => model.User.Email) </dt>
+        <dd> @Html.DisplayFor(model => model.User.Email) </dd>
+        <dt> @Html.DisplayNameFor(model => model.workdate) </dt>
+        <dd> @Html.DisplayFor(model => model.workdate) </dd>
+        <dt> @Html.DisplayNameFor(model => model.title) </dt>
+        <dd> @Html.DisplayFor(model => model.title) </dd>
+        <dt> @Html.DisplayNameFor(model => model.description) </dt>
+        <dd> @Html.DisplayFor(model => model.description) </dd>
+        <dt> @Html.DisplayNameFor(model => model.comments) </dt>
+        <dd> @Html.DisplayFor(model => model.comments) </dd>
+        <dt> @Html.DisplayNameFor(model => model.timespentinminutes) </dt>
+        <dd> @Html.DisplayFor(model => model.timespentinminutes) </dd>
+        <dt> @Html.DisplayNameFor(model => model.billabletimeinminutes) </dt>
+        <dd> @Html.DisplayFor(model => model.billabletimeinminutes) </dd>
+        <dt> @Html.DisplayNameFor(model => model.createdonutc) </dt>
+        <dd> @Html.DisplayFor(model => model.createdonutc) </dd>
+        <dt> @Html.DisplayNameFor(model => model.updatedonutc) </dt>
+        <dd> @Html.DisplayFor(model => model.updatedonutc) </dd>
+        <dt> @Html.DisplayNameFor(model => model.ipused) </dt>
+        <dd> @Html.DisplayFor(model => model.ipused) </dd>
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new {Model.id}) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

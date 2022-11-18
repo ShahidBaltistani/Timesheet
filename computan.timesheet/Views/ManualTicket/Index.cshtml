@@ -1,0 +1,118 @@
+﻿@model IEnumerable<computan.timesheet.core.TicketItem>
+@{ ViewBag.Title = "List Manual Tickets"; }
+@{ var statusid = Request.Url.Segments[3]; }
+
+@section header {
+    <div style="background-color: #fff;" class="panel page-header border-top-primary">
+        <div class="page-header-content">
+            <div class="page-title">
+                <h5>
+                    <i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Timesheet</span> - Manage Manual Tickets
+                    <small class="display-block">Manage Manual Tickets</small>
+                </h5>
+            </div>
+            <div class="heading-elements">
+                <div class="btn-group">
+                    <a href="/manualticket/create" class="btn btn-primary"><i class="icon-list3 position-left"></i>Add New Manual Ticket</a>
+                </div>
+            </div>
+            <a class="heading-elements-toggle">
+                <i class="icon-menu"></i>
+            </a>
+        </div>
+        <div style="border-bottom: 0; box-shadow: none; margin-bottom: 0;" class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/Home/index"><i class="icon-home2 position-left"></i>Home</a>
+                </li>
+                <li>
+                    <a href="/manualticket/index/1">Manual Tickets</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+}
+
+<div class="panel panel-flat" id="maincontent">
+    <div class="panel-heading">
+        <h5 class="panel-title">List Manual Ticket</h5>
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li>
+                    <a data-action="collapse"></a>
+                </li>
+                <li>
+                    <a data-action="reload"></a>
+                </li>
+            </ul>
+        </div>
+        <a class="heading-elements-toggle">
+            <i class="icon-menu"></i>
+        </a>
+    </div>
+    <ul class="nav nav-tabs nav-tabs-highlight">
+        @foreach (var items in ViewBag.ticketstatus)
+        {
+            bool isactive = ViewBag.currentsubtab == items.name;
+            <li class='@(isactive ? "active" : "")'>
+                <a href="/manualticket/index/@items.id">
+                    <span class="@(isactive ? "badge badge-success" : "badge badge-default") position-left">@items.ticketcount</span>@items.name
+                </a>
+            </li>
+        }
+    </ul>
+    <div id="DataTables_Table_0_Tickets" class="dataTables_wrapper no-footer">
+        <div class="datatable-scroll">
+            <table class="table datatable-button-html5-basic" id="DataTables_Table_tickets" role="grid" aria-describedby="DataTables_Table_0_info">
+                <thead>
+                <tr role="row">
+                    <th class="bg-primary"> Topic </th>
+                    <th class="bg-primary"> subject </th>
+                    <th class="bg-primary"> Project </th>
+                    <th class="bg-primary"> Skill </th>
+                    <th class="bg-primary"></th>
+                </tr>
+                </thead>
+                <tbody id="productList">
+                @if (Model.Count() > 0 && Model != null)
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="text-muted"> @Html.DisplayFor(modelItem => item.Ticket.topic) </div>
+                            </td>
+                            <td> @Html.DisplayFor(modelItem => item.subject) </td>
+                            <td> @Html.DisplayFor(modelItem => item.Project.name) </td>
+                            <td> @Html.DisplayFor(modelItem => item.Skill.name) </td>
+                            <td>
+                                <ul class="icons-list">
+                                    <li class="dropdown">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                            <i class="icon-menu9"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-menu-right">
+                                            <li>
+                                                <a href="/manualticket/edit/@item.ticketid" target="_blank"><i class="icon-pencil7"></i>Edit</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4">
+                            <h5 class="panel-title"> <i class="icon-envelop5 position-left"></i> Sorry, no Ticket found. </h5>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+            <div id="loading"></div>
+        </div>
+    </div>
+</div>

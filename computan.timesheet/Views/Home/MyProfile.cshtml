@@ -1,0 +1,419 @@
+﻿@model computan.timesheet.core.ApplicationUser
+@{ ViewBag.Title = "Edit My Profile"; }
+
+@section header {
+    <div style="background-color: #fff;" class="panel page-header border-top-primary">
+        <div class="page-header-content">
+            <div class="page-title">
+                <h5>
+                    <i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Timesheet</span> - My Profile
+                    <small class="display-block">Allows you to update your profile information.</small>
+                </h5>
+            </div>
+            <div class="heading-elements"> </div>
+            <a class="heading-elements-toggle">
+                <i class="icon-menu"></i>
+            </a>
+        </div>
+        <div style="border-bottom: 0; box-shadow: none; margin-bottom: 0;" class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/home/index"><i class="icon-home2 position-left"></i>Home</a>
+                </li>
+                <li>
+                    <a href="/home/myprofile">My Profile</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+}
+
+<!-- User profile -->
+<div class="row">
+    <div class="col-lg-3 col-md-3 col-sm-4">
+        <!-- User thumbnail -->
+        <div class="thumbnail">
+            <div class="thumb thumb-rounded thumb-slide">
+                <img src="/images/UserProfileImage/@ViewBag.ProfileImage" onerror="this.onerror = null, this.src = '/content/images/placeholder.jpg'" alt="">
+                <div class="caption">
+                    <span>
+                        <a href="#" class="btn bg-success-400 btn-icon btn-xs fileupload">
+                            <i class="icon-plus2"></i>
+                        </a>
+                    </span>
+                </div>
+            </div>
+            <div class="caption text-center">
+                <h6 class="text-semibold no-margin">
+                    @User.Identity.Name<small class="display-block">@ViewBag.designation</small>
+                </h6>
+            </div>
+        </div>
+        <!-- /user thumbnail -->
+    </div>
+    <div class="col-lg-9 col-md-9 col-sm-8">
+        <div class="panel panel-flat timeline-content">
+            <div class="panel-body">
+                @using (Html.BeginForm("myprofile", "home", FormMethod.Post, new {enctype = "multipart/form-data"}))
+    {
+                @Html.AntiForgeryToken()
+                <div class="form-horizontal">
+                    <h4>Update My Profile</h4>
+                    <hr />
+                    @if (ViewBag.success != null)
+                    {
+                        <div class="alert alert-success alert-dismissable">
+                            <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+                            @ViewBag.success
+                        </div>
+                    }
+                    @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+                    @Html.HiddenFor(model => model.Id)
+                    @Html.HiddenFor(model => model.UserName)
+                    @Html.HiddenFor(model => model.EmailConfirmed)
+                    @Html.HiddenFor(model => model.IsRestrictEntertime)
+                    <input type="hidden" value="yes" id="myprofileid" name="myprofileid" />
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            @Html.LabelFor(model => model.UserName, "User Name", new { @class = "control-label" })
+                            @Html.EditorFor(model => model.UserName, new { htmlAttributes = new { @class = "form-control", disabled = "disabled" } })
+                            @Html.ValidationMessageFor(model => model.UserName, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-3">
+                            @Html.LabelFor(model => model.Email, "Email*", new { @class = "control-label" })
+                            @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control", disabled = "disabled" } })
+                            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-3">
+                            @Html.LabelFor(model => model.FirstName, new { @class = "control-label" })
+                            @Html.EditorFor(model => model.FirstName, new { htmlAttributes = new { @class = "form-control", disabled = "disabled" } })
+                            @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-3">
+                            @Html.LabelFor(model => model.LastName, new { @class = "control-label" })
+                            @Html.EditorFor(model => model.LastName, new { htmlAttributes = new { @class = "form-control", disabled = "disabled" } })
+                            @Html.ValidationMessageFor(model => model.LastName, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-9">
+                            @Html.LabelFor(model => model.Address, new { @class = "control-label" })
+                            @Html.EditorFor(model => model.Address, new { htmlAttributes = new { @class = "form-control", disabled = "disabled" } })
+                            @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-3">
+                            @Html.LabelFor(model => model.City, new { @class = "control-label" })
+                            @Html.EditorFor(model => model.City, new { htmlAttributes = new { @class = "form-control", disabled = "disabled" } })
+                            @Html.ValidationMessageFor(model => model.City, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            @Html.LabelFor(m => m.StateId, new { @class = "control-label" })
+                            @Html.DropDownListFor(model => model.StateId, ViewBag.statelist as SelectList, "Please Select State", new { @class = "form-control", disabled = "disabled" })
+                        </div>
+                        <div class="col-md-3">
+                            @Html.LabelFor(m => m.CountryId, new { @class = "control-label" })
+                            @Html.DropDownListFor(model => model.CountryId, ViewBag.countrylist as SelectList, "Please Select Country", new { @class = "form-control", disabled = "disabled" })
+                            @Html.ValidationMessageFor(model => model.CountryId, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-3">
+                            @Html.LabelFor(model => model.Zip, new { @class = "control-label" })
+                            @Html.EditorFor(model => model.Zip, new { htmlAttributes = new { @class = "form-control", disabled = "disabled" } })
+                            @Html.ValidationMessageFor(model => model.Zip, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-3">
+                            @Html.LabelFor(model => model.Designation, new { @class = "control-label" })
+                            @Html.EditorFor(model => model.Designation, new { htmlAttributes = new { @class = "form-control", disabled = "disabled" } })
+                            @Html.ValidationMessageFor(model => model.Designation, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            @Html.LabelFor(model => model.Phone, new { @class = "control-label" })
+                            @Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @class = "form-control", disabled = "disabled" } })
+                            @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-3">
+                            @Html.LabelFor(model => model.Mobile, new { @class = "control-label" })
+                            @Html.EditorFor(model => model.Mobile, new { htmlAttributes = new { @class = "form-control", disabled = "disabled" } })
+                            @Html.ValidationMessageFor(model => model.Mobile, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-3">
+                            @Html.LabelFor(model => model.DateOfBirths, new { @class = "control-label" })
+                            @Html.EditorFor(model => model.DateOfBirths, new { htmlAttributes = new { @class = "form-control", disabled = "disabled" } })
+                            @Html.ValidationMessageFor(model => model.DateOfBirths, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-3">
+                            @Html.LabelFor(model => model.NationalIdentificationNumber, new { @class = "control-label" })
+                            @Html.EditorFor(model => model.NationalIdentificationNumber, new { htmlAttributes = new { @class = "form-control", disabled = "disabled" } })
+                            @Html.ValidationMessageFor(model => model.NationalIdentificationNumber, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    @*Miss Nadia*@
+
+                    <div class="form-group">
+                        <div class="col-md-4">
+                            @Html.LabelFor(model => model.PersonalEmailAddress, new { @class = "control-label" })
+                            @Html.EditorFor(model => model.PersonalEmailAddress, new { htmlAttributes = new { @class = "form-control", disabled = "disabled" } })
+                            @Html.ValidationMessageFor(model => model.PersonalEmailAddress, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-4">
+                            @Html.LabelFor(model => model.EmergencyPhoneNumber, new { @class = "control-label" })
+                            @Html.EditorFor(model => model.EmergencyPhoneNumber, new { htmlAttributes = new { @class = "form-control", disabled = "disabled" } })
+                            @Html.ValidationMessageFor(model => model.EmergencyPhoneNumber, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-4">
+                            @Html.LabelFor(model => model.PersonNameEmergency, new { @class = "control-label" })
+                            @Html.EditorFor(model => model.PersonNameEmergency, new { htmlAttributes = new { @class = "form-control", disabled = "disabled" } })
+                            @Html.ValidationMessageFor(model => model.PersonNameEmergency, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-4">
+                            @Html.LabelFor(model => model.TeamLead, new { @class = "control-label" })
+                            @Html.DropDownListFor(model => model.TeamLead, null, "Please Select", new { @class = "form-control", disabled = "disabled" })
+                        </div>
+                        <div class="col-md-4">
+                            @Html.LabelFor(model => model.ProjectManager, new { @class = "control-label" })
+                            @Html.DropDownListFor(model => model.ProjectManager, null, "Please Select", new { @class = "form-control", disabled = "disabled" })
+                        </div>
+                        <div class="col-md-4">
+                            @Html.LabelFor(model => model.DateOfJoin, new { @class = "control-label" })
+                            @Html.EditorFor(model => model.DateOfJoin, new { htmlAttributes = new { @class = "form-control", disabled = "disabled" } })
+                            @Html.ValidationMessageFor(model => model.DateOfJoin, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-4">
+                            @Html.LabelFor(model => model.Experience, new { @class = "control-label" })
+                            @Html.EditorFor(model => model.Experience, new { htmlAttributes = new { @class = "form-control", disabled = "disabled" } })
+                            @Html.ValidationMessageFor(model => model.Experience, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-4">
+                            @Html.LabelFor(model => model.ShiftTimePK, new { @class = "control-label" })
+                            @Html.DropDownListFor(model => model.ShiftTimePK, null, "Please Select", new { @class = "form-control", disabled = "disabled" })
+                        </div>
+                        <div class="col-md-4">
+                            @Html.LabelFor(model => model.ShiftTimeEST, new { @class = "control-label" })
+                            @Html.DropDownListFor(model => model.ShiftTimeEST, null, "Please Select", new { @class = "form-control", disabled = "disabled" })
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-4">
+                            @Html.LabelFor(m => m.LatestResume, new { @class = "control-label" })<br>
+                            @Html.TextBoxFor(m => m.LatestResume, new { type = "file", style = "display:none", disabled = "disabled" })
+                            <div class="input-group">
+                                <label for="LatestResume" class="btn input-group-addon" style="background-color: white;">
+                                    <i class="icon-image2 position-left"> Upload</i>
+                                </label>
+                                <label class="LatestResume form-control lbl">@(Model.LatestResume == null ? "No File Choose" :  Model.LatestResume)</label>
+                            </div>
+                            @Html.ValidationMessageFor(model => model.LatestResume, "", new { @class = "text-danger" })
+                            @if (Model.LatestResume != null)
+                            {
+                                @Html.ActionLink("Download", "DownloadFile", "UsersAdmin", new { fileName = Model.LatestResume },null)
+                            }
+                        </div>
+                        <div class="col-md-4">
+                            @Html.LabelFor(m => m.LastDegree, new { @class = "control-label" })<br>
+                            @Html.TextBoxFor(m => m.LastDegree, new { type = "file", style = "display:none", disabled = "disabled" })
+                            <div class="input-group">
+                                <label for="LastDegree" class="btn input-group-addon" style="background-color: white;">
+                                    <i class="icon-image2 position-left"> Upload</i>
+                                </label>
+                                <label class="LastDegree form-control lbl">@(Model.LastDegree == null ? "No File Choose" :  Model.LastDegree)</label>
+                            </div>
+                            @Html.ValidationMessageFor(model => model.LastDegree, "", new { @class = "text-danger" })
+                            @if (Model.LastDegree != null)
+                            {
+                                @Html.ActionLink("Download", "DownloadFile", "UsersAdmin", new { fileName = Model.LastDegree },null)
+                            }
+                        </div>
+                        <div class="col-md-4">
+                            @Html.LabelFor(m => m.CNIC_Front, new { @class = "control-label" })<br>
+                            @Html.TextBoxFor(m => m.CNIC_Front, new { type = "file", name = "hhh", style = "display:none", disabled = "disabled" })
+                            <div class="input-group">
+                                <label for="CNIC_Front" class="btn input-group-addon" style="background-color: white;">
+                                    <i class="icon-image2 position-left"> Upload</i>
+                                </label>
+                                <label class="CNIC_Front form-control lbl">@(Model.CNIC_Front == null ? "No File Choose" :  Model.CNIC_Front)</label>
+                            </div>
+                            @Html.ValidationMessageFor(model => model.CNIC_Front, "", new { @class = "text-danger" })
+                            @if (Model.CNIC_Back != null)
+                            {
+                                @Html.ActionLink("Download", "DownloadFile", "UsersAdmin", new { fileName = Model.CNIC_Front },null)
+                            }
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-4">
+                            @Html.LabelFor(m => m.CNIC_Back, new { @class = "control-label" })<br>
+                            @Html.TextBoxFor(m => m.CNIC_Back, new { type = "file", style = "display:none", disabled = "disabled" })
+                            <div class="input-group">
+                                <label for="CNIC_Back" class="btn input-group-addon" style="background-color: white;">
+                                    <i class="icon-image2 position-left"> Upload</i>
+                                </label>
+                                <label class="CNIC_Back form-control lbl">@(Model.CNIC_Back == null ? "No File Choose" :  Model.CNIC_Back)</label>
+                            </div>
+                            @Html.ValidationMessageFor(model => model.CNIC_Back, "", new { @class = "text-danger" })
+                            @if (Model.CNIC_Back != null)
+                            {
+                                @Html.ActionLink("Download", "DownloadFile", "UsersAdmin", new { fileName = Model.CNIC_Back },null)
+                            }
+
+                        </div>
+
+                        <div class="col-md-4">
+                            @Html.LabelFor(m => m.ExperienceLetter, new { @class = "control-label" })<br>
+                            @Html.TextBoxFor(m => m.ExperienceLetter, new { type = "file", style = "display:none",disabled = "disabled" })
+                            <div class="input-group">
+                                <label for="ExperienceLetter" class="btn input-group-addon" style="background-color: white;">
+                                    <i class="icon-image2 position-left"> Upload</i>
+                                </label>
+                                <label class="ExperienceLetter form-control lbl">@(Model.ExperienceLetter == null ? "No File Choose" :  Model.ExperienceLetter)</label>
+                            </div>
+                            @Html.ValidationMessageFor(model => model.ExperienceLetter, "", new { @class = "text-danger" })
+                            @if (Model.ExperienceLetter != null)
+                            {
+                                @Html.ActionLink("Download", "DownloadFile","UsersAdmin", new { fileName = Model.ExperienceLetter },null)
+                            }
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            <label class="col-md-3 control-label">Job Type</label>
+                            <div class="col-md-9">
+
+                                @if (Model.IsRemoteJob == true)
+                                {
+                                    <label class="radio-inline">
+                                        @Html.RadioButtonFor(model => model.IsRemoteJob, "False", new { @class = "custom-checkbox", disabled = "disabled" })On-Site
+                                    </label>
+                                    <label class="radio-inline">
+                                        @Html.RadioButtonFor(model => model.IsRemoteJob, "True", new { Checked = "checked", @class = "custom-checkbox", disabled = "disabled" }) Remote
+                                    </label>
+                                }
+                                else
+                                {
+                                    <label class="radio-inline">
+                                        @Html.RadioButtonFor(model => model.IsRemoteJob, "False", new { Checked = "checked", @class = "custom-checkbox", disabled = "disabled" })On-Site
+                                    </label>
+                                    <label class="radio-inline">
+                                        @Html.RadioButtonFor(model => model.IsRemoteJob, "True", new { @class = "custom-checkbox", disabled = "disabled" }) Remote
+                                    </label>
+                                }
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="col-md-4 control-label">Holiday Calendar</label>
+                            <div class="col-md-8">
+                                @if (Model.IsPkHoliday == true)
+                                {
+                                    <label class="radio-inline">
+                                        @Html.RadioButtonFor(model => model.IsPkHoliday, "True", new { Checked = "checked", @class = "custom-checkbox", disabled = "disabled" }) PAK
+                                    </label>
+                                    <label class="radio-inline">
+                                        @Html.RadioButtonFor(model => model.IsPkHoliday, "False", new { @class = "custom-checkbox", disabled = "disabled" }) USA
+                                    </label>
+                                }
+                                else
+                                {
+                                    <label class="radio-inline">
+                                        @Html.RadioButtonFor(model => model.IsPkHoliday, "True", new { @class = "custom-checkbox", disabled = "disabled" }) PAK
+                                    </label>
+                                    <label class="radio-inline">
+                                        @Html.RadioButtonFor(model => model.IsPkHoliday, "False", new { Checked = "checked", @class = "custom-checkbox", disabled = "disabled" }) USA
+                                    </label>
+                                }
+
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.EmailConfirmed, "Email Confirmed", new { @class = "control-label col-md-offset-1 col-md-3" })
+                        <div class="col-md-1">
+                            <div class="checkbox">
+                                @Html.CheckBoxFor(model => model.EmailConfirmed, new { disabled = "disabled" })
+                                @Html.ValidationMessageFor(model => model.EmailConfirmed, "", new { @class = "text-danger", disabled = "disabled" })
+                            </div>
+                        </div>
+                        @Html.LabelFor(model => model.IsNotifyManagerOnTaskAssignment, "Turn on manager notification", new { @class = "control-label col-md-offset-1 col-md-3" })
+                        <div class="col-md-1">
+                            <div class="checkbox">
+                                @Html.CheckBoxFor(model => model.IsNotifyManagerOnTaskAssignment, new { })
+                                @Html.ValidationMessageFor(model => model.IsNotifyManagerOnTaskAssignment, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group hidden">
+                        @Html.LabelFor(m => m.ProfileImage, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(m => m.ProfileImage, new { type = "file", @class = "input-file", hidden = "hidden" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12 text-center">
+                            <input type="submit" value="Save" class="btn btn-primary"/>
+                        </div>
+                    </div>
+                </div>
+                    }
+                </div>
+        </div>
+    </div>
+</div>
+<!-- /user profile -->
+<!--Bootstrape Model-->
+<div class="modal fade" id="Fileupload" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Update Profile Image</h4>
+            </div>
+            <div class="modal-body" id="uploadfilemodelbodydiv">
+                @using (Html.BeginForm("upload", "home", FormMethod.Post, new {enctype = "multipart/form-data"}))
+                {
+                <div class="form-group">
+                    <div class="col-md-offset-1 col-md-10">
+                        @Html.TextBoxFor(m => m.ProfileImage, new {type = "file", @class = "file-input-custom", data_classButton = "btn btn-primary", data_input = "false", data_classIcon = "icon-plus"})
+                    </div>
+                </div>
+                }
+            </div>
+            <div class="modal-footer"> </div>
+        </div>
+    </div>
+</div>
+<style>
+    .lbl {
+        white-space: nowrap;
+        overflow: hidden;
+        max-width: 230px;
+        text-overflow: ellipsis;
+    }
+</style>
+@section Scripts {
+    <script src="~/Scripts/default/js/plugins/uploaders/fileinput.min.js"></script>
+    <script src="~/Scripts/default/js/pages/uploader_bootstrap.js"></script>
+    <script src="~/Scripts/custom/CascadingDropdown.min.js"></script>
+}
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#StateId").select2();
+        $("#CountryId").select2();
+        $("#DateOfJoining").AnyTime_picker({ format: "%m/%d/%Z" });
+        $("#DateOfBirth").AnyTime_picker({ format: "%m/%d/%Z" });
+        $("#SpouseDateOfBirth").AnyTime_picker({ format: "%m/%d/%Z" });
+        $(".fileupload").on("click", function() { $('#Fileupload').modal('toggle'); });
+    });
+</script>

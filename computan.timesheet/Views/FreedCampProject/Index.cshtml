@@ -1,0 +1,60 @@
+﻿@model IEnumerable<computan.timesheet.Models.FreedCamp.FreedCampProjectViewModel>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="panel panel-default" id="maincontent">
+    <div class="panel">
+        <div class="panel-heading bg-teal-700">
+            <div class="row">
+                <h4 class="panel-title ticket-title">
+                    <span>Freed Camp Projects Listing </span>
+                </h4>
+            </div>
+        </div>
+        <div class="panel panel-flat">
+            <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper no-footer">
+                <div class="datatable-scroll">
+                    <table class="table datatable-button-html5-basic" id="DataTables_Table_0" role="grid" aria-describedby="DataTables_Table_0_info">
+                        <thead>
+                        <tr role="row">
+                            <th> @Html.DisplayName("Freedcamp Project") </th>
+                            <th> @Html.DisplayName("Timesheet Project") </th>
+                            <th> @Html.DisplayName("Skill") </th>
+                            <th> @Html.DisplayName("Users") </th>
+                            <th> @Html.DisplayName("Teams") </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr data-id="@item.id">
+                                <td> @Html.DisplayFor(modelItem => item.Name) </td>
+                                <td> @Html.DropDownListFor(modelItem => item.tsporjecid, new SelectList(ViewBag.projects, "id", "name", item.tsporjecid), "Select Project", new {@class = "form-control project"}) </td>
+                                <td> @Html.DropDownListFor(modelItem => item.skill, new SelectList(ViewBag.skillslist, "id", "name", item.skill), "Select Skill", new {@class = "form-control skill"}) </td>
+                                <td>
+                                    <input id="User-@item.id" name="AssignedUsersInput" type="text" class="form-control userassign"/>
+                                </td>
+                                <td>
+                                    <input id="Team-@item.id" name="AssignedTeamInput-@item.id" type="text" class="form-control teamassign"/>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/Scripts/select2")
+    @Scripts.Render("~/Scripts/custom/tagsinput")
+    <script type="text/javascript" src="~/Scripts/custom/Integration.min.js"></script>
+}
+
+<script type="text/javascript">
+    $('#DataTables_Table_0').on("draw.dt", function() { init(); });
+</script>

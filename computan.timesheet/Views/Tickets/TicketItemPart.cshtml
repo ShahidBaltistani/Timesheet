@@ -1,0 +1,31 @@
+﻿@model IEnumerable<computan.timesheet.core.TicketItem>
+@{
+    ViewBag.Title = "Ticket Detail";
+    Layout = null;
+}
+<ul id="leftNevMenu">
+    @foreach (var item in Model.OrderByDescending(ti => ti.lastmodifiedtime))
+    {
+        <li class="emailitem" data-emailid="@item.id">
+            <a href="#">
+                <span class="sender">@item.lastmodifiedname</span>
+                <label class="date-received pull-right">@item.ToShortDateTimeReceived</label>
+                <span class="minibody text-muted">@item.minibody</span>
+            </a>
+        </li>
+    }
+</ul>
+<div id="emailcontentwrapper">
+    @foreach (var item in Model.OrderByDescending(ti => ti.lastmodifiedtime))
+    {
+        <div id="email-@item.id" style="display: none;">
+            <span class="lastmodifiedtime">@item.lastmodifiedtime</span>
+            <span class="sender">@item.sender</span>
+            <span class="subject">@item.subject</span>
+            <span class="to-addresses">@item.torecipients</span>
+            <span class="cc-addresses @(item.displaycc != null ? "has-data" : "has-no-data")"> @item.displaycc </span>
+            <span class="bcc-addresses @(item.bccrecipients != null ? "has-data" : "has-no-data")"> @item.bccrecipients </span>
+            <span class="email-body"> @item.uniquebody </span>
+        </div>
+    }
+</div>

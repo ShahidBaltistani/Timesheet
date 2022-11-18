@@ -1,0 +1,30 @@
+﻿@model string
+<ul class="nav nav-tabs nav-tabs-highlight">
+    @if (User.IsInRole("Admin"))
+    {
+        <li class="@(Model == "index" ? "active" : "")">
+            <a href="/tickettimelogs/index/1"><i class="fa fa-clock-o label-icon-sm"></i>My Time Log</a>
+        </li>
+        <li class="@(Model == "team" ? "active" : "")">
+            <a href="/tickettimelogs/team"><i class="fa fa-clock-o label-icon-sm"></i>Team Time Log</a>
+        </li>
+        <li class="@(Model == "QualityControl" ? "active" : "")">
+            <a href="/tickettimelogs/QualityControl"><i class="fa fa-clock-o label-icon-sm"></i>Quality Control</a>
+        </li>
+        <li class="@(Model == "gettimelog" ? "active" : "")">
+            <a href="/tickettimelogs/gettimelog"><i class="fa fa-clock-o label-icon-sm"></i>Time Report</a>
+        </li>
+        <li class="@(Model == "DetailTimeReport" ? "active" : "")">
+            <a href="/tickettimelogs/DetailTimeReport"><i class="fa fa-clock-o label-icon-sm"></i>Detail Time Report</a>
+        </li>
+    }
+    else if (User.IsInRole("TeamLead"))
+    {
+        <li class="@(Model == "index" ? "active" : "")">
+            <a href="/tickettimelogs/index/1"><i class="fa fa-clock-o label-icon-sm"></i>My Time Log</a>
+        </li>
+        <li class="@(Model == "team" ? "active" : "")">
+            <a href="/tickettimelogs/team"><i class="fa fa-clock-o label-icon-sm"></i>Team Time Log</a>
+        </li>
+    }
+</ul>

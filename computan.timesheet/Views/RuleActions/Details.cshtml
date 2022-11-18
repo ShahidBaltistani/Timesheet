@@ -1,0 +1,27 @@
+﻿@model computan.timesheet.core.RuleAction
+@{ Layout = null; }
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width"/>
+    <title>Details</title>
+</head>
+<body>
+<div>
+    <h4>RuleAction</h4>
+    <hr/>
+    <dl class="dl-horizontal">
+        <dt> @Html.DisplayNameFor(model => model.Rule.name) </dt>
+        <dd> @Html.DisplayFor(model => model.Rule.name) </dd>
+        <dt> @Html.DisplayNameFor(model => model.RuleActionType.name) </dt>
+        <dd> @Html.DisplayFor(model => model.RuleActionType.name) </dd>
+        <dt> @Html.DisplayNameFor(model => model.ruleactionvalue) </dt>
+        <dd> @Html.DisplayFor(model => model.ruleactionvalue) </dd>
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new {Model.id}) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
+</body>
+</html>

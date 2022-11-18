@@ -1,0 +1,67 @@
+﻿@model IEnumerable<computan.timesheet.core.ContactCompany>
+@{ ViewBag.Title = "List Contact Domain"; }
+
+@section header {
+    <div style="background-color: #fff;" class="panel page-header border-top-primary">
+        <div class="page-header-content">
+            <div class="page-title">
+                <h5>
+                    <i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Timesheet</span> - Manage Contact Domains
+                    <small class="display-block">Manage Contact Domain</small>
+                </h5>
+            </div>
+            <div class="heading-elements">
+                <div class="btn-group">
+                    <a href="/ContactCompanies/create" class="btn btn-primary"><i class="icon-list3 position-left"></i>Add New Contact Domain</a>
+                </div>
+            </div>
+            <a class="heading-elements-toggle">
+                <i class="icon-menu"></i>
+            </a>
+        </div>
+        <div style="border-bottom: 0; box-shadow: none; margin-bottom: 0;" class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/Home/index"><i class="icon-home2 position-left"></i>Home</a>
+                </li>
+                <li>
+                    <a href="/ContactCompanies/index">Companies</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+}
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="tabbable">
+            <ul class="nav nav-tabs nav-tabs-highlight">
+                <li class=""> @Html.ActionLink("Contacts", "Index", "Contacts") </li>
+                <li class="active"> @Html.ActionLink("Companies", "Index", "ContactCompanies") </li>
+            </ul>
+            <div class="tab-content">
+                <table class="table datatable-button-html5-basic" id="DataTables_Table_0" role="grid" aria-describedby="DataTables_Table_0_info">
+                    <thead>
+                    <tr role="row">
+                        <th class="sorting_asc" tabindex="0" aria-controls="DataTables_Table_2" rowspan="1" colspan="1" aria-sort="ascending" aria-label="First Name: activate to sort column descending"> @Html.DisplayNameFor(model => model.name) </th>
+                        <th> @Html.DisplayName("Total Contacts Count") </th>
+                        <th> @Html.DisplayName("Contacts") </th>
+                        <th> </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td> @Html.DisplayFor(modelItem => item.name) </td>
+                            <td> @item.ContactCollection.Count() </td>
+                            <td> @Html.ActionLink("Load Contacts for domain", "Index", "Contacts", new {item.id}, new {@class = "btn btn-primary btn-xs"}) </td>
+                            <td> @Html.ActionLink("Edit", "Edit", new {item.id}, new {@class = "btn btn-primary btn-xs"}) </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

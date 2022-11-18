@@ -1,0 +1,24 @@
+﻿@model string
+<ul class="nav nav-tabs nav-tabs-highlight">
+    <li class="taskli @(Model == "index" ? "active" : "")">
+        <a href="/project/index/@ViewData["projectid"]" class="tasklist"><span class="badge badge-success"></span>Tasks</a>
+    </li>
+    <li class="credentialsli @(Model == "credentials" ? "active" : "")">
+        <a href="/project/credentials/@ViewData["projectid"]" class="projectcreadentials"><span class="badge badge-success"></span>Credentials</a>
+    </li>
+    <li class="projectfilesli @(Model == "files" ? "active" : "")">
+        <a href="/project/files/@ViewData["projectid"]" class="projectfiles"><span class="badge badge-success"></span>Files</a>
+    </li>
+    <li class="notesli @(Model == "notes" ? "active" : "")">
+        <a href="/project/notes/@ViewData["projectid"]" class="notes"><span class="badge badge-success"></span>Notes</a>
+    </li>
+    <li class="timelog @(Model == "timelog" ? "active" : "")">
+        <a href="/project/timelog/@ViewData["projectid"]" class="timelog"><span class="badge badge-success"></span>Time Logs</a>
+    </li>
+    @if (Model == "credentials")
+    {
+        <li class="Addcredentialsli pull-right">
+            <button data-id="@ViewData["projectid"]" class="btn btn-primary btnaddcredentials" target="_blank" style="color: white !important; margin-bottom: 10px !important;"><i class="icon-add position-left"></i><span class="badge badge-success"></span>Add Credentials</button>
+        </li>
+    }
+</ul>

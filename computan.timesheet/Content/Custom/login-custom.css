@@ -1,0 +1,235 @@
+﻿.login-container {
+    display: block;
+    position: relative;
+}
+
+.dot {
+    background-color: #f4b762;
+    border-radius: 50%;
+    display: inline-block;
+    height: 125px;
+    left: 15px;
+    position: absolute;
+    top: 15px;
+    width: 125px;
+    z-index: 100;
+}
+
+.dot2 {
+    background-color: #f4b762;
+    border-radius: 50%;
+    display: inline-block;
+    height: 64px;
+    left: 130px;
+    position: absolute;
+    top: 150px;
+    width: 64px;
+    z-index: 100;
+}
+
+.dot3 {
+    background-color: #f4b762;
+    border-radius: 50%;
+    bottom: 15px;
+    display: inline-block;
+    height: 125px;
+    position: absolute;
+    right: 15px;
+    width: 125px;
+    z-index: 10;
+}
+
+.dot4 {
+    background-color: #f4b762;
+    border-radius: 50%;
+    bottom: 150px;
+    display: inline-block;
+    height: 64px;
+    position: absolute;
+    right: 135px;
+    width: 64px;
+    z-index: 10;
+}
+
+.wht { background-color: #fff; }
+
+.login-container form { height: 100%; }
+
+.login-backend .content-group-lg {
+    font-size: 30px;
+    font-weight: 500;
+}
+
+.login-backend .text-center { margin-top: -30px; }
+
+.login-container .login-backend {
+    border: 0;
+    box-shadow: none;
+    height: 100%;
+    margin: 0;
+    margin-bottom: 30px;
+    margin-top: 5px;
+    overflow: hidden;
+    padding: 30px 0 100px;
+    position: relative;
+    width: 100%;
+}
+
+.logo1 { width: 120px; }
+
+.login-backend .back2 .center {
+    left: 50%;
+    margin-left: -165px;
+    margin-top: -180px;
+    position: absolute;
+    top: 50%;
+    width: 330px;
+    z-index: 15;
+}
+
+.login-backend .back2:before {
+    background-image: url('../../Images/curved-shape-corner.svg');
+    background-repeat: no-repeat;
+    content: '';
+    height: 220px;
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    width: 30%;
+    z-index: 1;
+}
+
+.login-container .login-backend:before {
+    content: '';
+    height: 161px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
+.login-container .login-backend svg {
+    margin-top: -30px;
+    position: relative;
+    width: 100%;
+}
+
+.login-container .login-backend:after {
+    background-color: #f4b762;
+    border-radius: 0 100% 0 0;
+    bottom: -32px;
+    content: '';
+    height: 195px;
+    left: -33px;
+    position: absolute;
+    transition: all .3s;
+    width: 195px;
+    z-index: 1;
+}
+
+.login-backend .form-group { margin: 0 auto 20px; }
+
+.login-backend .has-feedback-left .form-control {
+    background-color: rgba(245 184 96 / 30%) !important;
+    border-color: #f5b8604d;
+    color: #000;
+    font-family: 'Open Sans', sans-serif;
+    height: 44px;
+    padding-left: 12px;
+    padding-right: 36px;
+}
+
+.login-backend .has-feedback-left > .form-control-feedback {
+    background-color: #f5b860;
+    border-radius: 0 5px 5px 0;
+    height: 44px;
+    left: auto;
+    line-height: 44px;
+    right: 0;
+    width: 44px;
+}
+
+.login-backend .has-feedback-left > .form-control-feedback i { color: #fff; }
+
+.login-backend .orange-bg {
+    background-color: #fff;
+    border-color: #f5b860;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px 0px rgba(195 195 195 / 75%);
+    color: #f5b860;
+    font-size: 15px;
+}
+
+.login-backend .orange-bg:hover {
+    background-color: #f5b860;
+    color: #fff;
+}
+
+.login-backend .orange-bg:hover { box-shadow: none; }
+
+.position-right { display: none; }
+
+.login-container .footer a { color: #f4b762; }
+
+@media (max-width: 767px) {
+    .login-container .login-backend:after {
+        height: 115px;
+        width: 115px;
+    }
+
+    .login-backend .back2:after {
+        background-size: 70px auto;
+        height: 117px;
+        width: 120px;
+    }
+
+    .dot {
+        background-color: #f4b762;
+        border-radius: 50%;
+        display: inline-block;
+        height: 64px;
+        left: 26px;
+        top: 20px;
+        width: 64px;
+        z-index: 10;
+    }
+
+    .dot2 {
+        background-color: #f4b762;
+        border-radius: 50%;
+        display: inline-block;
+        height: 45px;
+        left: 85px;
+        position: absolute;
+        top: 90px;
+        width: 45px;
+        z-index: 10;
+    }
+
+    .dot3 {
+        background-color: #f4b762;
+        border-radius: 50%;
+        bottom: 20px;
+        display: inline-block;
+        height: 64px;
+        right: 26px;
+        width: 64px;
+        z-index: 10;
+    }
+
+    .dot4 {
+        background-color: #f4b762;
+        border-radius: 50%;
+        bottom: 90px;
+        display: inline-block;
+        height: 45px;
+        position: absolute;
+        right: 85px;
+        width: 45px;
+        z-index: 10;
+    }
+}
+
+@media (max-width: 520px) {
+    .dot, .dot2, .dot3, .dot4 { display: none; }
+}

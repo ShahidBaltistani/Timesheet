@@ -1,0 +1,22 @@
+﻿@model computan.timesheet.Models.TicketTimeSearchViewModel
+@using (Html.BeginForm("MyBucketsGlobal", "GlobalBuckets", FormMethod.Post, new {@class = "form-inline globalbucketform"}))
+{
+    <div class="input-group">
+        <div class="has-feedback has-feedback-left">
+            <div class="input-group">
+                <span class="input-group-addon">
+                    <i class="icon-calendar3"></i>
+                </span>
+                @Html.EditorFor(model => model.StartDate, new {htmlAttributes = new {Value = Model.StartDate.ToString("MM/dd/yyyy"), @class = "form-control Globalpicker", id = "GlobalStartDate"}})
+            </div>
+        </div>
+    </div>
+    <div class="input-group">
+        <input type="submit" value="Search" class="btn btn-sm btn-success center-block globalsearchbtn">
+    </div>
+}
+<script type="text/javascript">
+    $(function() {
+        $(".Globalpicker").datepicker({ dateFormat: 'mm/dd/yy' });
+    });
+</script>

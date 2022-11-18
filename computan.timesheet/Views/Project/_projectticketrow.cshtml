@@ -1,0 +1,140 @@
+﻿@model computan.timesheet.Models.ProDashboardViewModel
+<table class="table table-ticket">
+    <thead>
+    <tr class="border-double bg-teal-700">
+        <th></th>
+        <th style="width: 25px;">
+            <input type="checkbox" class="checkall"/>
+        </th>
+        <th> Task Details </th>
+    </tr>
+    </thead>
+    <tbody id="productList">
+    @if (Model.tickets != null && Model.tickets.Count() > 0)
+    {
+        foreach (var item in Model.tickets)
+        {
+            <tr id="@item.id">
+                <td style="padding-left: 5px; padding-right: 5px;" data-ticketid="@item.id">
+                    @if (!Model.IsFlagged(item.id))
+                    {
+                        <i class="fa fa-lg fav fa-star-o add-fav-ticket" data-toggle="tooltip" title="Add Favorite"></i>
+                    }
+                    else
+                    {
+                        <i class="fa fa-lg fav fa-star remove-fav-ticket" data-toggle="tooltip" title="Remove Favorite"></i>
+                    }
+                </td>
+                <td style="padding-left: 5px; padding-right: 5px;">
+                    <input type="checkbox" class="selticket" value="@item.id"/>
+                </td>
+                <td style="padding-left: 5px; padding-right: 5px;">
+                    <div class="ticket-container" style="margin-left: -10px;">
+                        <div class="ticket-toolbar wrapticket">
+                            <div class="btn-group btn-group-xs ticketstatusaction">
+                                <i class="ticketaction assignticketaction icon-play pull-left" data-ticketid="@item.id" data-projectid="@item.projectid" data-skillid="@item.skillid" data-toggle="tooltip" title="Assign Ticket"></i>
+                                <i class="icon-eye ticketaction previewticket pull-left" id="preview_@item.id" data-id="@item.id" data-toggle="tooltip" title="Preview Ticket"></i>
+                                <i class="icon-googleplus5 ticketaction previewticketdetail pull-left" id="preview_@item.id" data-id="@item.id" data-toggle="tooltip" title="Merge Ticket"></i>
+                                @if (item.statusid == 1)
+                                {
+                                    <button type="button" class="btn bg-success-700 changeticketstatus" data-statusid="3">Close</button>
+                                    <button type="button" class="btn bg-slate-700 changeticketstatus hideable" data-statusid="7">Review</button>
+                                    <button type="button" class="btn bg-danger-700 changeticketstatus hideable" data-statusid="8">Trash</button>
+                                }
+                                else if (item.statusid == 2)
+                                {
+                                    <button type="button" class="btn bg-success-700 changeticketstatus" data-statusid="3">Close</button>
+                                    <button type="button" class="btn bg-slate-700 changeticketstatus hideable" data-statusid="7">Review</button>
+                                    <button type="button" class="btn bg-danger-700 changeticketstatus hideable" data-statusid="8">Trash</button>
+                                }
+                                else if (item.statusid == 3)
+                                {
+                                    <button type="button" class="btn bg-info-700 changeticketstatus" data-statusid="2">Open</button>
+                                    <button type="button" class="btn bg-slate-700 changeticketstatus hideable" data-statusid="7">Review</button>
+                                    <button type="button" class="btn bg-danger-700 changeticketstatus hideable" data-statusid="8">Trash</button>
+                                }
+                                else if (item.statusid == 4)
+                                {
+                                    <button type="button" class="btn bg-info-700 changeticketstatus" data-statusid="2">Open</button>
+                                    <button type="button" class="btn bg-success-700 changeticketstatus" data-statusid="3">Close</button>
+                                    <button type="button" class="btn bg-slate-700 changeticketstatus hideable" data-statusid="7">Review</button>
+                                    <button type="button" class="btn bg-danger-700 changeticketstatus hideable" data-statusid="8">Trash</button>
+                                }
+                                else if (item.statusid == 5)
+                                {
+                                    <button type="button" class="btn bg-info-700 changeticketstatus" data-statusid="2">Open</button>
+                                    <button type="button" class="btn bg-success-700 changeticketstatus" data-statusid="3">Close</button>
+                                    <button type="button" class="btn bg-slate-700 changeticketstatus hideable" data-statusid="7">Review</button>
+                                    <button type="button" class="btn bg-danger-700 changeticketstatus hideable" data-statusid="8">Trash</button>
+                                }
+                                else if (item.statusid == 6)
+                                {
+                                    <button type="button" class="btn bg-success-700 changeticketstatus" data-statusid="3">Close</button>
+                                    <button type="button" class="btn bg-slate-700 changeticketstatus hideable" data-statusid="7">Review</button>
+                                    <button type="button" class="btn bg-danger-700 changeticketstatus hideable" data-statusid="8">Trash</button>
+                                }
+                                else if (item.statusid == 7)
+                                {
+                                    <button type="button" class="btn bg-info-700 changeticketstatus" data-statusid="2">Open</button>
+                                    <button type="button" class="btn bg-slate-700 changeticketstatus" data-statusid="3">Close</button>
+                                    <button type="button" class="btn bg-danger-700 changeticketstatus hideable" data-statusid="8">Trash</button>
+                                }
+                                else if (item.statusid == 8)
+                                {
+                                    <button type="button" class="btn bg-info-700 changeticketstatus" data-statusid="2">Open</button>
+                                }
+                                <i class="@(item.tickettypeid == 1 ? "icon-envelop5" : "icon-envelop3") position-left ticketaction previewticket" id="preview_@item.id" data-id="@item.id"></i>
+                                <span>
+                                    <b>@string.Format("{0}/{1} {2}:{3}", item.lastmodifiedtime.Month, item.lastmodifiedtime.Day, item.lastmodifiedtime.Hour.ToString().PadLeft(2, '0'), item.lastmodifiedtime.Minute.ToString().PadLeft(2, '0'))</b>
+                                </span>
+                                <span>@string.Format("({0})", item.messagecount)</span>
+                                @if (item.uniquesenders != null && item.uniquesenders.Length > 31)
+                                {
+                                    <span>@item.uniquesenders.ToString().Substring(0, 30).ToString() ...</span>
+                                }
+                                else
+                                {
+                                    @Html.DisplayFor(modelItem => item.uniquesenders)
+                                }
+                                @if (item.topic.Length > 80)
+                                {
+                                    <a href="/tickets/ticketitem/@item.id" target="_blank">@item.topic.Substring(0, 80).ToString() ... </a>
+                                }
+                                else
+                                {
+                                    <a href="/tickets/ticketitem/@item.id" target="_blank">@Html.DisplayFor(modelItem => item.topic)</a>
+                                }
+                                @if (item.tickettypeid == 2)
+                                {
+                                    <a class="ticketaction" href="/manualticket/edit/@item.id" target="_blank">
+                                        <i class="icon-pencil5"></i>
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                        <div class="ticket-toolbar btn-group btn-group-xs ticketstatusaction pull-right">
+                            @if (item.TicketTeamLogs.Count > 0)
+                            {
+                                <button type="button" class="btn bg-success-700">@item.TicketTeamName</button>
+                            }
+                            else
+                            {
+                                foreach (var team in Model.teams)
+                                {
+                                    <button type="button" class="btn bg-info-700 teamitem" name="@team.name" data-teamid="@team.id">@team.code</button>
+                                }
+                            }
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        }
+    }
+    else
+    {
+        <tr>
+            <td colspan="4" class="text-center">Sorry, No ticket found.</td>
+        </tr>
+    }
+    </tbody>
+</table>

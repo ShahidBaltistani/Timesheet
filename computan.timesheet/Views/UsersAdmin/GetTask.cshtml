@@ -1,0 +1,240 @@
+﻿@model computan.timesheet.Models.AdminTiaskbyUserViewModel
+@{ ViewBag.Title = "User Task List"; }
+
+@section header {
+    <div style="background-color: #fff;" class="panel page-header border-top-primary">
+        <div class="page-header-content">
+            <div class="page-title">
+                <h5>
+                    <i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">TimeSheet</span> - User Task's List
+                    <small class="display-block">User Task's List</small>
+                </h5>
+            </div>
+            <div class="heading-elements">
+                <div class="btn-group"> </div>
+            </div>
+            <a class="heading-elements-toggle">
+                <i class="icon-menu"></i>
+            </a>
+        </div>
+        <div style="border-bottom: 0; box-shadow: none; margin-bottom: 0;" class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/"><i class="icon-home2 position-left"></i>TimeSheet</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h5>User Tasks List</h5>
+            </div>
+            <div class="panel-body"> @Html.Partial("_SearchFilter", Model.SearchTask) </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-9">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h5>Tasks priority</h5>
+            </div>
+            <div class="panel-body">
+                <div>
+                    <div class="form-group">
+                        <button value="down" class="icon-arrow-down12 swap"></button>
+                        <button value="up" class="icon-arrow-up12 swap"></button>
+                    </div>
+                    <div id="tasklistdiv"> @Html.Partial("_GetTasklist", Model.tasks) </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h5>Today's Tasks</h5>
+            </div>
+            <div class="panel-body">
+                <div id="todaystaskdiv"> @Html.Partial("_TodayTasks", Model.todaytasks) </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $(document).on('submit',
+            '#Searchtaskform',
+            function(e) {
+                e.preventDefault(); // prevent the form's normal submission
+                var dataToPost = $(this).serialize();
+                $.ajax({
+                    url: '/usersadmin/GetTaskAjax/',
+                    data: dataToPost,
+                    type: 'POST'
+                }).done(function(data) {
+                    if (data.error) {
+                        return false;
+                    }
+                    $("#tasklistdiv").html(data);
+                    $.ajax({
+                        url: '/usersadmin/GetTodayTaskAjax/',
+                        data: dataToPost,
+                        type: 'POST'
+                    }).done(function(data) {
+                        if (data.error) {
+                            return false;
+                        }
+                        $("#todaystaskdiv").html(data);
+                        return false;
+                    });
+                    return false;
+                });
+            });
+        //****************************************
+        //  Get Selectd tr for sorting dispay order
+        //****************************************
+        //Global varibale for selected tr
+        var selectedtr = null;
+        $(document).on('click',
+            '#tasktable tbody tr',
+            function() {
+                selectedtr = $(this);
+                //Get tr that have class already class selectdtr
+                var alreadyselecttr = $("#tasktable tbody tr.selectedtr");
+                // check if this tr already has class selected tr
+                if ($(this).hasClass("selectedtr")) {
+                    $(this).css('background-color', 'white');
+                    $(this).removeClass("selectedtr");
+                    selectedtr = null;
+                } else {
+                    var r = $(this).data("id");
+                    $(this).css('background-color', 'whitesmoke');
+                    $(this).addClass("selectedtr");
+                    selectedtr = $(this);
+                }
+                // if already selected tr is exist then remove the class selected tr
+                if (alreadyselecttr.length != 0) {
+                    alreadyselecttr.css('background-color', 'white');
+                    alreadyselecttr.removeClass("selectedtr");
+                }
+            });
+        //*******************************************
+        //      Sorting of task for display order
+        //*******************************************
+        $(document).on('click',
+            '.swap',
+            function() {
+                $('.swap').attr("disabled", true);
+                // selected tr is null then show error
+                if (selectedtr == null) {
+                    swal("Sorry", "Please select row", "error");
+                    return false;
+                }
+                var value = $(this).val();
+                var prevtr;
+                // if vlue is up then get previous row
+                if (value == 'up') {
+                    var count = $('#tasktable tbody tr').length;
+                    if (selectedtr.attr('data-rownumber') == count) {
+                        $('.swap').attr("disabled", false);
+                        return false;
+                    }
+                    prevtr = selectedtr.prev(); // getting previous row
+                } else {
+                    if (selectedtr.attr('data-rownumber') == 1) {
+                        $('.swap').attr("disabled", false);
+                        return false;
+                    }
+                    // if vlue is down then get next row
+                    prevtr = selectedtr.next(); //getting next row incase
+                }
+                // get runorder of prevoius/next row
+                var prevorder = prevtr.attr('data-rownumber');
+                // get run order of selected row
+                //selectedtr.find("td:nth-child(2)").text(prevorder);
+                //update data attribute of selected row  with prevoius/next row run order
+                var selecttedtrdata = selectedtr.attr('data-rownumber');
+                selectedtr.attr('data-rownumber', prevorder);
+                prevtr.attr('data-rownumber', selecttedtrdata);
+                // get run order of  prevoius/next row
+                //prevtr.find("td:nth-child(2)").text(currentorder);
+                //update data attribute of prevoius/next row  with selected row run order
+                // swap the rows accroding to value up/down
+                if (value == 'up') {
+                    selectedtr.after(prevtr);
+                } else {
+                    prevtr.after(selectedtr);
+                }
+                var model = [];
+                $('#tasktable tbody tr.currentrow').each(function() {
+                    var id = $(this).attr('data-taskid');
+                    var displayorder = $(this).attr('data-rownumber');
+                    var modelitem = { 'id': id, 'displayorder': displayorder };
+                    model.push(modelitem);
+                });
+                $.ajax({
+                    url: "/usersadmin/sortingrow/",
+                    type: 'POST',
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(model),
+
+                }).done(function(data) {
+                    if (data.error) {
+                        swal("error", data.errortext, "error");
+                        return false;
+                    }
+                    $('.swap').attr("disabled", false);
+                    return false;
+                });
+            });
+        $(document).on('change',
+            '#changeuserstatus',
+            function() {
+                var dropdown = $(this);
+                var ticketid = $(this).data("ticketid");
+                var statusid = $(this).val();
+                // Send post request to server to change the status.
+                swal({
+                        title: "Are you sure, you want to changes the status of this task?",
+                        text: "By changing status this task will bre removed from this list.",
+                        type: "error",
+                        showCancelButton: true,
+                        closeOnConfirm: false,
+                        confirmButtonColor: "#2196F3",
+                        showLoaderOnConfirm: true
+                    },
+                    function(isConfirm) {
+                        if (isConfirm) {
+                            $.ajax({
+                                url: '/tickets/chnageticketstatus/',
+                                data: { id: ticketid, status: statusid, },
+                                type: 'POST',
+                            }).done(function(data) {
+                                // Verify if an error has occured, notify the user.
+                                if (data.error) {
+                                    new PNotify({ title: 'Error', text: data.error, type: 'error' });
+                                    return false;
+                                }
+                                // Display success message to user.
+                                $('.btnsearch').click();
+                                swal({ title: "Task status has been changed successfully!", confirmButtonColor: "#2196F3", type: "success" });
+                                // Remove ticket row.
+                                //var ticketrow = $("tr#" + ticketitemid);
+                                //ticketrow.animate({ backgroundColor: 'yellow' }, 1000).fadeOut(1000, function () {
+                                //    ticketrow.remove();
+                                //});
+                            });
+                        } else {
+                            dropdown.val("2");
+                        }
+                    }
+                );
+            });
+    });
+</script>

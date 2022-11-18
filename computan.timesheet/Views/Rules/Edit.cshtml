@@ -1,0 +1,144 @@
+﻿@using computan.timesheet.core
+@model computan.timesheet.Models.RuleViewModel
+@{ ViewBag.Title = "Edit"; }
+
+@section header {
+    <div style="background-color: #fff;" class="panel page-header border-top-primary">
+        <div class="page-header-content">
+            <div class="page-title">
+                <h5>
+                    <i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Timesheet</span> - Edit the assignment rule
+                    <small class="display-block">edit the rule for assigning tickets.</small>
+                </h5>
+            </div>
+            <div class="heading-elements">
+                <div class="btn-group">
+                    <a href="/rules/create" class="btn btn-primary"><i class="icon-list3 position-left"></i>Add New Rule</a>
+                </div>
+            </div>
+            <a class="heading-elements-toggle">
+                <i class="icon-menu"></i>
+            </a>
+        </div>
+        <div style="border-bottom: 0; box-shadow: none; margin-bottom: 0;" class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/home/index"><i class="icon-home2 position-left"></i>Home</a>
+                </li>
+                <li>
+                    <a href="/rules/index">Rules</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+}
+
+<h2>Edit</h2>
+<a class="btn btn-primary" href="/rules/preview/@ViewBag.currentruleid">Preview</a>
+<input type="hidden" value="@Model.Rule.id" id="ruleid"/>
+<div class="row">
+    <div class="col-lg-6">
+        <div class="panel panel-flat">
+            <div class="panel-heading">
+                <h6 class="panel-title">Rule Conditions</h6>
+                <div class="heading-elements">
+                    <ul class="icons-list">
+                        <li>
+                            <a data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                <a class="heading-elements-toggle">
+                    <i class="icon-menu"></i>
+                </a>
+            </div>
+            <div class="panel-body">
+                <div class="row rulesconditions">
+                    @Html.Partial("_RuleConditions", Model.RuleConditions)
+                </div>
+                <div class="row rulesconditionsform">
+                    @Html.Partial("_NewRuleCondition", new RuleCondition())
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="panel panel-flat">
+            <div class="panel-heading">
+                <h6 class="panel-title">Rule Actions</h6>
+                <div class="heading-elements">
+                    <ul class="icons-list">
+                        <li>
+                            <a data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                <a class="heading-elements-toggle">
+                    <i class="icon-menu"></i>
+                </a>
+            </div>
+            <div class="panel-body">
+                <div class="row ruleactionlist">
+                    @Html.Partial("_RuleActions", Model.RuleActions)
+                </div>
+                <div class="row ruleactoinform">
+                    @Html.Partial("_NewRuleAction", new RuleAction())
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-6">
+        <div class="panel panel-flat">
+            <div class="panel-heading">
+                <h6 class="panel-title">Edit Rule Name</h6>
+                <div class="heading-elements">
+                    <ul class="icons-list">
+                        <li>
+                            <a data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                <a class="heading-elements-toggle">
+                    <i class="icon-menu"></i>
+                </a>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    @Html.Partial("_EditRuleName", Model.Rule)
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="panel panel-flat">
+            <div class="panel-heading">
+                <h6 class="panel-title">Rule Exceptions</h6>
+                <div class="heading-elements">
+                    <ul class="icons-list">
+                        <li>
+                            <a data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                <a class="heading-elements-toggle">
+                    <i class="icon-menu"></i>
+                </a>
+            </div>
+            <div class="panel-body">
+                <div class="row rulexceptionlist">
+                    @Html.Partial("_RuleExceptions", Model.RuleExceptions)
+                </div>
+                <div class="row rulexceptionform">
+                    @Html.Partial("_NewRuleException", new RuleException())
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/Scripts/select2")
+    <script src="~/Scripts/custom/rules.min.js"></script>
+}

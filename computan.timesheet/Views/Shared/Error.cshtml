@@ -1,0 +1,65 @@
+﻿@model HandleErrorInfo
+@{ ViewBag.Title = "Error"; }
+
+@section header {
+    <div style="background-color: #fff;" class="panel page-header border-top-primary">
+        <div class="page-header-content">
+            <div class="page-title">
+                <h5>
+                    <i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Timesheet</span> - Error
+                    <small class="display-block">Error page</small>
+                </h5>
+            </div>
+            <a class="heading-elements-toggle">
+                <i class="icon-menu"></i>
+            </a>
+        </div>
+        <div style="border-bottom: 0; box-shadow: none; margin-bottom: 0;" class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/"><i class="icon-home2 position-left"></i>Dashboard</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+}
+
+<div class="panel panel-flat">
+    <div class="panel-heading">
+        <h5 class="panel-title">Error</h5>
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li>
+                    <a data-action="collapse"></a>
+                </li>
+                <li>
+                    <a data-action="reload"></a>
+                </li>
+            </ul>
+        </div>
+        <a class="heading-elements-toggle">
+            <i class="icon-menu"></i>
+        </a>
+    </div>
+    <div class="panel-body">
+        <section id="cart-view">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="aa-thankyou">
+                            <h2>Oops! An Error Occurred!</h2>
+                            <p>@ViewBag.exerror.Exception.Message</p>
+                            <i aria-hidden="false" class="fa fa-exclamation-circle fa-4x"></i>
+                            <p>Something is broken. Please let us know what you were doing when this error occurred. We will fix it as soon possible. Sorry for any inconvenience caused. </p>
+                            <b>
+                                <a href="/"> Go to Homepage</a>
+                            </b>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+<!-- / Cart view section -->
+<div style="clear: both; height: 20px;"></div>

@@ -1,0 +1,29 @@
+﻿@model computan.timesheet.Models.TaskSearchFilterViewModel
+@using (Html.BeginForm("gettask", "usersadmin", FormMethod.Post, new {@class = "form-inline", id = "Searchtaskform"}))
+{
+    <div class="row">
+        <div class="col-md-2">
+            <label class="control-label" for="FirstName">Select Status</label>
+        </div>
+        <div class="col-md-2">
+            <label class="control-label" for="FirstName">Select User</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2"> @Html.DropDownList("ticketstatus", new SelectList(ViewBag.ticketstatuslist, "id", "name"), new {@class = "form-control"}) </div>
+        <div class="col-md-2">
+            @Html.DropDownListFor(model => model.teamuserid, Model.UsersCollection.OrderBy(x => x.Text), "Select User", new {@class = "form-control"})
+            @Html.ValidationMessageFor(model => model.teamuserid)
+        </div>
+        <div class="col-md-2">
+            <input type="submit" value="Search" class="btn btn-sm btn-primary btnsearch">
+        </div>
+    </div>
+}
+<script type="text/javascript">
+    $(function() {
+        $(".picker").datepicker({ dateFormat: 'mm/dd/yy' });
+        $("#teamuserid").select2({ width: '200px' });
+        $("#ticketstatus").select2({ width: '200px' });
+    });
+</script>

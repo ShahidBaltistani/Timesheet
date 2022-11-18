@@ -1,0 +1,35 @@
+﻿
+@{
+    ViewBag.Title = "Security";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Security</h2>
+@if (ViewBag.IsEnabled == false)
+{
+<div class=" col-md-4 col-md-offset-4">
+    <a href="/account/EnableAppAuthenticator" class="btn-primary btn-block">Enable Two-factor authentication via TOTP </a>
+</div>
+
+}
+else
+{
+
+<div class=" col-md-4 col-md-offset-4">
+    <a href="/account/DisableAppAuthenticator" class="btn-danger btn-block">Disable Two-factor authentication via TOTP </a>
+</div>
+}
+<style>
+    .btn-block {
+        padding: 15px 10px;
+        text-align: center;
+        border-radius: 10px;
+        font-size: 18px;
+        line-height: 21px;
+    }
+
+    .btn-block {
+        display: block;
+        width: 100%;
+    }
+</style>

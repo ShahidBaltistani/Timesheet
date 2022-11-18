@@ -1,0 +1,175 @@
+﻿@model IEnumerable<computan.timesheet.Models.AllTaskViewModel>
+@{ ViewBag.Title = "Assigned Tasks"; }
+
+@section header {
+    <div style="background-color: #fff;" class="panel page-header border-top-primary">
+        <div class="page-header-content">
+            <div class="page-title">
+                <h5>
+                    <i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">TimeSheet</span> - Manage Assigned Tasks
+                    <small class="display-block">Manage Assigned Task</small>
+                </h5>
+            </div>
+            <div class="heading-elements">
+                <div class="btn-group"> </div>
+            </div>
+            <a class="heading-elements-toggle">
+                <i class="icon-menu"></i>
+            </a>
+        </div>
+        <div style="border-bottom: 0; box-shadow: none; margin-bottom: 0;" class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/"><i class="icon-home2 position-left"></i>TimeSheet</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+}
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h5 class="panel-title">Search Tasks</h5>
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li>
+                    <a data-action="collapse"></a>
+                </li>
+                <li>
+                    <a data-action="reload"></a>
+                </li>
+            </ul>
+        </div>
+        <a class="heading-elements-toggle">
+            <i class="icon-menu"></i>
+        </a>
+    </div>
+    <div class="panel-body"> @Html.Partial("_SearchAllTasks") </div>
+</div>
+<div class="panel panel-primary alltasklist"> @Html.Partial("_AllTasks", Model) </div>
+<div class="modal fade" id="uniquebodymodel" role="dialog">
+    <div class="modal-dialog" style="margin-bottom: 50px; margin-top: 100px; max-height: 85%; overflow-y: scroll; width: 75% !important">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body" id="modelbodydiv">
+                <div class="panel panel-flat">
+                    <div class="panel-heading mt-5">
+                        <h5 class="panel-title">
+                            <small class="display-block" id="modellastmodifiedtime"><b>Date: </b>0</small>
+                            <small class="display-block" id="modelfrom"><b>From: </b>0</small>
+                            <small class="display-block" id="modeldisplayto"><b>To: </b>0</small>
+                            <small class="display-block" id="modeldisplaycc"><b>Cc: </b>0</small>
+                        </h5>
+                        <a class="heading-elements-toggle">
+                            <i class="icon-menu"></i>
+                        </a>
+                    </div>
+                    <div class="panel-body" id="modelemailbody"> </div>
+                    <div class="panel-footer"> </div>
+                </div>
+            </div>
+            <div class="modal-footer"> </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/Scripts/select2")
+}
+
+<link rel="stylesheet" type="text/css" href="~/scripts/default/datepicker/css/jquery.datepick.min.css"/>
+<script type="text/javascript">
+    $(function() {
+        $("#projectid").select2();
+        $("#clientid").select2();
+        $(document).on('click',
+            '.searchtasks',
+            function() {
+                var fromdate = $('#fromdate').val();
+                var todate = $('#todate').val();
+                var clientid = $('#clientid').val();
+                if (clientid == '') {
+                    clientid = 0;
+                }
+                var projectid = $('#projectid').val();
+                if (projectid == '') {
+                    projectid = 0;
+                }
+                $.ajax({
+                    url: '/ticketitems/AllTasksListAjax/' + fromdate + '/' + todate + '/' + clientid + '/' + projectid,
+                    data: '',
+                    type: 'GET'
+                }).done(function(data) {
+                    if (data.error) {
+                        return false;
+                    }
+                    $(".alltasklist").html(data);
+                    return false;
+                });
+                return false;
+            });
+        $(document).on("click",
+            ".modellink",
+            function() {
+                var itemid = $(this).data("id");
+                $.ajax({
+                    url: '/TicketItems/Details/' + itemid,
+                    data: "",
+                    type: 'GET'
+                }).done(function(data) {
+                    if (data.error) {
+                        return false;
+                    }
+                    var date = ToJavaScriptDate(data.lastmodifiedtime);
+                    $("#modellastmodifiedtime").html("<b>Date:</b>" + date);
+                    $("#modelfrom").html("<b>From: </b>" + data.from);
+                    $("#modeldisplayto").html("<b>To: </b>" + data.displayto);
+                    $("#modeldisplaycc").html("<b>Cc: </b>" + data.displaycc);
+                    $("#modelemailbody").html(data.uniquebody);
+                    $('#uniquebodymodel').modal('show');
+                    return false;
+                });
+            });
+        $("#clientid").change(function() {
+            $("#projectid").val('').trigger('change');
+            var clientid = $(this).val();
+            if (clientid == '') {
+                $.getJSON("/tickettimeLogs/loadallprojects",
+                    function(data) {
+                        var select = $("#projectid");
+                        select.empty();
+                        select.append($('<option />', { value: '', text: "Select a project" }));
+                        $.each(data,
+                            function(index, itemData) {
+                                select.append($('<option />', { value: itemData.Value, text: itemData.Text }));
+                            });
+                    });
+            } else {
+                $.getJSON("/tickettimeLogs/loadprojectsbyclient",
+                    { id: clientid },
+                    function(data) {
+                        var select = $("#projectid");
+                        select.empty();
+                        select.append($('<option />', { value: '', text: "Select a project" }));
+                        $.each(data,
+                            function(index, itemData) {
+                                select.append($('<option />', { value: itemData.Value, text: itemData.Text }));
+                            });
+                    });
+            }
+        });
+
+    });
+
+    function ToJavaScriptDate(value) {
+        var pattern = /Date\(([^)]+)\)/;
+        var results = pattern.exec(value);
+        var dt = new Date(parseFloat(results[1]));
+        return (dt.getMonth() + 1) + "/" + dt.getDate() + "/" + dt.getFullYear();
+    }
+</script>
+<!--Templates-->

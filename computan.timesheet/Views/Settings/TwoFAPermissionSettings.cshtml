@@ -1,0 +1,125 @@
+﻿@model List<computan.timesheet.core.ApplicationUser>
+@{
+    ViewBag.Title = "TwoFAPermissionSettings";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="sidebar-detached">
+    <div class="sidebar sidebar-default">
+        <div class="sidebar-category">
+            <div class="category-title">
+                <span>Navigation</span>
+            </div>
+            @Html.Partial("_SettingMenu", "twoFA")
+        </div>
+    </div>
+</div>
+
+
+
+<div class="container-detached">
+    <div class="content-detached">
+        <div class="panel">
+            <div class="panel-heading bg-teal-700">
+                <div class="row">
+                    <h4 class="panel-title">
+                        <span>Permission Settings</span>
+                    </h4>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="datatable-scroll">
+                        <table class="table datatable-button-html5-basic" id="DataTables_Table_0" role="grid" aria-describedby="DataTables_Table_0_info">
+                            <thead>
+                                <tr role="row">
+                                    <th>Name</th>
+                                    @*<th>TOTP</th>*@
+                                    <th>Email</th>
+                                    <th>Rocket</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.FirstName  @item.LastName</td>
+                                       @* <td><input type="checkbox" value="@item.IsAppAuthenticatorEnabled" id="twoFACheckBox" data-id="@item.Id,@item.IsAppAuthenticatorEnabled ,1" @(item.IsAppAuthenticatorEnabled ? "checked" : "")></td>*@
+                                        <td><input type="checkbox" value="@item.EmailConfirmed" id="twoFACheckBox" data-id="@item.Id,@item.EmailConfirmed,2" @(item.EmailConfirmed ? "checked" : "")></td>
+                                        <td><input type="checkbox" value="@item.IsRocketAuthenticatorEnabled" id="twoFACheckBox" data-id="@item.Id,@item.IsRocketAuthenticatorEnabled,3" @(item.IsRocketAuthenticatorEnabled ? "checked" : "")></td>
+                                    </tr>
+
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+@*<div class="container-detached">
+    <div class="content-detached">
+        <div class="panel">
+            <div class="panel-heading bg-teal-700">
+                <div class="row">
+                    <h4 class="panel-title">
+                        <span>Orphaned Tickets Setting</span>
+                    </h4>
+                </div>
+            </div>
+            <div class="panel-body">
+
+
+                <style>
+                    table {
+                        font-family: arial, sans-serif;
+                        border-collapse: collapse;
+                        width: 100%;
+                    }
+
+                    td, th {
+                        border: 1px solid #dddddd;
+                        text-align: left;
+                        padding: 8px;
+                    }
+
+                    tr:nth-child(even) {
+                        background-color: #dddddd;
+                    }
+                </style>
+
+                    <table>
+                        <tr>
+                            <th>Name</th>
+                            <th>TOTP</th>
+                            <th>Email</th>
+                            <th>Rocket</th>
+                        </tr>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.FirstName</td>
+                                <td><input type="checkbox" value="@item.IsAppAuthenticatorEnabled" id="twoFACheckBox" data-id="@item.Id,@item.IsAppAuthenticatorEnabled ,1"  @(item.IsAppAuthenticatorEnabled ? "checked" : "")></td>
+                                <td><input type="checkbox" value="@item.EmailConfirmed" id="twoFACheckBox" data-id="@item.Id,@item.EmailConfirmed,2"  @(item.EmailConfirmed ? "checked" : "")></td>
+                                <td><input type="checkbox" value="@item.IsRocketAuthenticatorEnabled" id="twoFACheckBox" data-id="@item.Id,@item.IsRocketAuthenticatorEnabled,3"  @(item.IsRocketAuthenticatorEnabled ? "checked" : "")></td>
+                            </tr>
+
+                        }
+                      
+                    </table>
+            </div>
+        </div>
+    </div>
+</div>*@
+
+<link href="~/Content/Settings/OrphanTicketSubscribe.css" rel="stylesheet" />
+<script src="~/Scripts/custom/Settings/Settings.js"></script>
+

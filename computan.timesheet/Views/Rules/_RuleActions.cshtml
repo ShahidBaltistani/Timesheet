@@ -1,0 +1,23 @@
+﻿@model List<computan.timesheet.core.RuleAction>
+<table class="table ruleaction">
+    <thead>
+    <tr>
+        <th> @Html.DisplayNameFor(model => model.FirstOrDefault().RuleActionType.name) </th>
+        <th> @Html.DisplayNameFor(model => model.FirstOrDefault().ruleactionvalue) </th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td> @Html.DisplayFor(modelItem => item.RuleActionType.name) </td>
+            <td> @Html.DisplayFor(modelItem => item.fullname) </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new {item.id}, new {@class = "eidtrulesactions", data_id = item.id}) |
+                @Html.ActionLink("Delete", "Delete", new {item.id}, new {@class = "deletetruleaction", data_id = item.id})
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

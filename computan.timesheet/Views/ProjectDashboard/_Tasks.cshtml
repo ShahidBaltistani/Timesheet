@@ -1,0 +1,52 @@
+﻿@model IEnumerable<computan.timesheet.Models.AllTaskViewModel>
+@if (Model != null && Model.Count() > 0)
+{
+    foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                <input type="checkbox" class="selecttask" value="@item.id"/>
+            </td>
+            <td>
+                <div class="ticket-container" style="margin-left: -10px;">
+                    <div class="ticket-toolbar wrapticket">
+                        <div class="btn-group btn-group-xs ticketstatusaction">
+                            <span>
+                                <b>@string.Format("{0}/{1} {2}:{3}", item.assignedon.Month, item.assignedon.Day, item.assignedon.Hour.ToString().PadLeft(2, '0'), item.assignedon.Minute.ToString().PadLeft(2, '0'))</b>
+                            </span>
+                            @if (item.FirstName != null && item.FullName.Length > 31)
+                            {
+                                <span>@item.FullName.Substring(0, 30) ...</span>
+                            }
+                            else
+                            {
+                                @Html.DisplayFor(modelItem => item.FullName)
+                            }
+                            @if (item.subject.Length > 80)
+                            {
+                                <a href="/tickets/ticketitem/@item.id" target="_blank">@item.subject.Substring(0, 80) ... </a>
+                            }
+                            else
+                            {
+                                <a href="/tickets/ticketitem/@item.id" target="_blank">@Html.DisplayFor(modelItem => item.subject)</a>
+                            }
+                        </div>
+                    </div>
+                    <div class="ticket-toolbar btn-group btn-group-xs ticketstatusaction pull-right">
+                        <span class="btn bg-success-700">@item.team</span>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    }
+}
+else
+{
+    <tr>
+        <td colspan="4" class="text-center">
+            <h6 class="no-margin-top">
+                <a href="#"><i class="icon-task"></i>&nbsp;&nbsp;Sorry, No task found.</a>
+            </h6>
+        </td>
+    </tr>
+}

@@ -1,0 +1,30 @@
+﻿@using (Html.BeginForm("", "", FormMethod.Get, new {id = "searchTicketsForm", name = "searchTicketsForm"}))
+{
+    <div class="form-inline">
+        <div class="form-group">
+            <h5 class="panel-title">Search Tickets</h5>
+        </div>
+        <div class="form-group">
+            <input type="text" data-clientid="@ViewBag.clientid" id="idsearchtext-@ViewBag.clientid" name="searchtext-@ViewBag.clientid" class="form-control clssearchtext" placeholder="Search by subject or sender name" style="width: 400px;"/>
+            <input id="btnsearch-@ViewBag.clientid" data-clientid="@ViewBag.clientid" type="submit" value="Search" class="btn btn-default clsbtnsearch" disabled="disabled"/>
+            <button data-clientid="@ViewBag.clientid" id="idclearsearch-@ViewBag.clientid" class="btn btn-default clearsearch">Clear Search</button>
+        </div>
+        <div class="form-group">
+            <button type="button" class="btn btn-success btn-float btn-rounded multiassign">
+                <i class="icon-task"></i>
+            </button>
+        </div>
+        <div class="form-group">
+            <button type="button" title="Change Multiple Task Status" class="btn btn-success btn-float btn-rounded closeemultitask">
+                <i class="icon-check"></i>
+            </button>
+        </div>
+    </div>
+}
+<br/>
+<input type="hidden" value="@ViewBag.statusid" name="currentpagestatus" id="currentpagestatus"/>
+<div class="row">
+    <div class="col-md-12" style="margin-left: 25px;">
+        <h4 id="idpresearchstring-@ViewBag.clientid" class="presearchstring hidden">Search results for <span class="searchstring" id="idsearchstring-@ViewBag.clientid"></span></h4>
+    </div>
+</div>

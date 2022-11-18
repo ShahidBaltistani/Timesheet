@@ -1,0 +1,44 @@
+﻿@model computan.timesheet.Models.TicketViewModel
+@if (Model.tickets != null && Model.tickets.Count() > 0)
+{
+    foreach (var item in Model.tickets)
+    {
+        <tr id="@item.id">
+            <td>
+                <input type="checkbox" name="selectformerge" value="@item.id"/>
+            </td>
+            <td>
+                <span>
+                    <b>@string.Format("{0}/{1} {2}:{3}", item.lastmodifiedtime.Month, item.lastmodifiedtime.Day, item.lastmodifiedtime.Hour.ToString().PadLeft(2, '0'), item.lastmodifiedtime.Minute.ToString().PadLeft(2, '0'))</b>
+                </span>
+                <span>@string.Format("({0})", item.messagecount)</span>
+            </td>
+            <td>
+                @if (item.uniquesenders != null && item.uniquesenders.Length > 31)
+                {
+                    <span>@item.uniquesenders.Substring(0, 30) ...</span>
+                }
+                else
+                {
+                    @Html.DisplayFor(modelItem => item.uniquesenders)
+                }
+            </td>
+            <td>
+                @if (item.topic.Length > 101)
+                {
+                    <span>@item.topic.Substring(0, 100) ... </span>
+                }
+                else
+                {
+                    <span>@Html.DisplayFor(modelItem => item.topic)</span>
+                }
+            </td>
+        </tr>
+    }
+}
+else
+{
+    <tr>
+        <td colspan="2" class="text-center">Sorry, No ticket found.</td>
+    </tr>
+}

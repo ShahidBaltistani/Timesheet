@@ -1,0 +1,352 @@
+﻿@model computan.timesheet.Models.TicketViewModel
+@{ ViewBag.Title = "Send Email"; }
+<script src="~/Scripts/plugins/AjaxProgress/jq-ajax-progress.min.js"></script>
+<style>
+    .noSpaceLeft {
+        margin-left: 0px;
+        margin-right: 0px;
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+
+    .btn-bs-file { position: relative; }
+
+    .btn-bs-file input[type="file"] {
+        cursor: inherit;
+        filter: alpha(opacity=0);
+        height: 0;
+        opacity: 0;
+        outline: none;
+        position: absolute;
+        top: -9999999;
+        width: 0;
+    }
+</style>
+
+@section secondarysidebar {
+    <!-- Secondary sidebar -->
+    <div class="sidebar sidebar-secondary sidebar-default">
+        <div class="sidebar-content">
+            <!-- Action buttons -->
+            <div class="sidebar-category">
+                <div class="category-title">
+                    <span>Action buttons</span>
+                    <ul class="icons-list">
+                        <li>
+                            <a href="#" data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="category-content">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <a href="/manualticket/create" class="btn bg-teal-400 btn-block btn-float btn-float-lg" type="button">
+                                <i class="icon-googleplus5"></i> <span>Add Ticket</span>
+                            </a>
+                            <a href="/email/send" class="btn bg-teal-400 btn-block btn-float btn-float-lg" type="button">
+                                <i class="icon-googleplus5"></i> <span>New Email</span>
+                            </a>
+                        </div>
+                        <div class="col-xs-6">
+                            <a class="btn bg-blue btn-block btn-float btn-float-lg AssignUserSignature">
+                                <i class=" icon-pencil7"></i> <span>Signature</span>
+                            </a>
+                            @if (Request.IsAuthenticated && User.IsInRole("Admin"))
+                            {
+                                <a href="/clientmanager" target="_blank" class="btn bg-warning-400 btn-block btn-float btn-float-lg" type="button">
+                                    <i class="icon-people"></i> <span>Client</span>
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /action buttons -->
+            <!-- Tasks navigation -->
+            <div class="sidebar-category cts-sidebar">
+                <div class="category-title">
+                    <span>Tasks by Status</span>
+                    <ul class="icons-list">
+                        <li>
+                            <a href="#" data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="category-content no-padding">
+                    <ul class="navigation navigation-alt navigation-accordion filterbystatus">
+                        @foreach (var items in ViewBag.conversationstatus)
+                        {
+                            if (items != null)
+                            {
+                                bool isactive = ViewBag.currentsubtab == items.name;
+                                <li class='@(isactive ? "active" : "") statusli' id="@items.id">
+                                    <a href="#" data-id="@items.id" class="mytaskstatuslink" id="@items.id">
+                                        <span class="@(isactive ? "badge badge-success" : "badge badge-default") position-left conversationstatus" data-id="@items.id" id="@items.id">@items.ticketcount</span>@items.name
+                                    </a>
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /secondary sidebar -->
+}
+
+<div class="panel panel-default" id="maincontent">
+    @Html.Partial("_TicketNavTab", "inbox")
+    <div class="panel-heading">
+        <div class="sendemailcontainer container-fluid" id="replayPanel">
+            <label type="button" class="btn btn-info btn-float btn-sm btn-bs-file" style="padding: 10px;">
+                <i class="glyphicon glyphicon-paperclip"></i>
+                <input type="file" multiple id="attachNewFiles" name="attachNewFiles"/>
+            </label>
+            <div class="pull-right">
+                <button type="button" class="btn btn-default cancelemail">Cancel</button>
+                <button id="btnSendEmail" type="button" class="btn btn-success btnSendEmail">Send Email</button>
+            </div>
+            <div class="row">
+                <div class="progress-bar progress-bar-striped active fileuploadprogress hide" role="progressbar" aria-valuenow="5" aria-valuemin="0" aria-valuemax="100" style="width: 5%"> 5% </div>
+                <hr style="margin-bottom: 2px; margin-top: 0px;">
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="col-xs-12 inputMargin noSpaceLeft">
+                        <div class="col-xs-1">
+                            <label>To</label>
+                        </div>
+                        <div class="col-xs-11 noSpaceLeft">
+                            <div class="col-xs-12 noSpaceLeft">
+                                <div class="col-xs-11 noSpaceLeft">
+                                    <input type="hidden" id="emailType" name="emailType" value=""/>
+                                    <input type="hidden" id="HdEmailSendTo" name="HdEmailSendTo" value="@Model.SentItemLog.To"/>
+                                    <input id="EmailSendTo" name="EmailSendTo" type="text" class="form-control" value=""/>
+                                </div>
+                                <div class="col-xs-1 showCC">
+                                    <a class="pull-right" href="#">CC</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 inputMargin CC noSpaceLeft">
+                        <div class="col-xs-1">
+                            <label>CC</label>
+                        </div>
+                        <div class="col-xs-11 noSpaceLeft">
+                            <div class="col-xs-12 noSpaceLeft">
+                                <div class="col-xs-11 noSpaceLeft">
+                                    <input type="hidden" id="HdEmailSendCC" name="HdEmailSendCC" value="@Model.SentItemLog.Cc"/>
+                                    <input id="EmailSendCC" name="EmailSendCC" type="text" class="form-control" value=""/>
+                                </div>
+                                <div class="col-xs-1 showBCC">
+                                    <a class="pull-right" href="#">BCC</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 inputMargin BCC noSpaceLeft">
+                        <div class="col-xs-1">
+                            <label>BCC</label>
+                        </div>
+                        <div class="col-xs-11 noSpaceLeft">
+                            <input type="hidden" id="HdEmailSendBCC" name="HdEmailSendBCC" value="@Model.SentItemLog.Bcc"/>
+                            <input id="EmailSendBCC" name="EmailSendBCC" type="text" class="form-control" value=""/>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 inputMargin noSpaceLeft">
+                        <div class="col-xs-1">
+                            <label>Subject</label>
+                        </div>
+                        <div class="col-xs-11 noSpaceLeft">
+                            <input type="hidden" id="HdEmailSendSubject" name="HdEmailSendSubject" value="@Model.SentItemLog.subject"/>
+                            <input id="EmailSendSubject" name="EmailSendSubject" type="text" class="form-control" value=""/>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 inputMargin noSpaceLeft">
+                        <hr style="margin: 10px 0px;"/>
+                        <div class="send-attachments" style="display: none;">
+                            <hr style="margin: 10px 0px;"/>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 inputMargin noSpaceLeft">
+                        <div style="display: none;">
+                            @*Attachment old code not needed*@
+                            <div class="col-xs-1 noSpaceLeft">
+                                <label class="btn-bs-file btn btn-lg btn-default" title="Attach Files">
+                                    <span class="glyphicon glyphicon-paperclip"></span>
+                                    <input multiple type="file" id="UploadAttachment" name="UploadAttachment"/>
+                                </label>
+                            </div>
+                            <div class="col-xs-11 noSpaceLeft">
+                                <div class="col-md-12 noSpaceLeft" id="UploadAttachmentprogress">
+                                    @*run time it will add some controles*@
+                                </div>
+                            </div>
+                        </div>
+                        <span style="display: none;" class="emailbodyComplete">@Model.SentItemLog.body</span>
+                        <textarea name="Emailbody" id="Emailbody" rows="25"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@*Model For User Signature*@
+<div class="modal fade" id="AssignUserSignatureModal" role="dialog">
+    <div class="modal-dialog" style="width: 900px !important;">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="panel panel-primary" style="margin-bottom: 0px;">
+                <div class="panel-heading">
+                    <h4 class="panel-title">User Signature</h4>
+                    <div class="heading-elements">
+                        <button type="button" class="close" data-dismiss="modal" style="font-size: 30pt; font-weight: bolder" ;>&times;</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <div class="col-md-10" style="width: 100%">
+                                @Html.TextArea("emailreplysignature", "", new {@class = "form-control", width = "100%"})
+                                @Html.ValidationMessageFor(model => model, "", new {@class = "text-danger"})
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-offset-2 col-md-10" style="display: block; margin: auto; width: 100%;">
+                                <input type="button" value="Save" class="btn btn-default saveusersignature" style="display: block; font-size: x-large; height: 50px; margin: auto; width: 120px;"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div>
+    <input type="hidden" id="SentItemID" name="SentItemID" value="@Model.SentItemLog.id"/>
+    <input type="hidden" id="UserEmailSignature" value="@ViewBag.EmailSignature"/>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/Scripts/select2")
+    @Scripts.Render("~/Scripts/custom/tagsinput")
+    @Scripts.Render("~/Scripts/plugins/livefilter")
+    @Scripts.Render("~/Scripts/ckeditor4")
+    <script src="~/Scripts/default/plugins/jquery.alphanum.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/custom/sendemail.min.js"></script>
+    <script src="~/Scripts/plugins/sweetalert2@11.min.js"></script>
+}
+
+<script>
+    var editor = CKEDITOR.replace('Emailbody',
+        {
+            height: '500px',
+            removePlugins: 'easyimage, cloudservices',
+            extraPlugins: 'forms,base64image'
+        });
+    CKEDITOR.replace('emailreplysignature',
+        {
+            height: '300px',
+            removePlugins: 'easyimage, cloudservices',
+            extraPlugins: 'forms,base64image'
+        });
+    $('.AssignUserSignature').click(function() {
+        $.ajax({
+            url: '/ManualTicket/FetchingReplaySignature',
+            type: 'POST',
+        }).done(function(data) {
+            if (data.error == 1) {
+                CKEDITOR.instances.emailreplysignature.setData(data.contexttext);
+                jQuery('#AssignUserSignatureModal').modal('toggle');
+            } else {
+                new PNotify({
+                    title: 'warning',
+                    text: data.contexttext,
+                    type: 'warning',
+                    hide: true
+                });
+            }
+        });
+    });
+    jQuery('.saveusersignature').one('click',
+        function() {
+            var emailsignature = CKEDITOR.instances.emailreplysignature.getData();
+            $.ajax({
+                url: '/ManualTicket/EmailReplaySignature',
+                data: { emailsignature: emailsignature },
+                type: 'POST',
+            }).done(function(data) {
+                if (data.error == 1) {
+                    new PNotify({
+                        title: 'Success',
+                        text: data.contexttext,
+                        type: 'success',
+                        hide: true
+                    });
+                    jQuery('#AssignUserSignatureModal').modal('toggle');
+                    window.setTimeout(function() { location.reload() }, 1000);
+                } else {
+                    new PNotify({
+                        title: 'warning',
+                        text: data.contexttext,
+                        type: 'warning',
+                        hide: true
+                    });
+                }
+                return false;
+            });
+        });
+    // Full featured editor
+    var isCC = false;
+    var isBCC = false;
+    jQuery(document).on('click',
+        '.showCC',
+        function() {
+            $(".CC").show();
+            isCC = true;
+        });
+    jQuery(document).on('click',
+        '.showBCC',
+        function() {
+            $(".BCC").show();
+            isBCC = true;
+        });
+    jQuery(function() {
+        var HdTOemailvalue = $('#HdEmailSendTo').val();
+        if (HdTOemailvalue != '') {
+            var emailToArray = HdTOemailvalue.split(',');
+            $.each(emailToArray,
+                function(index) {
+                    jQuery('#EmailSendTo').tagsinput('add', { value: emailToArray[index], text: emailToArray[index] });
+                });
+        }
+        var HdEmailSendCC = $('#HdEmailSendCC').val();
+        if (HdEmailSendCC != '') {
+            var emailCcArray = HdEmailSendCC.split(',');
+            $.each(emailCcArray,
+                function(index) {
+                    jQuery('#EmailSendCC').tagsinput('add', { value: emailCcArray[index], text: emailCcArray[index] });
+                });
+        }
+        var HdEmailSendBCC = $('#HdEmailSendBCC').val();
+        if (HdEmailSendBCC != '') {
+            var emailBccArray = HdEmailSendBCC.split(',');
+            $.each(emailBccArray,
+                function(index) {
+                    jQuery('#EmailSendBCC').tagsinput('add', { value: emailBccArray[index], text: emailBccArray[index] });
+                });
+        }
+        var HdEmailSendSubject = $('#HdEmailSendSubject').val();
+        if (HdEmailSendSubject != '') {
+            jQuery('#EmailSendSubject').val(HdEmailSendSubject);
+        }
+        var HdEmailbody = $('.emailbodyComplete').html();
+        if (HdEmailbody != '') {
+            CKEDITOR.instances["Emailbody"].setData(HTMLDecode(HdEmailbody));
+        }
+
+        function HTMLDecode(s) { return jQuery('<div></div>').html(s).text(); }
+    });
+</script>

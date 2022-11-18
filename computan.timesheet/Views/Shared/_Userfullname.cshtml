@@ -1,0 +1,103 @@
+﻿@model computan.timesheet.Models.UserFullName
+<style>
+    hr {
+        margin-bottom: 10px;
+        margin-top: 10px;
+    }
+
+    .list-row {
+        margin-bottom: -15px;
+        margin-top: 5px;
+    }
+
+    .ul {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+</style>
+<ul class="nav navbar-nav navbar-right headmotification">
+    <li class="dropdown dropdown-notification headnotification">
+        <a href="#" class="dropdown-toggle update-list" data-popup="tooltip" title="Notifications" data-toggle="dropdown">
+            <i class="fa fa-bell-o" style="font-size: 1.5em !important;"></i>
+            <span class="visible-xs-inline-block position-right">Messages</span>
+            <span class="badge bg-warning-400 notification-count"></span>
+        </a>
+        <div class="dropdown-menu dropdown-content width-500">
+            <div class="dropdown-content-heading" style="padding: 20px 20px 0px 20px;">
+                Notifications <a id="hreadall" class="pull-right" href="#">Mark all as read</a>
+            </div>
+            <ul class="media-list dropdown-content-body ul header-notification"></ul>
+            <div class="dropdown-content-footer">
+                <a href="/notification/index" data-popup="tooltip" title="All Notification">
+                    <i class="icon-menu display-block"></i>
+                </a>
+            </div>
+        </div>
+    </li>
+    <li class="dropdown dropdown-user">
+        <a class="dropdown-toggle" data-toggle="dropdown">
+            @if (Model.image != null && File.Exists(Server.MapPath("/images/UserProfileImage/" + Model.image)))
+            {
+                <img src="@Html.Raw("/images/UserProfileImage/" + Model.image)" class="img-circle-default" alt="">
+            }
+            else
+            {
+                <img src="~/Content/images/placeholder.jpg" class="img-circle-default" alt="">
+            }
+            <span>@Model.fullname</span> <i class="caret"></i>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-right">
+            <li>
+                <a href="/home/myprofile"><i class="icon-user-plus"></i> My profile</a>
+            </li>
+            <li class="divider"></li>
+            <li>
+                <a href="/account/changepassword"><i class="icon-lock5"></i>Change Password</a>
+            </li>
+            <li class="divider"></li>
+            @if (Request.IsAuthenticated && User.IsInRole("Admin"))
+            {
+                <li>
+                    <a href="/integrations/index"><i class="icon-earth"></i>Integrations</a>
+                </li>
+                <li class="divider"></li>
+            }
+            <li>
+                <a href="/account/Security"><i class="icon-key"></i> Security</a>
+            </li> 
+            <li>
+                <a href="javascript:document.getElementById('logoutForm').submit()"><i class="icon-switch2"></i> Logout</a>
+            </li>
+        </ul>
+    </li>
+</ul>
+<input type="hidden" class="ajaxnotcall" value="1"/>
+<script>
+    $('[data-popup=tooltip]').tooltip();
+    var model = $(".header-notification");
+    var header = $('.notification-count');
+    jQuery(document).ready(function() {
+        $.ajax({
+            url: "/Notification/NotificationCount/",
+            type: "Get",
+            success: function(data) { header.html(data); }
+        });
+    });
+    window.setInterval(function() {
+            $.ajax({
+                url: "/Notification/NotificationCount/",
+                type: "Get",
+                success: function(data) { header.html(data); }
+            });
+        },
+        1800000);
+    jQuery(document).on('click',
+        '.update-list',
+        function() {
+            $.ajax({
+                url: "/Notification/HeaderNotification/",
+                type: "Get",
+                success: function(data) { model.empty().append(data); }
+            });
+        });
+</script>

@@ -1,0 +1,33 @@
+﻿<div class="sidebar-category cts-sidebar">
+    <div class="category-title">
+        <span>Tickets by status</span>
+        <ul class="icons-list">
+            <li>
+                <a href="#" data-action="collapse"></a>
+            </li>
+        </ul>
+    </div>
+    <div class="category-content no-padding">
+        <ul class="navigation navigation-alt navigation-accordion filterbystatus">
+            @foreach (var items in ViewBag.conversationstatus)
+            {
+                if (items != null)
+                {
+                    bool isactive = ViewBag.currentsubtab == items.name;
+                    <li class='@(isactive ? "active" : "") statusli' id="@items.id">
+                        <a href="/tickets/index/@items.id" data-id="@items.id" class="ticketsearch" id="@items.id">
+                            <span class="@(isactive ? "badge badge-success" : "badge badge-default") position-left conversationstatus" data-id="@items.id" id="@items.id">@items.ticketcount</span>@items.name
+                        </a>
+                    </li>
+                }
+            }
+            @{ bool isactive1 = ViewBag.currentsubtab == "Archived"; }
+            <li class='@(isactive1 ? "active" : "") statusli' id="9">
+                <a href="#" class="ArchivedTicketslink" data-id="9" id="9">
+                    @*Temporary assign 9 to Arcihved to avoid creating new action in controller*@
+                    <span class="badge badge-default position-left conversationstatus" data-id="9" id="9">@ViewBag.IsArchieved</span>Archived
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>

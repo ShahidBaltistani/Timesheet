@@ -1,0 +1,154 @@
+﻿@{
+    ViewBag.Title = "TimeEntry";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="sidebar-detached">
+    <div class="sidebar sidebar-default">
+        <div class="sidebar-category">
+            <div class="category-title"><span>Navigation</span></div>
+            @Html.Partial("_SettingMenu", "timeEntry")
+        </div>
+    </div>
+</div>
+<div class="container-detached">
+    <div class="content-detached">
+        <div class="panel">
+            <div class="panel-heading bg-teal-700">
+                <div class="row">
+                    <div class="col-xs-10">
+                        <h4 class="panel-title"><span>Manage User Time Restriction</span></h4>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="datatable-scroll">
+                        <table class="table datatable-button-html5-basic" id="DataTables_Table_0" role="grid" aria-describedby="DataTables_Table_0_info">
+                            <thead>
+                            <tr role="row">
+                                <th> @Html.DisplayName("User Name") </th>
+                                <th> @Html.DisplayName("Email") </th>
+                                <th> @Html.DisplayName("Allow Time Entry") </th>
+                                <th> </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var item in ViewBag.userlist)
+                            {
+                                <tr data-id="@item.Id">
+                                    <td> @item.FullName </td>
+                                    <td> @item.Email </td>
+                                    <td> <input class="time-entry-btn" type="checkbox" name="timeentry" data-toggle="toggle" data-size="normal" data-onstyle="info" @(item.IsRestrictEntertime == true ? "checked" : "")/></td>
+                                    <td> <button type="button" class="btn btn-primary Logs" value="@item.Id">Log</button> </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="RestrictionEnabledModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h2 class="modal-title" style="text-align: center">Restriction Enabled Log</h2>
+            </div>
+            <div class="modal-body">
+                <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="datatable-scroll">
+                        <table class="table" id="logTable" width="100%">
+                            <thead>
+                            <tr>
+                                <th>Allowed By</th>
+                                <th>Allowed Date</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .dataTables_scrollHeadInner { width: 100% !important; }
+    .dataTables_scrollHeadInner table { width: 100% !important; }
+</style>
+<link href="~/Content/bootstrap-toggle.min.css" rel="stylesheet"/>
+<script src="~/Scripts/bootstrap-toggle.min.js"></script>
+<script>
+    var table = $('#logTable').DataTable({
+        dom: 'Bfrtip',
+        language: { search: '', searchPlaceholder: "Search..." },
+        scrollY: 250,
+        buttons: {
+            dom: { button: { className: 'btn btn-default' } },
+            buttons: ['copyHtml5', 'excelHtml5', 'csvHtml5', 'pdfHtml5']
+        }
+    });
+    $('.Logs').click(function() {
+        var userid = $(this).val();
+        $.ajax({
+            url: "/Settings/RestrictEnabledLog",
+            data: { userid: userid },
+            type: 'GET',
+            async: true
+        }).done(function(response) {
+            if (response.error) {
+                swal({ title: response.errortext, confirmButtonColor: "#f0b95e", type: "error" });
+            } else {
+                if (response.Logs != null) {
+                    $(response.Logs).each(function(index, value) {
+                        table.row.add([value.unRestrictedBy.FullName, moment(value.createdonutc).format("D/MM/YYYY")]);
+                    });
+                    table.draw();
+                    $('#RestrictionEnabledModal').modal('show');
+                }
+            }
+        });
+    });
+    $("#RestrictionEnabledModal").on("hidden.bs.modal", function() { table.clear().draw(); });
+    $('.time-entry-btn').bootstrapToggle();
+    var body = document.body;
+    body.classList.add('has-detached-left');
+    $(document).on('change',
+        ".time-entry-btn",
+        function() {
+            var userid = $(this).closest('tr').data('id');
+            if ($(this).prop('checked')) {
+                $.ajax({
+                    url: "/Settings/AllowUser",
+                    data: { userid: userid },
+                    type: 'GET',
+                    async: true
+                }).done(function(response) {
+                    if (response.error) {
+                        swal({ title: response.errortext, confirmButtonColor: "#f0b95e", type: "error" });
+                    } else {
+                        swal("Removed", "The time restriction has been removed successfully.", "success");
+                    }
+                });
+            } else {
+                $.ajax({
+                    url: "/Settings/RestrictUser",
+                    data: { userid: userid },
+                    type: 'GET',
+                    async: true
+                }).done(function(response) {
+                    if (response.error) {
+                        swal({ title: response.errortext, confirmButtonColor: "#f0b95e", type: "error" });
+                    } else {
+                        swal("Activate", "The time restriction has been successfully activated.", "success");
+                    }
+                });
+            }
+        });
+</script>

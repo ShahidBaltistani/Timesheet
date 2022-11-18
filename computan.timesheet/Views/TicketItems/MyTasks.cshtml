@@ -1,0 +1,629 @@
+﻿@model IEnumerable<computan.timesheet.core.TicketItem>
+@{ ViewBag.Title = "My Tasks"; }
+
+@section secondarysidebar {
+    <!-- Secondary sidebar -->
+    <div class="sidebar sidebar-secondary sidebar-default">
+        <div class="sidebar-content">
+            <!-- Action buttons -->
+            <div class="sidebar-category">
+                <div class="category-title">
+                    <span>Action buttons</span>
+                    <ul class="icons-list">
+                        <li>
+                            <a href="#" data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="category-content">
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <a href="/manualticket/create" class="btn bg-teal-400 btn-block btn-float btn-float-lg" type="button">
+                                <i class="icon-googleplus5"></i> <span>Add Ticket</span>
+                            </a>
+                        </div>
+                        <div class="col-xs-6">
+                            @if (Request.IsAuthenticated && User.IsInRole("Admin"))
+                            {
+                                <a href="/ticketitems/alltaskslist" class="btn bg-warning-400 btn-block btn-float btn-float-lg" type="button">
+                                    <i class="icon-task"></i> <span>Team Tasks</span>
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /action buttons -->
+            <!-- Tasks navigation -->
+            <div class="sidebar-category cts-sidebar">
+                <div class="category-title">
+                    <span>Tasks by Status</span>
+                    <ul class="icons-list">
+                        <li>
+                            <a href="#" data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="category-content no-padding">
+                    <ul class="navigation navigation-alt navigation-accordion">
+                        @foreach (var items in ViewBag.MyTicketStatus)
+                        {
+                            bool isactive = ViewBag.statusid == items.id;
+                            <li class='@(isactive ? "active" : "") statusli' id="@items.id">
+                                <a href="#" data-id="@items.id" class="mytaskstatuslink" id="@items.id">
+                                    <i class="@items.iconname"></i>
+                                    @items.name
+                                    <span class="@(isactive ? "badge badge-success" : "badge badge-default") position-left my_task_status" id="@items.id">@items.ticketcount</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+            <!-- /task navigation -->
+            <!-- Filter tasks by clients -->
+            <div class="sidebar-category cts-sidebar">
+                <div class="category-title">
+                    <span>Filter Tasks by Client</span>
+                    <ul class="icons-list">
+                        <li>
+                            <a href="#" data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="category-content no-padding">
+                    <form action="#">
+                        <div class="has-feedback has-feedback-left">
+                            <input type="search" class="form-control filterclients" placeholder="Type to filter clients">
+                            <div class="form-control-feedback">
+                                <i class="icon-search4 text-size-base text-muted"></i>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="clientcollection">
+                        <ul class="navigation navigation-alt navigation-accordion">
+                            @foreach (var client in ViewBag.MyClients)
+                            {
+                                bool isactive = ViewBag.CurrentClientId == client.clientid;
+                                <li class='clientli@(isactive ? " active" : "") myclientlink' id="client-@client.clientid" data-clientid="@client.clientid">
+                                    <a href="#">
+                                        <i class="fa fa-lg @client.iconfile @client.actionclass" data-userfavid="@(client.userfavouriteid == null ? "0" : client.userfavouriteid)"></i>
+                                        <section id="@client.clientid" data-clientid="@client.clientid" class="ctx-sidebar-item-text myclientlink">@client.clientname</section>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- /Filter tasks by clients -->
+            <!-- Flagged Tasks -->
+            <div class="sidebar-category">
+                <div class="category-title">
+                    <span>Flagged Tasks</span>
+                    <ul class="icons-list">
+                        <li>
+                            <a href="#" data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="category-content"> </div>
+            </div>
+            <!-- /Flagged Tasks -->
+        </div>
+    </div>
+    <!-- /secondary sidebar -->
+}
+
+<div class="panel panel-default" id="maincontent">
+    <!-- Primary Tabs -->
+    <ul class="nav nav-tabs nav-tabs-highlight">
+        <li class="">
+            <a href="/tickets/index/1"><i class="icon icon-mail5 label-icon-sm"></i>Inbox</a>
+        </li>
+        <li class="active">
+            <a href="/ticketitems/mytasks/2"><i class="fa fa-tasks label-icon-sm"></i>Tasks</a>
+        </li>
+        <li class="">
+            <a href="/tickettimelogs/mybuckets"><i class="icon icon-basket label-icon-sm"></i>Bucket</a>
+        </li>
+        <li class="">
+            <a href="/tickettimelogs/index"><i class="icon icon-calculator2 label-icon-sm"></i>Time log</a>
+        </li>
+        @if (Request.IsAuthenticated && User.IsInRole("Admin"))
+        {
+            <li class="">
+                <a href="/rules"><i class="icon-list label-icon-sm"></i>Rules</a>
+            </li>
+        }
+    </ul>
+    <!-- /Primary Tabs -->
+    <!-- Search Box -->
+    <div class="panel-heading">
+        @using (Html.BeginForm("", "", FormMethod.Get, new {id = "searchTicketsForm", name = "searchTicketsForm"}))
+        {
+            <div class="form-inline">
+                <div class="form-group">
+                    <h5 class="panel-title">My Tasks</h5>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="searchtext" name="searchtext" class="form-control" placeholder="Search by subject or sender name" style="width: 400px;"/>
+                    <input id="btnsearch" type="submit" value="Search" class="btn btn-default" data-statusid="@ViewBag.statusid" disabled="disabled"/>
+                    <button class="btn btn-default clearsearch">Clear Search</button>
+                    <button type="button" title="Assin Multiple Task to Users" class="btn btn-success addmultibucket">
+                        <i class="icon-cart5"></i>
+                    </button>
+                    <button type="button" title="Change Multiple Task Status" class="btn btn-success closeemultitask">
+                        <i class="icon-check"></i>
+                    </button>
+                </div>
+            </div>
+        }
+        <div class="heading-elements"> </div>
+    </div>
+    <!-- /Search Box -->
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12" style="margin-left: 25px;">
+                <h4 class="presearchstring hidden">Search results for <span class="searchstring"></span></h4>
+            </div>
+        </div>
+        <div id="mytasklist">
+            @if (Model.Count() > 0)
+            {
+                <table class="table table-hover table-ticket">
+                    <thead>
+                    <tr class="bg-teal-400">
+                        <th>
+                            <input type="checkbox" class="checkall"/>
+                        </th>
+                        <th> Task Details <span class="pull-right" style="margin-right: 20%">Assigned On</span> </th>
+                    </tr>
+                    </thead>
+                    <tbody id="mytaskrow"> @Html.Partial("_mytask") </tbody>
+                </table>
+            }
+            else
+            {
+                <h5 class="panel-title"> <i class="icon-envelop5 position-left"></i> Sorry, no tasks found. </h5>
+                <div class="heading-elements top-right">
+                    <ul class="icons-list"></ul>
+                </div>
+                <a class="heading-elements-toggle">
+                    <i class="icon-menu"></i>
+                </a>
+            }
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="uniquebodymodel" role="dialog">
+    <div class="modal-dialog" style="margin-bottom: 50px; margin-top: 100px; max-height: 85%; overflow-y: scroll; width: 75% !important">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body" id="modelbodydiv">
+                <div class="panel panel-flat">
+                    <div class="panel-heading mt-5">
+                        <h5 class="panel-title">
+                            <small class="display-block" id="modellastmodifiedtime"><b>Date: </b>0</small>
+                            <small class="display-block" id="modelfrom"><b>From: </b>0</small>
+                            <small class="display-block" id="modeldisplayto"><b>To: </b>0</small>
+                            <small class="display-block" id="modeldisplaycc"><b>Cc: </b>0</small>
+                        </h5>
+                        <a class="heading-elements-toggle">
+                            <i class="icon-menu"></i>
+                        </a>
+                    </div>
+                    <div class="panel-body" id="modelemailbody"> </div>
+                    <div class="panel-footer"> </div>
+                </div>
+            </div>
+            <div class="modal-footer"> </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="addtimemodel" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Add Time</h4>
+            </div>
+            <div class="modal-body" id="modeladdtimebodydiv">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        @Html.Label("Title", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            <input type="text" class="form-control" id="title"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Project*", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.DropDownList("projectid_addtime", new SelectList(ViewBag.projects, "Value", "Text"), "Please Select", new {@class = "form-control"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Skill*", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.DropDownList("skillid_addtime", new SelectList(ViewBag.skills, "id", "name"), "Please Select", new {@class = "form-control"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Work Date*", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.TextBox("workdate", null, new {@class = "form-control"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Spent*", new {@class = "control-label col-md-2"})
+                        <div class="col-md-4">
+                            @Html.DropDownList("timespentinminutes", (IEnumerable<SelectListItem>) ViewBag.timespentinminutes, "Select Time")
+                        </div>
+                        @Html.Label("Billable", new {@class = "control-label col-md-2"})
+                        <div class="col-md-4">
+                            @Html.DropDownList("billabletimeinminutes", (IEnumerable<SelectListItem>) ViewBag.billabletimeinminutes, "Select Time", new {TabIndex = "-1"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Description*", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.TextArea("description", null, new {@class = "form-control", rows = "3"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Comments", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.Editor("comments", new {htmlAttributes = new {@class = "form-control"}})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="reset" id="addtimepopup" value="Add" class="btn btn-primary addtimepopupbtn"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="addbucketmodel" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Add Bucket</h4>
+            </div>
+            <div class="modal-body" id="modeladdbucketbodydiv">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        @Html.Label("Bucket Date*", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.TextBox("bucketkdate", null, new {@class = "form-control"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="reset" id="btnaddtobucket" value="Add" class="btn btn-primary savesinglebucket"/>
+                            <button class="btn btn-primary currentdate">Select Current Date</button>
+                        </div>
+                    </div>
+                    <input id="bucket_ticketitemid" type="hidden" value="0"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="addbucketmodelwithprojectid" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Add Bucket</h4>
+            </div>
+            <div class="modal-body" id="modeladdbucketbodydiv">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        @Html.Label("Bucket Date*", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.TextBox("bucketkdate_withproid", null, new {@class = "form-control"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Project*", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.DropDownList("projectid_addbucket", new SelectList(ViewBag.projects, "Value", "Text"), "Please Select", new {@class = "form-control"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Skill*", new {@class = "control-label col-md-2"})
+                        <div class="col-md-10">
+                            @Html.DropDownList("skillid_addbicket", new SelectList(ViewBag.skills, "id", "name"), "Please Select", new {@class = "form-control"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="reset" id="" value="Add" class="btn btn-primary addbucketwithproidpopupbtn"/>
+                            <button class="btn btn-primary currentdate">Select Current Date</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="ticketstatuses" class="hide">
+    <button type="button" class="btn bg-grey-700 changeticketstatus" data-statusid="@ViewBag.ticketstatusaction.CloseTicketStatus.id">@ViewBag.ticketstatusaction.CloseTicketStatus.name</button>
+    <div class="btn-group">
+        <button type="button" class="btn bg-grey-700 dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-right">
+            @foreach (var item in ViewBag.ticketstatusaction.OtherTicketStatusCollection)
+            {
+                <li>
+                    <a href="#" class="changeticketstatus" data-statusid="@item.id">
+                        <i class="icon-menu7"></i> @item.name
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+<div id="ticketitemstatuses" class="hide">
+    <button type="button" class="btn bg-grey-700 changeticketstatus" data-statusid="@ViewBag.ticketitemstatusaction.CloseTicketStatus.id">@ViewBag.ticketitemstatusaction.CloseTicketStatus.name</button>
+    <div class="btn-group">
+        <button type="button" class="btn bg-grey-700 dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-right">
+            @foreach (var item in ViewBag.ticketitemstatusaction.OtherTicketStatusCollection)
+            {
+                <li>
+                    <a href="#" class="changeticketstatus" data-statusid="@item.id">
+                        <i class="icon-menu7"></i> @item.name
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+<div class="modal fade" id="changemultiplestatusmodel" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Change Multiple Task Status</h4>
+            </div>
+            <div class="modal-body" id="modelstatusdiv">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        @Html.Label("Status Type", new {@class = "control-label col-md-2"})
+                        <div class="col-md-5">
+                            @Html.DropDownList("statustype", new List<SelectListItem> {new SelectListItem {Text = "Ticket", Value = "1", Selected = true}, new SelectListItem {Text = "Email", Value = "2"}, new SelectListItem {Text = "My Task", Value = "3"}}, "Please Select Status Type", new {@class = "form-control"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Status Type", new {@class = "control-label col-md-2"})
+                        <div class="col-md-5">
+                            @Html.DropDownList("statusid", new List<SelectListItem> {new SelectListItem {Text = "Closed", Value = "3", Selected = true}, new SelectListItem {Text = "Won't Fix", Value = "4"}}, "Please Select Status", new {@class = "form-control"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="reset" id="btnclosemultipletask" value="Add" class="btn btn-primary btnclosemultipletask"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" value="@ViewBag.statusid" id="currentstatusid">
+<input type="hidden" id="pagenumber" value="0"/>
+<input type="hidden" id="searchvalue" value=""/>
+<input type="hidden" id="currentStatusId" value="@ViewBag.CurrentStatusId"/>
+<input type="hidden" id="currentClientId" value="@ViewBag.CurrentClientId"/>
+
+<link rel="stylesheet" type="text/css" href="/scripts/default/datepicker/css/jquery.datepick.min.css"/>
+<script src="~/Scripts/default/plugins/jquery.alphanum.min.js"></script>
+<script type="text/javascript" src="~/Scripts/custom/task.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $(window).load(function() { $("#btnsearch").prop("disabled", false); });
+        // make sure that fallana field is focused in select2 dropdown list.
+        $.fn.modal.Constructor.prototype.enforceFocus = function() {};
+        // Apply select2 dropdown.
+        $("#timespentinminutes").select2({ width: 150 });
+        $("#billabletimeinminutes").select2({ width: 150 });
+        $("#projectid_addtime").select2();
+        $("#skillid_addtime").select2();
+        $("#projectid_addbucket").select2();
+        $("#skillid_addbicket").select2();
+        // Apply datepickers.
+        var date0 = $('#workdate').datepicker({ dateFormat: 'mm/dd/yy' }).val();
+        $('#workdate').datepicker({ dateFormat: 'mm/dd/yy' });
+        $("#bucketkdate").datepicker({ dateFormat: 'mm/dd/yy' });
+        $("#bucketkdate_withproid").datepicker({ dateFormat: 'mm/dd/yy' });
+
+        function leftPad(num, length) {
+            var result = '' + num;
+            while (result.length < length) {
+                result = '0' + result;
+            }
+            return result;
+        }
+
+        var fullDate = new Date();
+        var day = leftPad(fullDate.getDate(), 2);
+        var twoDigitMonth = ((fullDate.getMonth().length + 1) === 1) ? (fullDate.getMonth() + 1) : '0' + (fullDate.getMonth() + 1);
+        var currentDate = twoDigitMonth + "/" + day + "/" + fullDate.getFullYear();
+        $("#workdate").val(currentDate);
+        $("#bucketkdate").val(currentDate);
+        $("#bucketkdate_withproid").val(currentDate);
+        //****Add task time start****
+        //****Add time btn click start*****
+        $(document).on('click',
+            ".addtasktime",
+            function() {
+                var pid = $(this).data("projectid");
+                var sid = $(this).data("skillid");
+                ticketitemid = $(this).data("ticketitemid");
+                title = $(this).data("title");
+                pid = parseInt(pid);
+                sid = parseInt(sid);
+                $("#title").val(title);
+                if (pid != "") {
+                    $("#projectid_addtime").val(pid).trigger("change");
+                }
+                if (sid != "") {
+                    $("#skillid_addtime").val(sid).trigger("change");
+                }
+                $('#addtimemodel').modal('show');
+
+            });
+        //****Add time btn end****
+        //****Add time popup start****
+        $(document).on('click',
+            ".addtimepopupbtn",
+            function() {
+                var tcktitemid = ticketitemid;
+                var pid = $("#projectid_addtime").val();
+                var sid = $("#skillid_addtime").val();
+                var spenttime = $("#timespentinminutes").val();
+                var billtime = $("#billabletimeinminutes").val();
+                var workdate = $("#workdate").val();
+                var description = $("#description").val();
+                var comments = $("#comments").val();
+                if (spenttime == "" || workdate == "" || description == "" || pid == null || sid == null || pid == "" || sid == "") {
+                    sweetAlert("Sorry...", "All fields having * are Required.", "error");
+                    return false;
+                }
+                $.ajax({
+                    url: '/TicketTimeLogs/addtime/',
+                    data: {
+                        tcktitemid: tcktitemid,
+                        pid: pid,
+                        sid: sid,
+                        spenttime: spenttime,
+                        billtime: billtime,
+                        workdate: workdate,
+                        title: title,
+                        description: description,
+                        comments: comments
+                    },
+                    type: 'POST',
+
+                }).done(function(data) {
+                    if (data.error) {
+                        var source = $("#error-notification-template").html();
+                        var template = Handlebars.compile(source);
+                        var html = template(data);
+                        $("#modeladdtimebodydiv").prepend(html);
+                        return false;
+                    }
+                    new PNotify({ title: 'Success', text: 'Time has been added successfully.', type: 'success' });
+                    $('#addtimemodel').modal('toggle');
+                    //$("#" + tcktitemid + ".notimeadded").remove();
+                    //var source = $("#Add-time-after-template").html();
+                    //var template = Handlebars.compile(source);
+                    //var html = template(data);
+                    //$("#" + tcktitemid + ".addtimeafter").append(html);
+                    return false;
+                });
+            });
+        //****Add time popup end****
+        //****Add task time end****
+        $(document).on("click",
+            ".modellink",
+            function() {
+                var itemid = $(this).data("id");
+                $.ajax({
+                    url: '/TicketItems/Details/' + itemid,
+                    data: "",
+                    type: 'GET'
+                }).done(function(data) {
+                    if (data.error) {
+                        return false;
+                    }
+                    $("#modellastmodifiedtime").html("<b>Date:</b>" + data.lastmodifiedtime);
+                    $("#modelfrom").html("<b>From: </b>" + data.from);
+                    $("#modeldisplayto").html("<b>To: </b>" + data.displayto);
+                    $("#modeldisplaycc").html("<b>Cc: </b>" + data.displaycc);
+                    $("#modelemailbody").html(data.uniquebody);
+                    $('#modelemailbody a').attr('target', '_blank');
+                    $('#uniquebodymodel').modal('show');
+                    return false;
+                });
+            });
+    });
+</script>
+<script type="text/javascript">
+    var _inCallback = false;
+
+    function loadProducts() {
+        var pagenum = $("#pagenumber").val();
+        if (pagenum != -1) {
+            pagenum++;
+            $("#pagenumber").val(pagenum);
+        }
+        var search = $("#searchvalue").val();
+        var id = $("#btnsearch").attr('data-statusid');
+        if (pagenum != -1) {
+            var statusid = $("#btnsearch").attr('data-statusid');
+            $.ajax({
+                url: '/ticketitems/mytaskajax',
+                data: { id: statusid, topic: search, pagenum: pagenum },
+                type: 'POST'
+            }).done(function(data) {
+                if (data.itemcount != 0) {
+                    $("#pagenumber").val(pagenum);
+                    $("#mytaskrow").append(data.ticketitems);
+                    var count = $("#mytaskrow").find("tr").length;
+                    $("#" + statusid + ".conversationstatus").html(data.totalcount);
+                } else {
+                    $("#pagenumber").val(-1);
+                    $("#mytaskrow").append('<tr><td colspan="2" class="text-center">Sorry,no more task found.</td></tr>');
+                }
+                return false;
+            });
+            return false;
+        }
+    }
+
+    var dcList = true;
+    $(window).scroll(function() {
+        if ($(window).scrollTop() == $(document).height() - $(window).height()) {
+            var count = $("#mytaskrow").find("tr").length;
+            if (count > 1) {
+                loadProducts();
+            }
+        }
+    });
+</script>
+<!--Templates-->
+<script id="success-notification-template" type="text/x-handlebars-template">
+    <div class="alert alert-success alert-styled-left alert-bordered usernotification">
+        <button data-dismiss="alert" class="close" type="button"><span>×</span><span class="sr-only">Close</span></button>
+        <span class="text-semibold">{{Successtext}}</span>
+    </div>
+</script>
+<script id="error-notification-template" type="text/x-handlebars-template">
+    <div class="alert alert-danger alert-styled-left alert-bordered usernotification">
+        <button data-dismiss="alert" class="close" type="button"><span>×</span><span class="sr-only">Close</span></button>
+        <span class="text-semibold">{{errortext}}</span>
+    </div>
+</script>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/Scripts/select2")
+    @Scripts.Render("~/Scripts/plugins/livefilter")
+    <script src="~/Scripts/default/plugins/jquery.alphanum.min.js"></script>
+}

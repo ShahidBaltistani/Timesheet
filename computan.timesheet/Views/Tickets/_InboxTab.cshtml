@@ -1,0 +1,20 @@
+﻿@model string
+<div class="category-content no-padding">
+    <ul class="navigation navigation-alt navigation-accordion filterbystatus">
+        <li class="@(Model == "send" ? "active" : "")">
+            <a href="/email/send"><i class="icon-googleplus5"></i> New Email</a>
+        </li>
+        <li class="@(Model == "index" ? "active" : "")">
+            <a href="/tickets/index/0"><i class="icon-googleplus5"></i> Inbox</a>
+        </li>
+        <li class="@(Model == "draft" ? "active" : "")">
+            <a href="/tickets/draft"><i class="icon-googleplus5"></i> Drafts</a>
+        </li>
+        <li class="@(Model == "sentitem" ? "active" : "")">
+            <a href="/tickets/sentitem"><i class="icon-googleplus5"></i> Sent Items</a>
+        </li>
+        <li class="@(Model == "flagged" ? "active" : "")">
+            <a href="/tickets/flagged"><i class="icon-googleplus5"></i> Flagged Items</a>
+        </li>
+    </ul>
+</div>

@@ -1,0 +1,646 @@
+﻿@model computan.timesheet.Models.TicketViewModel
+@{ ViewBag.Title = "List Tickets"; }
+@{ var statusid = Request.Url.Segments[3]; }
+<!-- Detached sidebar -->
+<div class="sidebar-detached">
+    <div class="sidebar sidebar-default">
+        <div class="sidebar-content">
+            <!-- Computan Support Inbox -->
+            <div class="sidebar-category cts-sidebar">
+                <div class="category-title">
+                    <span>Computan Support Inbox</span>
+                    <ul class="icons-list">
+                        <li>
+                            <a href="#" data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                @Html.Partial("_InboxTab", "index")
+            </div>
+            <!-- Tickets by Status -->
+            @Html.Partial("_TicketByStatus")
+            <!-- /Tickets by Status -->
+        </div>
+    </div>
+</div>
+<!-- /detached sidebar -->
+<!-- Detached content -->
+<div class="container-detached">
+    <div class="content-detached">
+        <!-- Sidebars overview -->
+        <div class="panel panel-flat">
+            @Html.Partial("_TicketNavTab", "inbox")
+            <div class="panel-heading">
+                @using (Html.BeginForm("", "", FormMethod.Get, new { id = "searchTicketsForm", name = "searchTicketsForm" }))
+                {
+                    <div class="form-inline">
+                        <div class="form-group1">
+                            <h5 class="panel-title">List Tickets</h5>
+                        </div>
+                        <div class="form-group1">
+                            <input type="text" id="searchtext" name="searchtext" class="form-control" placeholder="Search by subject or sender name" style="" />
+                            <input id="btnsearch" type="submit" value="Search" class="btn btn-default" data-statusid="@ViewBag.statusid" disabled="disabled" />
+                            <a href="/tickets/index/@ViewBag.statusid" class="btn btn-default">Clear Search</a>
+                            <button type="button" data-toggle="tooltip" title="Assign Multiple Task to Users" class="btn btn-success multiassign">
+                                <i class="icon-task"></i>
+                            </button>
+                            <button type="button" data-toggle="tooltip" title="Change Multiple Task Status" class="btn btn-success closeemultitask">
+                                <i class="icon-check"></i>
+                            </button>
+                        </div>
+                        <div class="form-group1 filter-box">
+                            <input type="text" id="liveticketfilter" name="searchtext" class="form-control" placeholder="Filter tickets" style="" autocomplete="off">
+                        </div>
+                    </div>
+                }
+                <input type="hidden" value="@statusid" name="currentpagestatus" id="currentpagestatus" />
+                @if (ViewBag.search != null && ViewBag.search != "")
+                {
+                    <div class="row">
+                        <div class="col-md-12" style="margin-left: 25px;">
+                            <h4 class="presearchstring">
+                                Search results for
+                                <span class="searchstring">
+                                    <b>' @ViewBag.search '</b>
+                                </span>
+                            </h4>
+                        </div>
+                    </div>
+                }
+                <div class="row">
+                    <div class="col-md-12" style="margin-left: 25px;">
+                        <h4 class="presearchstring hidden">Search results for <span class="searchstring"></span></h4>
+                    </div>
+                </div>
+                <a class="heading-elements-toggle">
+                    <i class="icon-menu"></i>
+                </a>
+            </div>
+            <div class="panel-body">
+                <table class="table table-ticket">
+                    <thead>
+                        <tr class="border-double bg-teal-700">
+                            <th></th>
+                            <th style="width: 25px;">
+                                <input type="checkbox" class="checkall" />
+                            </th>
+                            <th> Task Details </th>
+                        </tr>
+                    </thead>
+                    <tbody id="productList">
+                        @if (Model.tickets.Count() > 0)
+                        {
+                            @Html.Partial("_ConversationRow")
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4">
+                                    <h5 class="panel-title"> <i class="icon-envelop5 position-left"></i> Sorry, no Ticket found. </h5>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- /sidebars overview -->
+    </div>
+</div>
+<!-- /detached content -->
+<input type="hidden" id="pagenumber" value="0" />
+<input type="hidden" id="searchvalue" value="@ViewBag.search" />
+<input type="hidden" id="TicketStatusId" value="@ViewBag.statusid" />
+<input type="hidden" id="Tickettype" value="@ViewBag.tickettype" />
+<input type="hidden" id="TicketTd" value="" />
+<input type="hidden" id="AssignmentDialogTicketId" value="0" />
+<link href="~/Content/Custom/Tickets/TicketsIndex.min.css" rel="stylesheet" />
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/Scripts/select2")
+    @Scripts.Render("~/Scripts/custom/tagsinput")
+    <script src="~/Scripts/default/plugins/jquery.alphanum.min.js"></script>
+    <script src="/Scripts/plugins/jquery.livefilter.min.js"></script>
+    @*<script src="~/Scripts/custom/ticket.min.js"></script>*@
+    <script src="~/Scripts/custom/ticket.js"></script>
+    <script src="~/Scripts/custom/Base64js.min.js"></script>
+    <script src="~/Scripts/custom/CommonForTickets.min.js"></script>
+}
+
+<script type="text/javascript">
+    var body = document.body;
+    body.classList.add('has-detached-left');
+    $(window).load(function () { $("#btnsearch").prop("disabled", false); });
+    $(document).ready(function () {
+        $(document).on('click',
+            '.ticketsearch',
+            function () {
+                var topic = $("#searchvalue").val();
+                if (topic == "" || topic == null) {
+                    return true;
+                } else {
+                    var id = $(this).attr("data-id");
+                    topic = Base64.encode(topic);
+                    window.location.href = "/tickets/index/" + id + "/" + topic;
+                    return false;
+                }
+            });
+        $.fn.modal.Constructor.prototype.enforceFocus = function () { };
+        //admin user assignment End
+        $("#projectid").select2();
+        $("#skillid").select2();
+        $("#projectid_assignuser").select2();
+        $("#skillid_assignuser").select2();
+        $('#DataTables_Table_tickets').dataTable().fnDestroy();
+        $("#quotabletime").numeric({ allowMinus: false, allowThouSep: false });
+        // load tickets by status
+        $(document).on("click",
+            ".mytaskstatuslink",
+            function () {
+                // get the status id
+                var id = $(this).attr("data-id");
+                // update url start
+                // set paramatter according to stautus id
+                var para = id;
+                var title = "new";
+                if (typeof (history.pushState) != "undefined") {
+                    var obj = { Title: title, Url: para };
+                    history.pushState(obj, obj.Title, obj.Url);
+                } else {
+                    alert("Browser does not support HTML5.");
+                }
+                // update url end
+                // update hidden field of ticket status with statusid
+                $("#TicketStatusId").val(id);
+                // set page number to 0
+                var page = 0;
+                $("#pagenumber").val(0);
+                // update data property of search button for statusid
+                $("#btnsearch").attr('data-statusid', id);
+                // remove active class from all tabs
+                $('.statusli').each(function () {
+                    $(this).removeClass('active');
+                });
+                //remove and class class of counter
+                $('.conversationstatus').each(function () {
+                    $(this).removeClass('badge-success');
+                    $(this).addClass('badge-default');
+                });
+                // add active class to current tab
+                $('.statusli#' + id).addClass('active');
+                //remove and class class of current tab counter
+                $('#' + id + '.conversationstatus').removeClass('badge-default');
+                $('#' + id + '.conversationstatus').addClass('badge-success');
+                var topic = $("#searchvalue").val();
+                $.post("/Tickets/IndexAjax/",
+                    { id, page, topic },
+                    function (data) {
+                        if (data.itemcount != 0) {
+                            $("#productList").html(data.tickets);
+                            $('.collapse').collapse();
+                            // update total count of tickets
+                            $("#" + id + ".conversationstatus").html(data.totalcount);
+                            return false;
+                        } else {
+                            $("#productList").html('<tr><td colspan="2" class="text-center">Sorry,no task found.</td></tr>');
+                            $("#" + id + ".conversationstatus").html(data.totalcount);
+                            return false;
+                        }
+                    });
+            });
+        //--------load Archived Tickets
+        // load tickets by status
+        $(document).on("click",
+            ".ArchivedTicketslink",
+            function () {
+                // get the status id
+                var id = $(this).attr("data-id");
+                // update url start
+                // set paramatter according to stautus id
+                var para = id;
+                var title = "new";
+                if (typeof (history.pushState) != "undefined") {
+                    var obj = { Title: title, Url: para };
+                    history.pushState(obj, obj.Title, obj.Url);
+                } else {
+                    alert("Browser does not support HTML5.");
+                }
+                // update url end
+                // update hidden field of ticket status with statusid
+                $("#TicketStatusId").val(id);
+                // set page number to 0
+                var page = 0;
+                $("#pagenumber").val(0);
+                // update data property of search button for statusid
+                $("#btnsearch").attr('data-statusid', id);
+                // remove active class from all tabs
+                $('.statusli').each(function () { $(this).removeClass('active'); });
+                //remove and class class of counter
+                $('.conversationstatus').each(function () {
+                    $(this).removeClass('badge-success');
+                    $(this).addClass('badge-default');
+                });
+                // add active class to current tab
+                $('.statusli#' + id).addClass('active');
+                //remove and class class of current tab counter
+                $('#' + id + '.conversationstatus').removeClass('badge-default');
+                $('#' + id + '.conversationstatus').addClass('badge-success');
+                var topic = $("#searchvalue").val();
+                $.post("/Tickets/IndexAjax/",
+                    { id, page, topic },
+                    function (data) {
+                        if (data.itemcount != 0) {
+                            $("#productList").html(data.tickets);
+                            $('.collapse').collapse();
+                            // update total count of tickets
+                            $("#" + id + ".conversationstatus").html(data.totalcount);
+                            return false;
+                        } else {
+                            $("#productList").html('<tr><td colspan="2" class="text-center">Sorry,no task found.</td></tr>');
+                            $("#" + id + ".conversationstatus").html(data.totalcount);
+                            return false;
+                        }
+                    });
+            });
+    });
+    var _inCallback = false;
+
+    function loadProducts() {
+        $("#productList").find("#loadmoretr").remove();
+        var pagenum = $("#pagenumber").val();
+        if (pagenum != -1) {
+            pagenum++;
+            $("#pagenumber").val(pagenum);
+        }
+        var search = $("#searchvalue").val();
+        var id = $('#TicketStatusId').val();
+        if (pagenum != -1) {
+            var statusid = $("#btnsearch").attr('data-statusid');
+            $.ajax({
+                url: '/tickets/indexajax',
+                data: { id: id, topic: search, pagenum: pagenum },
+                type: 'POST'
+            }).done(function (data) {
+                if (data.itemcount != 0) {
+                    $("#productList").append(data.tickets);
+                    var count = $("#productList").find("tr").length;
+                    $("#" + statusid + ".conversationstatus").html(data.totalcount);
+                } else {
+                    $("#pagenumber").val(-1);
+                    $("#productList").append('<tr><td colspan="4" class="text-center">Sorry, No more ticket found.</td></tr>');
+                }
+                return false;
+            });
+            return false;
+        }
+    }
+
+    jQuery('#liveticketfilter').livefilter({ selector: '#productList tr' });
+    var dcList = true;
+    //$(window).scroll(function () {
+    //    if ($(window).scrollTop() == $(document).height() - $(window).height()) {
+    //        if ($('#loadmoretr').html() != null && $('#loadmoretr').html() != 'nan') {
+    //            alert("Hello")
+    //            loadProducts();
+    //        }
+    //    }
+    //});
+    $(document).on("click", ".loadmoretickets", function () { loadProducts(); });
+</script>
+
+<!--Ticket Assign Modal-->
+@Html.Partial("_ticketAssignModal")
+<!--Ticket Merge modal-->
+<div class="modal fade" id="ticketMergeModal" role="dialog">
+    <div class="modal-dialog" style="width: 900px !important;" data-ticketid="">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="panel panel-primary" style="margin-bottom: 0px;">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Merge Ticket</h4>
+                    <div class="heading-elements">
+                        <button id="closeMergeButton" type="button" class="close" data-dismiss="modal" style="font-size: 30pt; font-weight: bolder;">&times;</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label class="control-label col-lg-2">Search Ticket</label>
+                            <div class="col-lg-10">
+                                <div class="input-group">
+                                    <input type="text" class="form-control subjectforsearch" name="subjectforsearch">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button" id="searchmergabletickets">Search</button>
+                                    </span>
+                                </div>
+                                <input type="hidden" id="firstticketid" name="firstticketid" value="" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive pre-scrollable">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Date</th>
+                                    <th>Sender</th>
+                                    <th>Topic</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ticketstomerge"></tbody>
+                        </table>
+                    </div>
+                    <div class="form-group" style="padding-top: 50px">
+                        <input id="Mergeticket" type="button" value="Merge Ticket" class="btn btn-primary merge_ticket" />
+                        <input type="button" id="closeMergeButton" value="Cancel" data-dismiss="modal" class="btn btn-default" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@*Preview Model*@
+@Html.Partial("_PreviewTicketModal")
+<div class="modal fade" id="uniquebodymodelTicketDetail" role="dialog">
+    <div class="modal-dialog conversationmodel" style="margin-bottom: 50px; margin-top: 100px; max-height: 85%; overflow-y: scroll; width: 75% !important">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body" id="Ticketdetailbody">
+                <p>Ticket# <span id="ticketid"></span> meta information: </p><br /><br />
+                <p>Created Date: <span id="ticketCreatedDate"></span></p><br /><br />
+                <p>Assigned to <span id="AssignedToTeamName"></span> on <span id="TeamAssignedDateTime"></span> By <span id="AssignedByTeamMember"></span></p><br />
+            </div>
+            <div class="modal-footer"> </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="changemultiplestatusmodel" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Change Status</h4>
+            </div>
+            <div class="modal-body" id="modelstatusdiv">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <h4>Click a status below to apply to all selected tickets.</h4>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            <div class="btn-group btn-group-justified">
+                                <div class="btn-group">
+                                    <button type="button" data-statusid="3" class="btn bg-danger-700 btnclosemultipletask">Close</button>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" data-statusid="2" class="btn bg-success-700 btnclosemultipletask">Open Ticket(s)</button>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" data-statusid="8" class="btn bg-info-700 btnclosemultipletask">Trash</button>
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" data-statusid="7" class="btn bg-slate-700 btnclosemultipletask">Need Review</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@*Assign Tickets Model*@
+<div class="modal fade" id="assignuseradmin" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Assign Users</h4>
+            </div>
+            <div class="modal-body" id="modelassignuseradmindiv">
+                <div class="form-horizontal">
+                    @*<div class="form-group">
+                            @Html.Label("Project", new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.DropDownList("projectid_assignuser", new SelectList(ViewBag.projects, "Value", "Text"), "Please Select", new { @class = "form-control CustSelect2" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.Label("Skill", new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.DropDownList("skillid_assignuser", new SelectList(ViewBag.skills, "id", "name"), "Please Select", new { @class = "form-control CustSelect2" })
+                            </div>
+                        </div>*@
+                    <div class="form-group">
+                        <div class="input-group">
+                            <label class="input-group-addon">
+                                <i class="icon-add add-new-project"> Project</i>
+                            </label>
+                            @Html.DropDownList("projectid_assignuser", new SelectList(ViewBag.projects, "Value", "Text"), "Please Select", new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <label class="input-group-addon">
+                                <i class="icon-add add-new-skill"> Skill</i>
+                            </label>
+                            @Html.DropDownList("skillid_assignuser", new SelectList(ViewBag.skills, "id", "name"), "Please Select", new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">Assign User:</span>
+                            <input name="ticketAssignedUsersInput" type="text" class="form-control assignedusers" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">Assign Team:</span>
+                            <input name="ticketAssignedTeamInput" type="text" class="form-control assignedteams" />
+                        </div>
+                    </div>
+                    @*<div class="form-group">
+                            <label class="control-label col-md-2">Teams</label>
+                            @{ var countteam = 0; }
+                            @foreach (var team in ViewBag.teams)
+                            {
+                                if (countteam >= 4)
+                                {
+                                    <label class="control-label col-md-2">&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                    countteam = 0;
+                                }
+                                countteam++;
+                                <div class="col-md-5" style="float: left; position: relative;">
+                                    @Html.CheckBox("teamid", new {@class = "shiftteammember shiftuserslist", data_teamid = team.id, team.id})
+                                    <label for="@team.id" class="">@team.name</label>
+                                </div>
+                            }
+                        </div>
+                        <div class="form-group" style="height: 250px; overflow-y: scroll;">
+                            <label class="control-label col-md-2">Users</label>
+                            @{ var countuser = 0; }
+                            @foreach (var users in ViewBag.users)
+                            {
+                                if (countuser >= 4)
+                                {
+                                    <label class="control-label col-md-2">&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                    countuser = 0;
+                                }
+                                countuser++;
+                                <div class="col-md-5" style="float: left; position: relative;">
+                                    @Html.CheckBox("userid", new {@class = "teammember userslist", data_userid = users.Id, id = users.Id})
+                                    <label for="@users.Id" class="">@users.FirstName @users.LastName</label>
+                                </div>
+                            }
+                        </div>*@
+                    <div class="form-group">
+                        <div class="col-md-12 text-center">
+                            <input type="button" id="btnassignticket" value="Add" class="btn btn-primary  saveticketassignment" />
+                        </div>
+                    </div>
+                    <input type="hidden" id="assignticket_ticketid" value="0" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*Start Working Model*@
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Start Working</h4>
+            </div>
+            <div class="modal-body" id="modelbodydiv">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        @Html.Label("Project", new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.DropDownList("projectid", new SelectList(ViewBag.projects, "Value", "Text"), "Select Project", new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <br />
+                    <div class="form-group">
+                        @Html.Label("Skill", new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.DropDownList("skillid", new SelectList(ViewBag.skills, "id", "name"), "Select Skill", new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <br />
+                    <div class="form-group">
+                        @Html.Label("Quoted Time", new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.TextBox("quotabletime", null, new { placeholder = "Add Time In Minutes", @class = "form-control" })
+                        </div>
+                    </div>
+                    <br />
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" id="startworking" value="Start" class="btn btn-primary" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer"> </div>
+        </div>
+    </div>
+</div>
+@* Model for add project *@
+<div class="modal fade" id="AddProjectModal" role="dialog">
+    <div class="modal-dialog" style="width: 900px !important;" data-ticketid="">
+        <div class="modal-content">
+            <div class="panel panel-primary" style="margin-bottom: 0px;">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Add Project</h4>
+                    <div class="heading-elements">
+                        <button type="button" class="close" data-dismiss="modal" style="font-size: 30pt; font-weight: bolder;">&times;</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label class="input-group-addon">Client</label>
+                                @Html.DropDownList("clientid", new SelectList(ViewBag.clients, "Value", "Text"), "Please Select", new { @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label class="input-group-addon">Project Name</label>
+                                @Html.TextBox("projectname", null, new { @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="text-center">
+                                <input id="btnsavetobucket" type="button" value="Add Project" class="btn btn-primary add-project" />
+                                <input type="button" value="Cancel" class="btn btn-default btnCancel" data-dismiss="modal" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@* Model for add Skill *@
+<div class="modal fade" id="AddSkillModal" role="dialog">
+    <div class="modal-dialog" style="width: 900px !important;" data-ticketid="">
+        <div class="modal-content">
+            <div class="panel panel-primary" style="margin-bottom: 0px;">
+                <div class="panel-heading">
+                    <h4 class="panel-title">Add Skill</h4>
+                    <div class="heading-elements">
+                        <button type="button" class="close" data-dismiss="modal" style="font-size: 30pt; font-weight: bolder;">&times;</button>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <label class="input-group-addon">Skill Name</label>
+                                @Html.TextBox("skillname", null, new { @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="text-center">
+                                <input id="btnsavetobucket" type="button" value="Add Skill" class="btn btn-primary add-skill" />
+                                <input type="button" value="Cancel" class="btn btn-default btnCancel" data-dismiss="modal" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Templates-->
+<script id="success-notification-template" type="text/x-handlebars-template">
+    <div class="alert alert-success alert-styled-left alert-bordered usernotification">
+        <button data-dismiss="alert" class="close" type="button"><span>×</span><span class="sr-only">Close</span></button>
+        <span class="text-semibold">{{successtext}}</span>
+    </div>
+</script>
+<script id="error-notification-template" type="text/x-handlebars-template">
+    <div class="alert alert-danger alert-styled-left alert-bordered usernotification">
+        <button data-dismiss="alert" class="close" type="button"><span>×</span><span class="sr-only">Close</span></button>
+        <span class="text-semibold">{{errortext}}</span>
+    </div>
+</script>
+<script id="success-notification-template-ticket" type="text/x-handlebars-template">
+    <div class="alert alert-danger alert-styled-left alert-bordered usernotification">
+        <button data-dismiss="alert" class="close" type="button"><span>×</span><span class="sr-only">Close</span></button>
+        <span class="text-semibold">This {{subject}} ticket has been assigned to you.click <a href="{{link}}">here</a>for details.</span>
+    </div>
+</script>
+

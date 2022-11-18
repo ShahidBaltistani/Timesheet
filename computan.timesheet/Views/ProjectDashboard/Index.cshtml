@@ -1,0 +1,592 @@
+﻿@model computan.timesheet.Models.ProjectDashBoardViewModel
+@{ ViewBag.Title = "Project-Dashboard"; }
+
+@section secondarysidebar {
+    <!-- Secondary sidebar -->
+    <div class="sidebar sidebar-secondary sidebar-default">
+        <div class="sidebar-content">
+            <!-- Actions -->
+            <div class="sidebar-category">
+                <div class="category-title">
+                    <span>Actions</span>
+                    <ul class="icons-list">
+                        <li>
+                            <a href="#" data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="category-content">
+                    <div class="row row-condensed">
+                        <div class="col-xs-6">
+                            <a class="addfiles btn bg-blue btn-block btn-float btn-float-lg">
+                                <i class="icon-file-plus"></i> <span>Add File</span>
+                            </a>
+                            <button data-id="@Model.project.id" target="_blank" class="btn bg-indigo-300 btn-block btn-float btn-float-lg btnaddcredentials">
+                                <i class="icon-key"></i> <span>New Creden</span>
+                            </button>
+                        </div>
+                        <div class="col-xs-6">
+                            <a href="/projects/edit/@Model.project.id" target="_blank" class="btn bg-purple-300 btn-block btn-float btn-float-lg">
+                                <i class="icon-files-empty2"></i> <span>Edit Project</span>
+                            </a>
+                            <button class="btn bg-grey-300 btn-block btn-float btn-float-lg notes" data-id="@Model.project.id">
+                                <i class="icon-notebook"></i> <span>Notes</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-category cts-sidebar">
+                <div class="category-title">
+                    <span>Tickets by status</span>
+                    <ul class="icons-list">
+                        <li>
+                            <a href="#" data-action="collapse"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="category-content no-padding">
+                    <ul class="navigation navigation-alt navigation-accordion filterbystatus">
+                        @foreach (var item in Model.sidebarstatus)
+                        {
+                            <li>
+                                <a class="@(item.id == 2 ? "active" : "") taskstatus" data-id="@Model.project.id" data-statusid="@item.id">
+                                    @item.name <span class="badge badge-success position-left">@item.count</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+            <div class="sidebar-category">
+                <div class="category-title">
+                    <span>Members worked on</span>
+                    <ul class="icons-list">
+                        <li>
+                            <a href="#" data-action="collapse" class=""></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="category-content" style="display: block;">
+                    <ul class="media-list">
+                        @if (Model.usernames != null && Model.usernames.Count() > 0)
+                        {
+                            foreach (var item in Model.usernames)
+                            {
+                                <li class="media">
+                                    <a href="#" class="media-left">
+                                        <img src="/images/placeholder.jpg" class="img-sm img-circle" alt="">
+                                    </a>
+                                    <div class="media-body">
+                                        <a href="#" class="media-heading text-semibold">@item</a>
+                                    </div>
+                                    <div class="media-right media-middle">
+                                        <span class="status-mark border-success"></span>
+                                    </div>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <li class="media">
+                                <span class="text-size-mini text-muted display-block">Sorry no member found.</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+            <!-- /latest updates -->
+        </div>
+    </div>
+    <!-- /secondary sidebar -->
+}
+
+@section header{
+    <div class="page-header">
+        <div class="page-header-content"> </div>
+        <div class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/"><i class="icon-home2 position-left"></i> Home</a>
+                </li>
+                <li>
+                    <a href="/projectdashboard/@Model.project.id">@Model.project.name</a>
+                </li>
+            </ul>
+            <a class="breadcrumb-elements-toggle">
+                <i class="icon-menu-open"></i>
+            </a>
+        </div>
+    </div>
+}
+
+<div class="panel panel-default" id="maincontent">
+    <div class="panel-heading">
+        <h5 class="panel-title">@Model.project.name</h5>
+    </div>
+    <div class="panel-body">
+        <div id="tasklist">
+            <ul class="nav nav-tabs nav-tabs-highlight">
+                <li class="active taskli">
+                    <a href="#" class="tasklist" data-id="@Model.project.id"><span class="badge badge-success"></span>Tasks</a>
+                </li>
+                <li class="credentialsli">
+                    <a href="/ProjectDashboard/ProjectCredentials/@Model.project.id" class="projectcreadentials" data-id="@Model.project.id"><span class="badge badge-success"></span>Credentials</a>
+                </li>
+                <li class="projectfilesli">
+                    <a href="#" class="projectfiles" data-id="@Model.project.id"><span class="badge badge-success"></span>Files</a>
+                </li>
+                <li class="notesli">
+                    <a href="#" class="notes" data-id="@Model.project.id"><span class="badge badge-success"></span>Notes</a>
+                </li>
+                <li class="Addcredentialsli pull-right" style="display: none;">
+                    <button data-id="@Model.project.id" @*onclick="window.open('/credentials/CreateForProject/@Model.project.id')"*@ class="btn btn-primary btnaddcredentials" target="_blank" style="color: white !important; margin-bottom: 10px !important;"><i class="icon-add position-left"></i><span class="badge badge-success"></span>Add Credentials</button>
+                </li>
+            </ul>
+            <div class="contentdiv"> @Html.Partial("_Tasklist", Model) </div>
+        </div>
+    </div>
+</div>
+<!-- File upload Model-->
+<div class="modal fade" id="uploadfielmodel" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Upload Project File</h4>
+            </div>
+            <div class="modal-body" id="modeldiv">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <div id="notificationdiv"></div>
+                        <div class="col-md-offset-2 col-md-5">
+                            @Html.TextBox("projectfile", null, new {@class = "", type = "file"})
+                            <input type="hidden" value="@Model.project.id" class="modelprojectid"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="reset" id="btnuploadfile" value="Upload" class="btn btn-primary"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End File upload Model-->
+<!-- Add Credential Model-->
+<div class="modal fade" id="Addcredentialmodel" role="dialog">
+    <div class="modal-dialog" style="width: 60%;">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">
+                    <span class="credentialmodeltitle"></span>
+                </h4>
+            </div>
+            <div class="modal-body" id="credentialformmodeldiv" style="height: 600px; max-height: 600px; overflow-y: scroll"> </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        // To make select2 searchable on model popup
+        $.fn.modal.Constructor.prototype.enforceFocus = function() {};
+        //****************************************************
+        //*************** Get Task List By Status ************
+        //****************************************************
+        $(document).on('click',
+            ".taskstatus",
+            function() {
+                var btn = $(this);
+                var id = $(this).data('id');
+                var statusid = $(this).data('statusid');
+                $.ajax({
+                    url: '/projectdashboard/get_task/' + id + '/' + statusid,
+                    type: 'GET'
+                }).done(function(data) {
+                    if (data.error) {
+                        //var source = $("#error-notification-template").html();
+                        //var template = Handlebars.compile(source);
+                        //var html = template(data);
+                        //$("#modeladdtimebodydiv").prepend(html);
+                        alert("Failed");
+                        return false;
+                    }
+                    $('#taskrow').html(data);
+                    $(".taskstatus").removeClass("active");
+                    btn.addClass("active");
+                    //$("#" + tcktitemid + ".notimeadded").remove();
+                    //var source = $("#Add-time-after-template").html();
+                    //var template = Handlebars.compile(source);
+                    //var html = template(data);
+                    //$("#" + tcktitemid + ".addtimeafter").append(html);
+                    return false;
+                });
+            });
+        //****************************************************
+        //*************** Get Project Files ******************
+        //****************************************************
+        $(document).on('click',
+            ".projectfiles",
+            function() {
+                $(".Addcredentialsli").hide();
+                var id = $(this).data('id');
+                $.ajax({
+                    url: '/projectdashboard/get_projectfiles/' + id,
+                    type: 'GET'
+                }).done(function(data) {
+                    if (data.error) {
+                        //var source = $("#error-notification-template").html();
+                        //var template = Handlebars.compile(source);
+                        //var html = template(data);
+                        //$("#modeladdtimebodydiv").prepend(html);
+                        alert("Failed");
+                        return false;
+                    }
+                    $('.contentdiv').html(data);
+                    $(".taskli").removeClass("active");
+                    $(".credentialsli").removeClass("active");
+                    $(".notesli").removeClass("active");
+                    $(".projectfilesli").addClass("active");
+                    //var inprogress = $(".taskstatus").data("statusid");
+                    //$("#" + tcktitemid + ".notimeadded").remove();
+                    //var source = $("#Add-time-after-template").html();
+                    //var template = Handlebars.compile(source);
+                    //var html = template(data);
+                    //$("#" + tcktitemid + ".addtimeafter").append(html);
+                    return false;
+                });
+            });
+        //****************************************************
+        //*************** Get Task List **********************
+        //****************************************************
+        $(document).on('click',
+            ".tasklist",
+            function() {
+                $(".Addcredentialsli").hide();
+                var id = $(this).data('id');
+                $.ajax({
+                    url: '/projectdashboard/get_tasklist/' + id,
+                    type: 'GET',
+                }).done(function(data) {
+                    if (data.error) {
+                        //var source = $("#error-notification-template").html();
+                        //var template = Handlebars.compile(source);
+                        //var html = template(data);
+                        //$("#modeladdtimebodydiv").prepend(html);
+                        alert("Failed");
+                        return false;
+                    }
+                    $('.contentdiv').html(data);
+                    $(".projectfilesli").removeClass("active");
+                    $(".credentialsli").removeClass("active");
+                    $(".notesli").removeClass("active");
+                    $(".taskli").addClass("active");
+                    $(".taskstatus").removeClass("active");
+                    $('.filterbystatus  .taskstatus').each(function(e) {
+                        if ($(this).data("statusid") == 2) {
+                            $(this).addClass("active");
+                        }
+                    });
+                    //$("#" + tcktitemid + ".notimeadded").remove();
+                    //var source = $("#Add-time-after-template").html();
+                    //var template = Handlebars.compile(source);
+                    //var html = template(data);
+                    //$("#" + tcktitemid + ".addtimeafter").append(html);
+                    return false;
+                });
+            });
+        $(document).on('click', '.addfiles', function() { $("#uploadfielmodel").modal('show'); });
+        $(document).on('click', '#projectfile', function() { $("#notificationdiv").html(' '); });
+        $(document).on('click',
+            '#btnuploadfile',
+            function() {
+                $("#notificationdiv").html(' ');
+                var formData = new FormData();
+                var imagefile = $("#projectfile")[0].files[0];
+                if (!imagefile) {
+                    var data = { errortext: "Please select a file." };
+                    var source = $("#error-notification-template").html();
+                    var template = Handlebars.compile(source);
+                    var html = template(data);
+                    $("#notificationdiv").prepend(html);
+                    return false;
+                }
+                formData.append("imageFile", imagefile);
+                var id = $('.modelprojectid').val();
+                $.ajax({
+                    url: '/projectdashboard/UploadFile/' + id,
+                    type: "POST",
+                    contentType: false, // Not to set any content header
+                    processData: false, // Not to process data
+                    data: formData
+                }).done(function(data) {
+                    if (data.error) {
+                        var source = $("#error-notification-template").html();
+                        var template = Handlebars.compile(source);
+                        var html = template(data);
+                        $("#notificationdiv").prepend(html);
+                        return false;
+                    }
+                    var source = $("#success-notification-template").html();
+                    var template = Handlebars.compile(source);
+                    var html = template(data);
+                    $("#notificationdiv").prepend(html);
+                    $("#projectfile").val(null);
+                    return false;
+                });
+            });
+        //****************************************************
+        //*************** Get Project Credentials ************
+        //****************************************************
+        $(document).on('click',
+            '.projectcreadentials',
+            function() {
+                var id = $(this).data('id');
+                $.ajax({
+                    url: '/projectdashboard/ProjectCredentials/' + id,
+                    type: 'GET'
+                }).done(function(data) {
+                    if (data.error) {
+                        //var source = $("#error-notification-template").html();
+                        //var template = Handlebars.compile(source);
+                        //var html = template(data);
+                        //$("#modeladdtimebodydiv").prepend(html);
+                        alert("Failed");
+                        return false;
+                    }
+                    $('.contentdiv').html(data);
+                    $(".projectfilesli").removeClass("active");
+                    $(".taskli").removeClass("active");
+                    $(".notesli").removeClass("active");
+                    $(".credentialsli").addClass("active");
+                    $(".Addcredentialsli").show();
+                    return false;
+                });
+            });
+        $(document).on('click',
+            '.btnaddcredentials',
+            function() {
+                var id = $(this).data("id");
+                $.ajax({
+                    url: '/credentials/create/',
+                    type: 'GET'
+                }).done(function(data) {
+                    if (data.error) {
+                        //var source = $("#error-notification-template").html();
+                        //var template = Handlebars.compile(source);
+                        //var html = template(data);
+                        //$("#modeladdtimebodydiv").prepend(html);
+                        alert("Failed");
+                        return false;
+                    }
+                    var title = "Add @Model.project.name Credentials";
+                    $(".credentialmodeltitle").text(title);
+                    $('#credentialformmodeldiv').html(data);
+                    var proid = "<input type='hidden' value='" + id + "' id='projectid' name='projectid'>";
+                    $("#form-group-productid").html('');
+                    $("#form-group-productid").hide();
+                    $("#addcredentials").append(proid);
+                    $('select').select2();
+                    $("#Addcredentialmodel").modal('show');
+                    //$("#" + tcktitemid + ".notimeadded").remove();
+                    //var source = $("#Add-time-after-template").html();
+                    //var template = Handlebars.compile(source);
+                    //var html = template(data);
+                    //$("#" + tcktitemid + ".addtimeafter").append(html);
+                    return false;
+                });
+            });
+        $(document).on('submit',
+            '#addcredentials',
+            function(e) {
+                e.preventDefault(); // prevent the form's normal submission
+                var dataToPost = $(this).serialize();
+                $.post("/credentials/create", dataToPost)
+                    .done(function(response, status, jqxhr) {
+                        sweetAlert("", "The credentials has been added successfully!", "success");
+                        $(".projectcreadentials").click();
+                        $("#Addcredentialmodel").modal('hide');
+                        return false;
+                    })
+                    .fail(function(jqxhr, status, error) {
+                        // this is the ""error"" callback
+                        //sweetAlert("", error.errortext, "error");
+                    });
+            });
+        $(document).on('click',
+            ".editcredentialsbtn",
+            function() {
+                $(".credentialmodeltitle").text('');
+                var id = $(this).data('id');
+                $.ajax({
+                    url: '/credentials/edit/' + id,
+                    type: 'GET'
+                }).done(function(data) {
+                    if (data.error) {
+                        //var source = $("#error-notification-template").html();
+                        //var template = Handlebars.compile(source);
+                        //var html = template(data);
+                        //$("#modeladdtimebodydiv").prepend(html);
+                        alert("Failed");
+                        return false;
+                    }
+                    $('#credentialformmodeldiv').html(data);
+                    var projectid = $("#projectid").val();
+                    var proid = "<input type='hidden' value='" + projectid + "' id='projectid' name='projectid'>";
+                    $("#form-group-productid").html('');
+                    $("#form-group-productid").hide();
+                    $("#editcredentials").append(proid);
+                    $('select').select2();
+                    $("#Addcredentialmodel").modal('show');
+                    //$("#" + tcktitemid + ".notimeadded").remove();
+                    //var source = $("#Add-time-after-template").html();
+                    //var template = Handlebars.compile(source);
+                    //var html = template(data);
+                    //$("#" + tcktitemid + ".addtimeafter").append(html);
+                    return false;
+                });
+            });
+        $(document).on('submit',
+            '#editcredentials',
+            function(e) {
+                e.preventDefault(); // prevent the form's normal submission
+                var dataToPost = $(this).serialize();
+                $.post("/credentials/edit", dataToPost)
+                    .done(function(response, status, jqxhr) {
+                        sweetAlert("", "The credentials has been updated successfully!", "success");
+                        $(".projectcreadentials").click();
+                        $("#Addcredentialmodel").modal('hide');
+                        return false;
+                    })
+                    .fail(function(jqxhr, status, error) {
+                        // this is the ""error"" callback
+                    });
+            });
+        $(document).on('click',
+            '.notes',
+            function() {
+                var id = $(this).data('id');
+                $.ajax({
+                    url: '/projectdashboard/ProjectNotes/' + id,
+                    type: 'GET'
+                }).done(function(data) {
+                    if (data.error) {
+                        //var source = $("#error-notification-template").html();
+                        //var template = Handlebars.compile(source);
+                        //var html = template(data);
+                        //$("#modeladdtimebodydiv").prepend(html);
+                        alert("Failed");
+                        return false;
+                    }
+                    $('.contentdiv').html(data);
+                    $(".projectfilesli").removeClass("active");
+                    $(".taskli").removeClass("active");
+                    $(".credentialsli").removeClass("active");
+                    $(".notesli").addClass("active");
+                    $(".Addcredentialsli").hide();
+                    return false;
+                });
+            });
+        $(document).on('click',
+            '.btnsendmsg',
+            function() {
+                var text = $("#msg").val();
+                var id = $(this).data('id');
+                $.ajax({
+                    url: '/projectdashboard/addprojectnotes/' + id + '/' + text,
+                    type: 'GET'
+                }).done(function(data) {
+                    if (data.error) {
+                        //var source = $("#error-notification-template").html();
+                        //var template = Handlebars.compile(source);
+                        //var html = template(data);
+                        //$("#modeladdtimebodydiv").prepend(html);
+                        alert("Failed");
+                        return false;
+                    }
+                    $(".notes").click();
+                    return false;
+                });
+            });
+        $(function() {
+            $('.contentdiv').on('click',
+                '.usernameclick',
+                function() {
+                    var $temp = $("<input>");
+                    $("body").append($temp);
+                    $temp.val($(this).closest('tr').find(".usernameval").text().trim()).select();
+                    document.execCommand("copy");
+                    $temp.remove();
+                });
+        });
+        $(function() {
+            $('.contentdiv').on('click',
+                '.pwdclick',
+                function() {
+                    var $temp = $("<input>");
+                    $("body").append($temp);
+                    $temp.val($(this).closest('tr').find(".passwordval").text().trim()).select();
+                    document.execCommand("copy");
+                    $temp.remove();
+                });
+        });
+        $(document).on('click',
+            '.deletenotemsg',
+            function() {
+                var id = $(this).data('id');
+                var li = $(this).closest("li");
+                var licount = $(this).closest("ul").find('li').length;
+                swal({
+                        title: "Delete Note?",
+                        text: "Are you sure, you want to delete this note ?",
+                        type: "error",
+                        showCancelButton: true,
+                        closeOnConfirm: false,
+                        confirmButtonColor: "#2196F3",
+                        showLoaderOnConfirm: true
+                    },
+                    function() {
+                        $.ajax({
+                            url: '/projectdashboard/DeleteProjectNotes/' + id,
+                            data: '',
+                            type: 'GET',
+                        }).done(function(data) {
+                            if (data.error) {
+                                swal({ title: data.error, confirmButtonColor: "#2196F3", type: "error" });
+                                return false;
+                            }
+                            // remove selected row from the list.
+                            $(li).remove();
+                            if (licount == 1) {
+                                var html = '<li class="media"><span class="media-annotation display-block mt-10"><b>Sorry, no note found!</b></span></li>';
+                                $('.ulmsg').prepend(html);
+                            }
+                            swal({
+                                title: "The selected note has been deleted successfully!",
+                                confirmButtonColor: "#2196F3",
+                                type: "success"
+                            });
+                        });
+                    });
+                return false;
+            });
+    });
+</script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+<script id="error-notification-template" type="text/x-handlebars-template">
+    <div class="alert alert-danger alert-styled-left alert-bordered usernotification">
+        <button data-dismiss="alert" class="close" type="button"><span>×</span><span class="sr-only">Close</span></button>
+        <span class="text-semibold">{{errortext}}</span>
+    </div>
+</script>
+<script id="success-notification-template" type="text/x-handlebars-template">
+    <div class="alert alert-success alert-styled-left alert-bordered usernotification">
+        <button data-dismiss="alert" class="close" type="button"><span>×</span><span class="sr-only">Close</span></button>
+        <span class="text-semibold">{{successtext}}</span>
+    </div>
+</script>

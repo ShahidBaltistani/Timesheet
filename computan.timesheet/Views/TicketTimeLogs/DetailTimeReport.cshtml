@@ -1,0 +1,123 @@
+﻿@using System.Data
+@model DataTable
+@{ ViewBag.Title = "Detail Time Report"; Layout = "~/Views/Shared/_Layout.cshtml"; }
+@section header {
+    <div style="background-color: #fff;" class="panel page-header border-top-primary">
+        <div class="page-header-content">
+            <div class="page-title">
+                <h5>
+                    <i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">TimeSheet</span> - Detail Time-Report
+                    <small class="display-block">Detail Time-Report</small>
+                </h5>
+            </div>
+            <div class="heading-elements"> <div class="btn-group"> </div> </div>
+            <a class="heading-elements-toggle"><i class="icon-menu"></i></a>
+        </div>
+        <div style="margin-bottom: 0; border-bottom: 0; box-shadow: none;" class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li><a href="/"><i class="icon-home2 position-left"></i>TimeSheet</a></li>
+            </ul>
+        </div>
+    </div>
+}
+<div class="panel panel-primary">
+    @Html.Partial("_TimeNavTabs", "DetailTimeReport")
+    <div class="panel-heading">
+        <h5 class="panel-title">Search Detail Time Report</h5>
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li><a data-action="collapse"></a></li>
+                <li><a data-action="reload"></a></li>
+            </ul>
+        </div>
+        <a class="heading-elements-toggle"><i class="icon-menu"></i></a>
+    </div>
+    <div class="panel-body"> @Html.Partial("_SearchTImelog", "DetailTime") </div>
+</div>
+<div class="panel panel-primary timeloglist"> @Html.Partial("_DetailTimeReport", Model) </div>
+<input type="hidden" id="TimeFilter" value="1" />
+@section Scripts {
+    <script src="~/Scripts/Datatable/dataTables.buttons.min.js"></script>
+    <script src="~/Scripts/Datatable/pdfmake.min.js"></script>
+    <script src="~/Scripts/Datatable/vfs_fonts.js"></script>
+    <script src="~/Scripts/Datatable/buttons.html5.min.js"></script>
+    <script src="~/Scripts/default/js/plugins/tables/datatables/extensions/fixed_columns.min.js"></script>
+}
+<style>
+    table.detail-report td:not(:first-child), th:not(:first-child) { text-align: center; }
+    table.detail-report thead tr th:first-child,
+    table.detail-report tbody tr td:first-child { min-width: 160px; white-space: nowrap; text-overflow: ellipsis; word-break: break-all; overflow: hidden; }
+    .DTFC_LeftBodyLiner { overflow-x: hidden; }
+</style>
+<link rel="stylesheet" type="text/css" href="/scripts/default/datepicker/css/jquery.datepick.min.css" />
+<script type="text/javascript">
+    $(function () {
+        ApplyDatatable();
+        $(document).on('click', '.searchtimelog', function () {
+            $("#spinner").show();
+            var fromdate = $('#fromdate').val();
+            var todate = $('#todate').val();
+            $.ajax({
+                url: '/tickettimelogs/DetailTimeReport',
+                data: {
+                    'startdate': fromdate,
+                    'enddate': todate,
+                    'TimeType': $('#TimeFilter').val()
+                },
+                type: 'POST'
+            }).done(function (data) {
+                if (data.error) { return false; }
+                else {
+                    $(".timeloglist").html(data);
+                    ApplyDatatable();
+                    $("#spinner").hide();
+                    return false;
+                }
+            });
+            return false;
+        });
+        $('input[name="optradio"]').change(function () {
+            $('input[name="optradio"]').closest("label").removeClass('btn-primary').addClass('btn-default')
+            $('#TimeFilter').val($('input[name="optradio"]:checked').val())
+            $('input[name="optradio"]:checked').closest("label").removeClass('btn-default').addClass('btn-primary')
+            $(".searchtimelog").click()
+        });
+    });
+    function ApplyDatatable() {
+        $('.detail-report').dataTable({
+            scrollY: 555,
+            scrollX: true,
+            scrollCollapse: true,
+            "bPaginate": false,
+            fixedHeader: true,
+            fixedColumns: { leftColumns: 1 },
+            dom: 'lBfrtip',
+            ordering: true,
+            columnDefs: [
+                { orderable: true, targets: 0 },
+                { orderable: false, targets: '_all' }
+            ],
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    title: '',
+                    customize: function (xlsx) {
+                        var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                        var loop = 0;
+                        if ($('#TimeFilter').val() == "both") {
+                            $('row', sheet).each(function () {
+                                if (loop % 2 == 0 && loop > 1) {
+                                    $(this).find("c:first").text('');
+                                }
+                                loop++;
+                            });
+                        }
+                    }
+                },
+                { extend: 'pdfHtml5', pageSize: 'A1', orientation: 'landscape', title: 'Detail Time-log' }
+            ],
+            initComplete: function () { $('.buttons-html5').addClass('btn btn-default btn-sm'); },
+        });
+        $('.dataTables_length select').select2({ minimumResultsForSearch: Infinity, width: 'auto' });
+    }
+</script>

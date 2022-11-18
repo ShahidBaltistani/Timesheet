@@ -1,0 +1,44 @@
+﻿@model computan.timesheet.core.Client
+@{ ViewBag.Title = "Details"; }
+<h2>Details</h2>
+<div>
+    <h4>Client</h4> <hr/>
+    <dl class="dl-horizontal">
+        <dt> @Html.DisplayNameFor(model => model.name) </dt>
+        <dd> @Html.DisplayFor(model => model.name) </dd>
+        <dt> @Html.DisplayNameFor(model => model.email) </dt>
+        <dd> @Html.DisplayFor(model => model.email) </dd>
+        <dt> @Html.DisplayNameFor(model => model.address) </dt>
+        <dd> @Html.DisplayFor(model => model.address) </dd>
+        <dt> @Html.DisplayNameFor(model => model.city) </dt>
+        <dd> @Html.DisplayFor(model => model.city) </dd>
+        <dt> @Html.DisplayNameFor(model => model.stateid) </dt>
+        <dd> @Html.DisplayFor(model => model.stateid) </dd>
+        <dt> @Html.DisplayNameFor(model => model.countryid) </dt>
+        <dd> @Html.DisplayFor(model => model.countryid) </dd>
+        <dt> @Html.DisplayNameFor(model => model.zip) </dt>
+        <dd> @Html.DisplayFor(model => model.zip) </dd>
+        <dt> @Html.DisplayNameFor(model => model.phone) </dt>
+        <dd> @Html.DisplayFor(model => model.phone) </dd>
+        <dt> @Html.DisplayNameFor(model => model.mobile) </dt>
+        <dd> @Html.DisplayFor(model => model.mobile) </dd>
+        <dt> @Html.DisplayNameFor(model => model.website) </dt>
+        <dd> @Html.DisplayFor(model => model.website) </dd>
+        <dt> @Html.DisplayNameFor(model => model.isactive) </dt>
+        <dd> @Html.DisplayFor(model => model.isactive) </dd>
+        <dt> @Html.DisplayNameFor(model => model.usersid) </dt>
+        <dd> @Html.DisplayFor(model => model.usersid) </dd>
+        <dt> @Html.DisplayNameFor(model => model.createdonutc) </dt>
+        <dd> @Html.DisplayFor(model => model.createdonutc) </dd>
+        <dt> @Html.DisplayNameFor(model => model.updatedonutc) </dt>
+        <dd> @Html.DisplayFor(model => model.updatedonutc) </dd>
+        <dt> @Html.DisplayNameFor(model => model.ipused) </dt>
+        <dd> @Html.DisplayFor(model => model.ipused) </dd>
+        <dt> @Html.DisplayNameFor(model => model.userid) </dt>
+        <dd> @Html.DisplayFor(model => model.userid) </dd>
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new {Model.id}) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

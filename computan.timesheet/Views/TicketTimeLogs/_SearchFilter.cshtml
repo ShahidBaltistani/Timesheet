@@ -1,0 +1,34 @@
+﻿@model computan.timesheet.Models.TicketTimeSearchViewModel
+@using (Html.BeginForm("Index", "TicketTimeLogs", FormMethod.Post, new {@class = "form-inline"}))
+{
+    <div class="form-group">
+        <div class="input-group">
+            <span class="input-group-addon">
+                <i class="icon-calendar3"></i>
+            </span>
+            @Html.EditorFor(model => model.StartDate, new {htmlAttributes = new {Value = Model.StartDate.ToString("MM/dd/yyyy"), @class = "form-control picker  default-margin-for"}})
+        </div>
+        <div class="input-group">
+            <span class="input-group-addon">
+                <i class="icon-calendar3"></i>
+            </span>
+            @Html.EditorFor(model => model.EndDate, new {htmlAttributes = new {Value = Model.EndDate.ToString("MM/dd/yyyy"), @class = "form-control picker default-margin-for"}})
+        </div>
+        <div class="input-group">
+            @Html.DropDownListFor(model => model.projectid, Model.ProjectCollection.OrderBy(x => x.Text), "Select Project", new {@class = "form-control "})
+            @Html.ValidationMessageFor(model => model.projectid)
+        </div>
+        <div class="input-group">
+            <button type="submit" class="btn btn-success form-control"> <span class="glyphicon glyphicon-search"></span> Search </button>
+        </div>
+    </div>
+}
+<style>
+    .select2-container { width: 200px !important; }
+</style>
+<script type="text/javascript">
+    $(function() {
+        $(".picker").datepicker({ dateFormat: 'mm/dd/yy' });
+        $(".picker").css('width', "100px");
+    });
+</script>

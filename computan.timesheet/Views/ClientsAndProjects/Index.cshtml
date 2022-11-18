@@ -1,0 +1,250 @@
+﻿@model IEnumerable<computan.timesheet.core.Client>
+@{ ViewBag.Title = "Clients & Projects"; }
+
+@section header {
+    <div style="background-color: #fff;" class="panel page-header border-top-primary">
+        <div class="page-header-content">
+            <div class="page-title">
+                <h5>
+                    <i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Timesheet</span> - Manage Clients
+                    <small class="display-block">Manage Clients</small>
+                </h5>
+            </div>
+            <div class="heading-elements">
+                <div class="btn-group">
+                    <a href="/clients/create" class="btn btn-primary addclientlink"><i class="icon-list3 position-left"></i>Add New Client</a>
+                    <a href="/projects/create" class="btn btn-primary addprojectlink"><i class="icon-list3 position-left"></i>Add New project</a>
+                </div>
+            </div>
+            <a class="heading-elements-toggle">
+                <i class="icon-menu"></i>
+            </a>
+        </div>
+        <div style="border-bottom: 0; box-shadow: none; margin-bottom: 0;" class="breadcrumb-line">
+            <ul class="breadcrumb breadcrumblinks ">
+                <li>
+                    <a href="/Home/index"><i class="icon-home2 position-left"></i>Home</a>
+                </li>
+                <li>
+                    <a href="#" class="clients">Clients </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+}
+
+<div class="container">
+    <div class="row">
+        <div class="panel panel-primary clientlist">
+            @Html.Partial("_Clients", Model)
+        </div>
+    </div>
+    <div class="row">
+        <div class="panel panel-primary projectlist"> </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        // making client panel collapseable on dynamic content
+        $(document).on('click',
+            '.panelcollapse',
+            function() {
+                var hasclass = $("#clientpanelbody.collapse");
+                if (hasclass.length == 0) {
+                    $("#clientpanelbody").addClass('collapse');
+                    $(this).addClass('rotate-180');
+                } else {
+                    $("#clientpanelbody").removeClass('collapse');
+                    $(this).removeClass('rotate-180');
+                }
+            });
+        // making project panel collapseable on dynamic content
+        $(document).on('click',
+            '.projectpanelcollapse',
+            function() {
+                var hasclass = $("#projectpanelbody.collapse");
+                if (hasclass.length == 0) {
+                    $("#projectpanelbody").addClass('collapse');
+                    $(this).addClass('rotate-180');
+                } else {
+                    $("#projectpanelbody").removeClass('collapse');
+                    $(this).removeClass('rotate-180');
+                }
+            });
+        // making task panel collapseable on dynamic content
+        $(document).on('click',
+            '.taskpanelcollapse',
+            function() {
+                var hasclass = $("#taskpanelbody.collapse");
+                if (hasclass.length == 0) {
+                    $("#taskpanelbody").addClass('collapse');
+                    $(this).addClass('rotate-180');
+                } else {
+                    $("#taskpanelbody").removeClass('collapse');
+                    $(this).removeClass('rotate-180');
+                }
+            });
+
+        //***********************************************
+        //              Load clients
+        //***********************************************
+        $(document).on('click',
+            '.clients',
+            function() {
+                $.ajax({
+                    url: '/clientsandprojects/Clients/',
+                    data: '',
+                    type: 'GET'
+                }).done(function(data) {
+                    if (data.error) {
+                        console.log("error");
+                    }
+                    $('.clientlist').html(data);
+                    $('.projectlist').html('');
+                    //update add client link
+                    $(".addclientlink").attr('href', '/clients/create/');
+                    //update add project link
+                    $(".addprojectlink").attr('href', '/projects/create/');
+                    // find if link already exist in brudcrum
+                    var sub = $(".breadcrumblinks").find('.clients');
+                    var li = sub.closest('li');
+                    li.nextAll('li').remove();
+                    return false;
+                });
+            });
+
+        //***********************************************
+        //              Load sub-clients
+        //***********************************************
+        $(document).on('click',
+            '.subclients',
+            function() {
+                var id = $(this).data("id");
+                var name = $(this).data("name");
+                $.ajax({
+                    url: '/clientsandprojects/SubClients/' + id,
+                    data: '',
+                    type: 'GET'
+                }).done(function(data) {
+                    if (data.error) {
+                        console.log("error");
+                    }
+                    $('.clientlist').html(data.clientlist);
+                    //update panel title of clients
+                    $('.paneltitleofclient').html("<b>" + name + "</b> Sub-Clients");
+                    $('.projectlist').html(data.projectlist);
+                    //update panel title of Projects
+                    $('.paneltitleofprojects').html("<b>" + name + "</b> Projects");
+                    //update add client link with parent id
+                    $(".addclientlink").attr('href', '/clients/create/' + id);
+                    //update add project link with client id
+                    $(".addprojectlink").attr('href', '/projects/create/' + id);
+                    // find if link already exist in brudcrum
+                    var sub = $(".breadcrumblinks").find('#' + id + '.subclients');
+                    var li = sub.closest('li');
+                    if (sub.length == 0) {
+                        $(".breadcrumblinks").append(' <li><a href="#"  data-id="' + id + '" data-name="' + name + '" id="' + id + '"  class="subclients">Sub Clients of ' + name + '</a></li>');
+                    } else {
+                        li.nextAll('li').remove();
+                    }
+                    return false;
+                });
+            });
+
+        //***********************************************
+        //        Load projects of client/sub-client
+        //***********************************************
+        $(document).on('click',
+            '.projects',
+            function() {
+                var id = $(this).data("id");
+                var name = $(this).data("name");
+                $.ajax({
+                    url: '/clientsandprojects/projects/' + id,
+                    data: '',
+                    type: 'GET'
+                }).done(function(data) {
+                    if (data.error) {
+                        console.log("error");
+                    }
+                    $('.clientlist').html('');
+                    $('.projectlist').html(data);
+                    //update panel title of projects
+                    $('.paneltitleofprojects').html("<b>" + name + "</b> Projects");
+                    // find if link already exist in brudcrum
+                    var sub = $(".breadcrumblinks").find('#' + id + '.projects');
+                    var li = sub.closest('li');
+                    if (sub.length == 0) {
+                        $(".breadcrumblinks").append(' <li><a href="#"  data-id="' + id + '" data-name="' + name + '" id="' + id + '"  class="projects">Projects of ' + name + '</a></li>');
+                    } else {
+                        li.nextAll('li').remove();
+                    }
+                    return false;
+                });
+            });
+
+        //***********************************************
+        //          Load Sub-projects of a Project
+        //***********************************************
+        $(document).on('click',
+            '.subprojects',
+            function() {
+                var id = $(this).data("id");
+                var name = $(this).data("name");
+                $.ajax({
+                    url: '/clientsandprojects/subprojects/' + id,
+                    data: '',
+                    type: 'GET'
+                }).done(function(data) {
+                    if (data.error) {
+                        console.log("error");
+                    }
+                    $('.clientlist').html('');
+                    $('.projectlist').html(data);
+                    //update panel title of projects
+                    $('.paneltitleofprojects').html("<b>" + name + "</b> Sub-Projects");
+                    // find if link already exist in brudcrum
+                    var sub = $(".breadcrumblinks").find('#' + id + '.subprojects');
+                    var li = sub.closest('li');
+                    if (sub.length == 0) {
+                        $(".breadcrumblinks").append(' <li><a href="#"  data-id="' + id + '" data-name="' + name + '" id="' + id + '"  class="subprojects">Projects of ' + name + '</a></li>');
+                    } else {
+                        li.nextAll('li').remove();
+                    }
+                    return false;
+                });
+            });
+
+        //***********************************************
+        //          Load Tasks by Project
+        //***********************************************
+        $(document).on('click',
+            '.loadtasks',
+            function() {
+                var id = $(this).data("id");
+                var name = $(this).data("name");
+                $.ajax({
+                    url: '/clientsandprojects/LoadTasks/' + id,
+                    data: '',
+                    type: 'GET'
+                }).done(function(data) {
+                    if (data.error) {
+                        console.log("error");
+                    }
+                    $('.clientlist').html('');
+                    $('.projectlist').html(data);
+                    //update panel title of tasks
+                    $('.paneltitleoftask').html("<b>" + name + "</b> Tasks");
+                    // find if link already exist in brudcrum
+                    var sub = $(".breadcrumblinks").find('#' + id + '.loadtasks');
+                    var li = sub.closest('li');
+                    if (sub.length == 0) {
+                        $(".breadcrumblinks").append(' <li><a href="#"  data-id="' + id + '" data-name="' + name + '" id="' + id + '"  class="loadtasks">Tasks of ' + name + '</a></li>');
+                    } else {
+                        li.nextAll('li').remove();
+                    }
+                    return false;
+                });
+            });
+    });
+</script>

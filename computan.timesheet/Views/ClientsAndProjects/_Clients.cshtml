@@ -1,0 +1,64 @@
+﻿@model IEnumerable<computan.timesheet.core.Client>
+<div class="panel-heading">
+    <h5 class="panel-title paneltitleofclient">Clients</h5>
+    <div class="heading-elements">
+        <ul class="icons-list">
+            <li>
+                <a data-action="collapse" class="panelcollapse"></a>
+            </li>
+        </ul>
+    </div>
+    <a class="heading-elements-toggle">
+        <i class="icon-menu"></i>
+    </a>
+</div>
+<div class="panel-body panel-collapse" id="clientpanelbody">
+    @if (Model != null && Model.Count() > 0)
+    {
+        foreach (var item in Model)
+        {
+            <div class="col-md-4">
+                <div class="panel border-left-lg border-left-primary">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h6 class="no-margin-top">
+                                    <a href="/clients/edit/@item.id"><i class="icon-user"></i>&nbsp;&nbsp;@item.name</a>
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        <ul>
+                            @if (item.SubClients != null && item.SubClients.Count() > 0)
+                            {
+                                <li>
+                                    <a href="#" data-id="@item.id" data-name="@item.name" class="subclients">Sub-Client</a>
+                                </li>
+                            }
+                            <li>
+                                <a href="#" data-id="@item.id" data-name="@item.name" class="projects">Projects</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-md-4">
+            <div class="panel border-left-lg border-left-primary">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h6 class="no-margin-top">
+                                <a href="#"><i class="icon-task"></i>&nbsp;&nbsp;Sorry, No client found.</a>
+                            </h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

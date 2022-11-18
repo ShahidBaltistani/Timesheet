@@ -1,0 +1,41 @@
+﻿@model string
+@using (Html.BeginForm("", "", FormMethod.Post, new { @class = "form-inline" }))
+{
+    <div class="input-group">
+        <span class="input-group-addon"><i class="icon-calendar3"></i></span>
+        <input type="text" class="form-control picker  default-margin-for" id="fromdate" name="fromdate" placeholder="From Date" required="required" />
+    </div>
+    <div class="input-group">
+        <span class="input-group-addon"><i class="icon-calendar3"></i></span>
+        <input type="text" class="form-control picker  default-margin-for" id="todate" name="todate" placeholder="To Date" required="required" />
+    </div>
+    <div class="input-group">
+        <input type="submit" value="Search" class="btn btn-success searchtimelog form-control">
+    </div>
+    if (Model == "DetailTime")
+    {
+        <div class="dt-buttons btn-group" data-toggle="buttons">
+            <label class="btn btn-primary"> <input type="radio" name="optradio" value="spent" checked="checked">Spent Time</label>
+            <label class="btn btn-default"> <input type="radio" name="optradio" value="bill">Bill Time</label>
+            <label class="btn btn-default"> <input type="radio" name="optradio" value="both">Spent & Bill Time</label>
+        </div>
+    }
+}
+<script type="text/javascript">
+    $(function () {
+        $(".picker").css('width', "100px");
+        // set current date with minus one week
+        var today = new Date();
+        today.setDate(today.getDate());
+        var day = new Date(today),
+            year = ((day.getMonth()) < 0) ? (day.getFullYear()) : day.getFullYear(),
+            month = ((day.getMonth()) < 0) ? (12 + (day.getMonth())) : (day.getMonth() + 1),
+            date = (month) + '-' + (day.getDate()) + '-' + year;
+        var currentdateminusoneweek = (month) + '-' + 01 + '-' + year;
+        // set current date
+        var monthlast = new Date(year, month, 0).getDate();
+        var currentdate = (month) + '-' + monthlast + '-' + year;
+        $("#fromdate").datepicker({ dateFormat: 'mm-dd-yy', }).val(currentdateminusoneweek);
+        $("#todate").datepicker({ dateFormat: 'mm-dd-yy' }).val(currentdate);
+    });
+</script>

@@ -1,0 +1,53 @@
+﻿@model computan.timesheet.core.RuleAction
+@using (Html.BeginForm())
+{
+    <div class="form-horizontal">
+        <h4>Add New Rule</h4>
+        <hr/>
+        @Html.ValidationSummary(true, "", new {@class = "text-danger"})
+        <div class="form-group">
+            <div class="col-md-12">
+                @Html.DropDownList("ruleactiontypeid", null, "Please Select Rule Action Type", new {@class = "form -control"})
+                @Html.ValidationMessageFor(model => model.ruleactiontypeid, "", new {@class = "text-danger"})
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12">
+                @Html.DropDownList("ruleactionvalue", null, "Please Select", new {@class = "form-control"})
+                @Html.ValidationMessageFor(model => model.ruleactionvalue, "", new {@class = "text-danger"})
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12">
+                @Html.DropDownList("projectid", null, "Please Select Project", new {@class = "form-control"})
+                @Html.ValidationMessageFor(model => model.projectid, "", new {@class = "text-danger"})
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12">
+                @Html.DropDownList("skillid", null, "Please Select Skill", new {@class = "form-control"})
+                @Html.ValidationMessageFor(model => model.skillid, "", new {@class = "text-danger"})
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12">
+                @Html.DropDownList("statusid", null, "Please Select Status", new {@class = "form-control hidden"})
+                @Html.ValidationMessageFor(model => model.statusid, "", new {@class = "text-danger"})
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input id="btnsaveaction" type="submit" value="Create" class="btn btn-default"/>
+                <button id="cancelruleaction" class="btn btn-default">Cancal</button>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" id="" class="ruleactionid" data-id="@Model.id"/>
+    <input type="hidden" id="" class="ruleid" data-id="@Model.ruleid"/>
+}
+<script>
+    jQuery("#ruleactionvalue").select2();
+    jQuery("#ruleactiontypeid").select2();
+    jQuery("#projectid").select2();
+    jQuery("#skillid").select2();
+</script>

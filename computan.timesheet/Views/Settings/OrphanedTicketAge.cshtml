@@ -1,0 +1,74 @@
+﻿@model List<computan.timesheet.core.ConversationStatus>
+@{
+    ViewBag.Title = "Settings";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="sidebar-detached">
+    <div class="sidebar sidebar-default">
+        <div class="sidebar-category">
+            <div class="category-title">
+                <span>Navigation</span>
+            </div>
+            @Html.Partial("_SettingMenu", "customizeOrphanAge")
+        </div>
+    </div>
+</div>
+<div class="container-detached">
+    <div class="content-detached">
+        <div class="panel">
+            <div class="panel-heading bg-teal-700">
+                <div class="row">
+                    <h4 class="panel-title">
+                        <span>Orphaned Ticket Age</span>
+                    </h4>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="datatable-scroll">
+                        <table class="table datatable-button-html5-basic" id="DataTables_Table_0" role="grid" aria-describedby="DataTables_Table_0_info">
+                            <thead>
+                            <tr role="row">
+                                <th> Status Name </th>
+                                <th> Age [Days] </th>
+                                <th> Action </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td> @item.name </td>
+                                    <td> @item.OrphanAge </td>
+                                    <td>
+                                        <button type="button" id="editAgeModal" class="btn btn-primary" data-id="@item.id">Edit</button>
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="EditOrphanAgeModal" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h2 class="modal-title" style="text-align: center">Orphaned Status Edit </h2>
+            </div>
+            <div class="modal-body">
+                <input class="form-control editAge" type="text" value="" maxlength="2"
+                       oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"/>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary center-block submitStatus">Edit</button>
+            </div>
+        </div>
+    </div>
+</div>
+<link href="~/Content/Settings/OrphanTicketSubscribe.css" rel="stylesheet"/>
+<script src="~/Scripts/custom/Settings/Settings.min.js"></script>

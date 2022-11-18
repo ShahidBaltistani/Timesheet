@@ -1,0 +1,195 @@
+﻿@{ ViewBag.Title = "Manage Users"; }
+<div class="panel panel-default" id="maincontent">
+    @Html.Partial("_NavTabs", "usersadmin")
+    <div class="panel">
+        <div class="panel-heading bg-teal-700">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="col-xs-12 col-sm-7">
+                        <h4 class="panel-title ticket-title">
+                            <span>Users Listing </span>
+                        </h4>
+                    </div>
+                    <div class="col-xs-12 col-sm-5">
+                        <div class="heading-elements">
+                            <ul class="icons-list">
+                                <li>
+                                    <button class="label border-left-primary label-striped" onclick="window.location.href = '/usersadmin/create'">Add New User</button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-flat">
+            <div id="DataTables_Table_0_wrapper" class="dataTables_wrapper no-footer">
+                <div class="datatable-scroll">
+                    <table class="table" id="DataTables_Table_0" role="grid" aria-describedby="DataTables_Table_0_info">
+                        <thead>
+                        <tr>
+                            <th> Name </th>
+                            <th> Email </th>
+                            <th> Phone Number </th>
+                            <th> Role </th>
+                            <th> Status </th>
+                            <th> Option </th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="statusFilter" value="1"/>
+<script type="text/javascript">
+
+    $(document).on('click', '.twoFA', function () {
+        var userId = $(this).data('id');
+        swal({
+            title: "Are you sure?",
+            text: "Do you want to reset Two-FA!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#EF5350",
+            cancelButtonColor: '#6e7d88',
+            confirmButtonText: "Yes",
+            cancelButtonText: "Cancel",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        },
+            function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "/UsersAdmin/ResetTwoFA/" + userId,
+                        type: 'GET'
+                    }).done(function (data) {
+                        if (data == true) {
+                            swal({
+                                title: "Success",
+                                text: "Success",
+                                confirmButtonColor: "#2196F3",
+                                type: "success"
+                            });
+                        }
+                        else {
+                            swal({
+                                title: "Error",
+                                text: "Something went wrong please try again",
+                                confirmButtonColor: "#2196F3",
+                                type: "error"
+                            });
+                        }
+                    });
+                } else {
+                    swal({
+                        title: "Cancelled",
+                        //text: "Two-FA not reset",
+                        confirmButtonColor: "#2196F3",
+                        type: "error"
+                    });
+                }
+            });
+    });
+    $(document).ready(function () {
+        var utable = $('#DataTables_Table_0').DataTable({
+            "ajax": {
+                "url": "/UsersAdmin/GetData",
+                "type": "GET",
+                "data": function(data) {
+                    data.filter = $('#statusFilter').val() == 'null' ? null : ($('#statusFilter').val() == '1' ? true : false);
+                },
+                "datatype": "json"
+            },
+            "columnDefs": [
+                { "targets": 0, "data": "FullName", "render": function(data) { return data; } },
+                { "targets": 1, "data": "Email", "render": function(data) { return data; } },
+                { "targets": 2, "data": "PhoneNumber", "render": function(data) { return data; } },
+                { "targets": 3, "data": "Role", "render": function(data) { return data; } },
+                {
+                    "targets": 4,
+                    "data": "isactive",
+                    "render": function(data) {
+                        if (data == true) {
+                            return '<span class="label label-success">Active</span>';
+                        }
+                        return '<span class="label label-danger">In-Active</span>';
+                    }
+                },
+                {
+                    "targets": 5,
+                    "data": "Id",
+                    "render": function(data) {
+                        return '<a class="btn btn-primary btn-xs" href="/UsersAdmin/Edit/' +
+                            data +
+                            '" >Edit</a>&nbsp;' +
+                            '<a class="btn btn-primary btn-xs" href="/UsersAdmin/ResetPassword/' +
+                            data +
+                            '" target="_blank">Reset Password</a>&nbsp;' +
+                            '<a class="btn btn-primary btn-xs" href="/UsersAdmin/GetTask/' +
+                            data +
+                            '" target="_blank">Task List</a>&nbsp;'+
+                        '<a class="btn btn-primary btn-xs twoFA"  data-id="' +
+                            data +
+                            '" target="_blank">Reset 2FA</a>';
+/*                         href="/UsersAdmin/ResetTwoFA/*/
+                    }
+                }
+            ],
+            buttons: {
+                dom: { button: { className: 'btn btn-default' } },
+                buttons: [
+                    { extend: 'copyHtml5', exportOptions: { columns: 'th:not(:last-child)' } },
+                    { extend: 'excelHtml5', exportOptions: { columns: 'th:not(:last-child)' } },
+                    { extend: 'csvHtml5', exportOptions: { columns: 'th:not(:last-child)' } },
+                    { extend: 'pdfHtml5', exportOptions: { columns: 'th:not(:last-child)' } }
+                ]
+            }
+        });
+        $(".dataTables_length").before($("#status-radiobutton-template").html());
+        $('input[name="optradio"]').change(function() {
+            $('input[name="optradio"]').closest("label").removeClass('btn-primary').addClass('btn-default');
+            $('#statusFilter').val($('input[name="optradio"]:checked').val());
+            $('input[name="optradio"]:checked').closest("label").removeClass('btn-default').addClass('btn-primary');
+            utable.ajax.reload();
+        });
+        $('.dataTables_length select').select2({ minimumResultsForSearch: Infinity, width: 'auto' });
+
+        var data = '@TempData["isRocketUserCreated"]';
+        var tsdata = '@TempData["isTimesheetUserCreated"]';
+        if (performance.navigation.type == 2) {
+            data = '';
+            tsdata = '';
+        }
+        if (data != '') {
+            var rocketData = JSON.parse(data.replace(/&quot;/g, '"'));
+            new PNotify({
+                title: 'Rocket',
+                text: rocketData.Message,
+                type: rocketData.IsSuccess ? 'success' : 'error'
+            });
+            data = '';
+        }
+
+        if (tsdata != '') {
+            var tsData = JSON.parse(tsdata.replace(/&quot;/g, '"'));
+            new PNotify({
+                title: 'Timesheeet',
+                text: tsData.Message,
+                type: tsData.IsSuccess ? 'success' : 'error'
+            });
+            tsdata = '';
+        }
+    });
+
+
+
+</script>
+<script id="status-radiobutton-template" type="text/x-handlebars-template">
+    <div data-toggle="buttons" class="dt-buttons btn-group">
+        <label class="btn btn-primary"> <input type="radio" name="optradio" value="1" checked="checked">Active </label>
+        <label class="btn btn-default"> <input type="radio" name="optradio" value="0">In-Active </label>
+        <label class="btn btn-default"> <input type="radio" name="optradio" value="null">All </label>
+    </div>
+</script>

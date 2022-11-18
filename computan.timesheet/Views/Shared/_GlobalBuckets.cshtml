@@ -1,0 +1,80 @@
+﻿@model computan.timesheet.Models.TicketTimeViewModel
+@if (Model.SearchResults != null && Model.SearchResults.Count > 0)
+{
+    for (var i = 0; i < Model.SearchResults.Count; i++)
+    {
+        <div class="row bucketitemrow" id="@Model.SearchResults[i].id">
+            @Html.HiddenFor(modelitem => Model.SearchResults[i].id, new {@class = "id"})
+            <div class="row">
+                <div class="col-lg-4 col-md-3 col-sm-3">
+                    <div class="bucketinfo text-center">
+                        <b>@Html.DisplayFor(modelItem => Model.SearchResults[i].Project.name, new {@class = "projectforbucket"})</b>
+                        <span class="titleforbucket" data-placement="right" data-html="true" rel="tooltip" data-popup="tooltip" title="@Model.SearchResults[i].title">@Model.SearchResults[i].title</span>
+                    </div>
+                </div>
+                <div class="col-lg-5 col-md-5 col-sm-4">
+                    @Html.TextAreaFor(modelItem => Model.SearchResults[i].description, new {@class = "form-control bucketdescription", rows = "1"})
+                </div>
+                <div class="col-lg-2 col-md-3 col-sm-4 text-center">
+                    @Html.DropDownListFor(modelItem => Model.SearchResults[i].timespentinminutes, (IEnumerable<SelectListItem>) ViewData["item.timespentinminutes"], "Spent", new {@class = "timespent"})
+                    @Html.DropDownListFor(modelItem => Model.SearchResults[i].billabletimeinminutes, (IEnumerable<SelectListItem>) ViewData["item.billabletimeinminutes"], "Billable", new {@class = "timebill"})
+                </div>
+                <div class="col-lg-1 col-md-1 col-sm-1">
+                    <a class="fa fa-close fa-2x deletetimelogGobal" href="/tickettimelogs/delete/@Model.SearchResults[i].id"></a>
+                </div>
+            </div>
+        </div>
+    }
+    <div class="form-group savebtn">
+        <div class="col-lg-offset-5 col-sm-offset-5" style="padding-top: 10px;">
+            <input type="submit" value="save" class="btn-success btn-lg globaladdtimeinbucketbtn"/>
+        </div>
+    </div>
+    <hr/>
+}
+else
+{
+    <center>
+        <span>
+            <b>Sorry, no task found in your bucket</b>
+        </span>
+    </center>
+    <hr/>
+}
+@if (Model.TimeAddedResults != null && Model.TimeAddedResults.Count > 0)
+{
+    <div class="row">
+        <div class="col-md-4 col-sm-4 col-xs-4">
+            <b>Ticket Information</b>
+        </div>
+        <div class="col-md-6 col-sm-6 col-xs-6">
+            <b>Description</b>
+        </div>
+        <div class="col-md-1 col-sm-1 col-xs-1 text-center">
+            <b>Spent Time</b>
+        </div>
+        <div class="col-md-1 col-sm-1 col-xs-1 text-center">
+            <b>Billable Time</b>
+        </div>
+    </div>
+    foreach (var items in Model.TimeAddedResults)
+    {
+        <div class="row">
+            <div class="col-md-4 col-sm-4 col-xs-4">
+                <b>@Html.DisplayFor(modelItem => items.Project.name, new {@class = ""})</b>
+                <span>@items.title</span>
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-6"> @Html.DisplayFor(modelItem => items.description, new {@class = ""}) </div>
+            <div class="col-md-1 col-sm-1 col-xs-1 text-center"> @Html.DisplayFor(modelItem => items.timespentinminutes, new {@class = ""}) </div>
+            <div class="col-md-1 col-sm-1 col-xs-1 text-center"> @Html.DisplayFor(modelItem => items.billabletimeinminutes, new {@class = ""}) </div>
+        </div>
+    }
+}
+<script type="text/javascript">
+    $(function() {
+        autosize(document.querySelectorAll('textarea'));
+        $(".bucketinfo").hover(function() { $("[rel='tooltip']").tooltip(); });
+        $(".timespent").select2({ width: 90 });
+        $(".timebill").select2({ width: 90 });
+    });
+</script>

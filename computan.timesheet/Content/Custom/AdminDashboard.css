@@ -1,0 +1,65 @@
+﻿.nospace {
+    margin: 0 0 10px;
+    padding-left: 1px;
+    padding-right: 1px;
+}
+
+.flex-container {
+    align-items: stretch;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.panel-css {
+    color: #fff;
+    height: 100%;
+    margin-bottom: 0;
+    padding: 0 0 20px;
+    position: relative;
+}
+
+.vertical-center {
+    text-align: center;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.nospace:nth-child(6n + 1) .panel-footer { background: #691575; }
+
+.nospace:nth-child(6n + 2) .panel-footer { background: #748189; }
+
+.nospace:nth-child(6n + 3) .panel-footer { background: #0075C9; }
+
+.nospace:nth-child(6n + 4) .panel-footer { background: #FE7227; }
+
+.nospace:nth-child(6n + 5) .panel-footer { background: #ff2e2e; }
+
+.nospace:nth-child(6n + 6) .panel-footer { background: mediumspringgreen; }
+
+.nospace:nth-child(6n + 1) .panel-css { background: #691575; }
+
+.nospace:nth-child(6n + 2) .panel-css { background: #748189; }
+
+.nospace:nth-child(6n + 3) .panel-css { background: #0075C9; }
+
+.nospace:nth-child(6n + 4) .panel-css { background: #FE7227; }
+
+.nospace:nth-child(6n + 5) .panel-css { background: #ff2e2e; }
+
+.nospace:nth-child(6n + 6) .panel-css { background: mediumspringgreen; }
+
+.panel-footer {
+    bottom: 0;
+    left: 0;
+    padding-bottom: 3px;
+    padding-top: 3px;
+    position: absolute;
+    right: 0;
+}
+
+.arrow-position {
+    float: right;
+    padding-bottom: 10px;
+    padding-right: 10px;
+}

@@ -1,0 +1,145 @@
+﻿@model computan.timesheet.core.Project
+@{ ViewBag.Title = "Add Project"; }
+<div class="panel panel-default" id="maincontent">
+    @Html.Partial("_NavTabs", "projects")
+    <div class="panel">
+        <div class="panel-heading bg-teal-700">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="col-xs-12 col-sm-7">
+                        <h4 class="panel-title ticket-title">
+                            <span>Add New Project </span>
+                        </h4>
+                    </div>
+                    <div class="col-xs-12 col-sm-5">
+                        <div class="heading-elements">
+                            <ul class="icons-list">
+                                <li>
+                                    <button class="label border-left-primary label-striped" onclick="window.location.href = '/projects/index'">List Projects</button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-body">
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-horizontal">
+                    @Html.ValidationSummary(true, "", new {@class = "text-danger"})
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            @Html.LabelFor(model => model.name, new {@class = "control-label"})
+                            @Html.EditorFor(model => model.name, new {htmlAttributes = new {@class = "form-control"}})
+                            @Html.ValidationMessageFor(model => model.name, "", new {@class = "text-danger"})
+                        </div>
+                        <div class="col-md-3">
+                            @Html.LabelFor(model => model.parentid, "Parent Project", new {@class = "control-label"})
+                            @Html.DropDownListFor(model => model.parentid, (IEnumerable<SelectListItem>) ViewBag.parentlist, "Please Select", new {@class = "form-control"})
+                            @Html.ValidationMessageFor(model => model.parentid, "", new {@class = "text-danger"})
+                        </div>
+                        <div class="col-md-3">
+                            @Html.LabelFor(model => model.clientid, "Client Name", new {@class = "control-label"})
+                            @if (ViewBag.hasclient == true)
+                            {
+                                @Html.DropDownListFor(model => model.clientid, (IEnumerable<SelectListItem>) ViewBag.clientlist, "Please Select", new {@class = "form-control", disabled = "disabled"})
+                                <input type="hidden" id="clientid" name="clientid" value="@ViewBag.clientid"/>
+                            }
+                            else
+                            {
+                                @Html.DropDownListFor(model => model.clientid, (IEnumerable<SelectListItem>) ViewBag.clientlist, "Please Select", new {@class = "form-control"})
+                            }
+                            @Html.ValidationMessageFor(model => model.clientid, "", new {@class = "text-danger"})
+                        </div>
+                        <div class="col-md-3">
+                            @Html.LabelFor(model => model.projectmanager, new {@class = "control-label"})
+                            @Html.DropDownListFor(model => model.projectmanager, ViewBag.users as SelectList, "Please Select", new {@class = "form-control"})
+                            @Html.ValidationMessageFor(model => model.projectmanager, "", new {@class = "text-danger"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            @Html.LabelFor(model => model.startdate, new {@class = "control-label"})
+                            @Html.EditorFor(model => model.startdate, new {htmlAttributes = new {@class = "form-control"}})
+                            @Html.ValidationMessageFor(model => model.startdate, "", new {@class = "text-danger"})
+                        </div>
+                        <div class="col-md-3">
+                            @Html.LabelFor(model => model.completiondate, new {@class = "control-label"})
+                            @Html.EditorFor(model => model.completiondate, new {htmlAttributes = new {@class = "form-control"}})
+                            @Html.ValidationMessageFor(model => model.completiondate, "", new {@class = "text-danger"})
+                        </div>
+                        <div class="col-md-6">
+                            @Html.LabelFor(model => model.warningtext, new {@class = "control-label"})
+                            @Html.EditorFor(model => model.warningtext, new {htmlAttributes = new {@class = "form-control"}})
+                            @Html.ValidationMessageFor(model => model.warningtext, "", new {@class = "text-danger"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-1" for="isactive">Status</label>
+                        <div class="col-md-1">
+                            <div class="checkbox">
+                                @Html.CheckBoxFor(model => model.isactive, new {@checked = "checked"})
+                                @Html.LabelFor(m => m.isactive, "Active", new {@class = "lbl-active label label-success", style = "margin-left: 18px; padding-left: 4px;"})
+                                @Html.LabelFor(m => m.isactive, "In-Active", new {@class = "lbl-deactive label label-danger", style = "margin-left: 18px; padding-left: 4px;"})
+                                @Html.ValidationMessageFor(model => model.isactive, "", new {@class = "text-danger"})
+                            </div>
+                        </div>
+                        <label class="control-label col-md-1" for="iswarning">Warning</label>
+                        <div class="col-md-1">
+                            <div class="checkbox" data-toggle="tooltip" title="Show warning text whenever ticket time enter">
+                                @Html.CheckBoxFor(model => model.iswarning)
+                                @Html.ValidationMessageFor(model => model.iswarning, "", new {@class = "text-danger"})
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12">
+                            @Html.LabelFor(model => model.description, new {@class = "control-label"})
+                            @Html.TextAreaFor(model => model.description, new {htmlAttributes = new {@class = "form-control"}})
+                            @Html.ValidationMessageFor(model => model.description, "", new {@class = "text-danger"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-12 text-center">
+                            <input type="submit" value="Create" class="btn btn-primary"/>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/Scripts/ckeditor4")
+}
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#parentid").select2();
+        $("#clientid").select2();
+        $("#projectmanager").select2();
+        $("#startdate").AnyTime_picker({ format: "%m/%d/%Z" });
+        $("#completiondate").AnyTime_picker({ format: "%m/%d/%Z" });
+        ChangeStatus();
+        $("#isactive").change(function() { ChangeStatus(); });
+
+        function ChangeStatus() {
+            if ($("#isactive").is(':checked')) {
+                $(".lbl-active").show();
+                $(".lbl-deactive").hide();
+            } else {
+                $(".lbl-active").hide();
+                $(".lbl-deactive").show();
+            }
+        }
+    });
+</script>
+<script type="text/javascript">
+    jQuery(function() {
+        // Full featured editor
+        CKEDITOR.replace('description', { height: '300px', removePlugins: 'easyimage, cloudservices', extraPlugins: 'forms,base64image' });
+    });
+</script>

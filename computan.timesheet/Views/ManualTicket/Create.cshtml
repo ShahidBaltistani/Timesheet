@@ -1,0 +1,201 @@
+﻿@model computan.timesheet.Models.ManualTicketViewModel
+@{ ViewBag.Title = "Add Manual Ticket"; }
+
+@section header {
+    <div style="background-color: #fff;" class="panel page-header border-top-primary">
+        <div class="page-header-content">
+            <div class="page-title">
+                <h5>
+                    <i class="icon-arrow-left52 position-left"></i>
+                    <span class="text-semibold">Timesheet</span> - Manage Manual Tickets
+                    <small class="display-block">Manage Manual Tickets</small>
+                </h5>
+            </div>
+            <div class="heading-elements">
+                <div class="btn-group">
+                    <a href="/manualticket/index/2" class="btn btn-primary"><i class="icon-list3 position-left"></i> List Manual Tickets</a>
+                </div>
+            </div>
+            <a class="heading-elements-toggle">
+                <i class="icon-menu"></i>
+            </a>
+        </div>
+        <div style="border-bottom: 0; box-shadow: none; margin-bottom: 0;" class="breadcrumb-line">
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/Home/index"><i class="icon-home2 position-left"></i>Home</a>
+                </li>
+                <li>
+                    <a href="/manualticket/index">Manual Tickets</a>
+                </li>
+                <li>
+                    <a href="/manualticket/create">Add Manual Ticket</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+}
+
+<div class="panel panel-flat">
+    <div class="panel-heading">
+        <div class="heading-elements">
+            <ul class="icons-list">
+                <li>
+                    <a data-action="collapse"></a>
+                </li>
+                <li>
+                    <a data-action="reload"></a>
+                </li>
+            </ul>
+        </div>
+        <a class="heading-elements-toggle">
+            <i class="icon-menu"></i>
+        </a>
+    </div>
+    <div class="panel-body">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-horizontal">
+                <h4>Add Manual Ticket</h4>
+                <hr/>
+                @Html.ValidationSummary(false, "", new {@class = "text-danger"})
+                <div class="form-group">
+                    <div class="col-md-8">
+                        @Html.LabelFor(model => model.ticket.topic, new {@class = "control-label"})
+                        @Html.EditorFor(model => model.ticket.topic, new {htmlAttributes = new {@class = "form-control", required = "required"}})
+                        @Html.ValidationMessageFor(model => model.ticket.topic, "", new {@class = "text-danger"})
+                    </div>
+                    <div class="col-md-4">
+                        @Html.LabelFor(model => model.ticketitem.projectid, "Project", new {@class = "control-label"})
+                        @Html.DropDownList("ticketitem.projectid", ViewBag.projectid as SelectList, "Please Select", new {@class = "form-control"})
+                        @Html.ValidationMessageFor(model => model.ticketitem.projectid, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-8">
+                        @Html.LabelFor(model => model.ticketitem.subject, new {@class = "control-label"})
+                        @Html.EditorFor(model => model.ticketitem.subject, new {htmlAttributes = new {@class = "form-control", required = "required"}})
+                        @Html.ValidationMessageFor(model => model.ticketitem.subject, "", new {@class = "text-danger"})
+                    </div>
+                    <div class="col-md-4">
+                        @Html.LabelFor(model => model.ticketitem.skillid, "Skill", new {@class = "control-label"})
+                        @Html.DropDownList("ticketitem.skillid", ViewBag.skillid as SelectList, "Please Select", new {@class = "form-control"})
+                        @Html.ValidationMessageFor(model => model.ticketitem.skillid, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <div class="input-group">
+                            <span class="input-group-addon">Assign User:</span>
+                            <input name="users" id="users" type="text" class="form-control assignedusersinput"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        @Html.Label("Description", new {@class = "control-label"})
+                        @Html.TextAreaFor(model => model.ticketitem.uniquebody, 10, 1, new {@class = "form-control", width = "100%"})
+                        @Html.ValidationMessageFor(model => model.ticketitem.uniquebody, "", new {@class = "text-danger"})
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12 text-center">
+                        <input type="submit" value="Create" class="btn btn-primary createnewticket"/>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/Scripts/select2")
+    @Scripts.Render("~/Scripts/custom/tagsinput")
+    @Scripts.Render("~/Scripts/ckeditor4")
+}
+
+<script type="text/javascript">
+    jQuery(function() {
+        // Full featured editor
+        CKEDITOR.replace('ticketitem.uniquebody',
+            {
+                height: '300px',
+                removePlugins: 'easyimage, cloudservices',
+                extraPlugins: 'forms,base64image'
+            });
+        $("#users").change(function() {
+            $.ajax({
+                url: "/ManualTicket/CheckUsersTeam/", //make sure url exist
+                type: "Get",
+                data: { usersid: $("#users").val() }, //pass data to action
+                success: function(data) {
+                    if (data.error) {
+                        new PNotify({ title: "Error", text: data.response, type: 'error', hide: true });
+                        $('.bootstrap-tagsinput .tag').last().children().click();
+                    }
+                }
+            });
+        });
+        $("#ticketitem_projectid").select2();
+        $("#ticketitem_skillid").select2();
+        loadUsersTagInputs();
+        $(".createnewticket").on("click",
+            function() {
+                var topic = jQuery("#ticket_topic").val();
+                var subject = jQuery("#ticketitem_subject").val();
+                if (topic == "") {
+                    new PNotify({ title: "Error", text: "Please enter topic", type: 'warning', hide: true });
+                    return false;
+                }
+                if (subject == "") {
+                    new PNotify({ title: "Error", text: "Please enter subject", type: 'warning', hide: true });
+                    return false;
+                }
+                return true;
+            });
+    });
+
+    function loadUsersTagInputs() {
+        // Use Bloodhound engine
+        var users = new Bloodhound({
+            datumTokenizer: Bloodhound.tokenizers.obj.whitespace('text'),
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            limit: 10,
+            prefetch: {
+                url: '/tickets/PrefetchUsers',
+                prepare: function(settings) {
+                    settings.type = "POST";
+                    settings.contentType = "application/json; charset=UTF-8";
+                    return settings;
+                },
+                remote: function(query, settings) {
+                    settings.type = "POST";
+                    settings.data = { q: query, foo: 'bar' }; // you can pass some data if you need to
+                    return settings;
+                }
+            }
+        });
+        // Kicks off the loading/processing of `local` and `prefetch`
+        users.initialize();
+        // Define element
+        elt = $('.assignedusersinput');
+        // Initialize
+        elt.tagsinput({ itemValue: 'value', itemText: 'text' });
+        // Attach Typeahead
+        elt.tagsinput('input').typeahead(null,
+            {
+                name: 'assignedusers',
+                valueKey: 'value',
+                displayKey: 'text',
+                source: users.ttAdapter(),
+                templates: '<p>{{text}}</p>'
+            }).bind('typeahead:selected',
+            $.proxy(function(obj, datum) {
+                    this.tagsinput('add', datum);
+                    this.tagsinput('input').typeahead('val', '');
+                },
+                elt));
+    }
+</script>
